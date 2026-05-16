@@ -2047,71 +2047,64 @@ async function fetchLiveOdds(){
   const btn=document.getElementById('liveBtn');
   btn.classList.add('loading');
   try{
+    // Betfair Exchange API — free delayed key for development
+    // URL: listMarketCatalogue to find the race market, then listMarketBook for prices
+    const venue=currentRace.venue||'';
+    const raceNum=currentRace.num;
     const date=formatDate(currentRace.date);
-    const jur=getJurisdiction(currentRace.venue);
-    const r1=await tabFetch(`https://api.tab.com.au/v1/tab-info-service/racing/dates/${date}/meetings?jurisdiction=${jur}`);
-    if(!r1.ok)throw new Error(`TAB API ${r1.status||'error'}`);
-    const d1=await r1.json();
-    let meeting=findMeeting(d1.meetings||[],currentRace.venue.toUpperCase());
-    // Fallback: try other jurisdictions if not found
-    if(!meeting){
-      for(const j of ['NSW','VIC','QLD','SA','WA','TAS','ACT','NT']){
-        if(j===jur) continue;
-        const rb=await tabFetch(`https://api.tab.com.au/v1/tab-info-service/racing/dates/${date}/meetings?jurisdiction=${j}`);
-        if(rb.ok){const db=await rb.json();meeting=findMeeting(db.meetings||[],currentRace.venue.toUpperCase());if(meeting)break;}
-      }
-    }
-    if(!meeting)throw new Error(`Venue not found: ${currentRace.venue}`);
-    const race=meeting.races?.find(r=>String(r.raceNumber)===String(currentRace.num));
-    if(!race?.raceLink)throw new Error(`Race ${currentRace.num} not found`);
-    const r2=await tabFetch(`https://api.tab.com.au${race.raceLink}?jurisdiction=${jur}`);
-    const d2=await r2.json();
 
-    // ── Build live odds map ──
+    // Step 1: Search Betfair for today's win market for this race
+    const searchUrl=`https://api.betfair.com/exchange/betting/rest/v1.0/listMarketCatalogue/`;
+    const filter={
+      eventTypeIds:['7'], // Horse Racing
+      marketCountries:['AU'],
+      marketTypeCodes:['WIN'],
+      marketStartTime:{from:date+'T00:00:00Z',to:date+'T23:59:59Z'},
+      textQuery:venue
+    };
+    const catalogueResp=await tabFetch(
+      `https://api.betfair.com/exchange/betting/rest/v1.0/listMarketCatalogue/?filter=${encodeURIComponent(JSON.stringify(filter))}&marketProjection=["RUNNER_METADATA","EVENT"]&maxResults=20&locale=en`
+    );
+    const markets=await catalogueResp.json();
+
+    // Find matching race by name/number
+    const targetMarket=markets.find(m=>{
+      const n=(m.marketName||'').toUpperCase();
+      return n.includes(venue.toUpperCase().split(' ')[0])&&
+             (n.includes('R'+raceNum)||n.includes('RACE '+raceNum));
+    })||markets[0];
+
+    if(!targetMarket){throw new Error('Race not found on Betfair');}
+
+    // Step 2: Get runner prices from listMarketBook
+    const bookResp=await tabFetch(
+      `https://api.betfair.com/exchange/betting/rest/v1.0/listMarketBook/?marketIds=["${targetMarket.marketId}"]&priceProjection={"priceData":["EX_BEST_OFFERS"]}`
+    );
+    const books=await bookResp.json();
+    const book=books[0];
+
     liveOddsData={};
-    const tabRunners=d2.runners||[];
-    tabRunners.forEach(runner=>{
-      const name=(runner.runnerName||'').toUpperCase().trim();
-      const win=parseFloat(runner.parimutuel?.returnWin||runner.fixedOdds?.returnWin||0);
-      if(name&&win>0){liveOddsData[name]=win;if(runner.tabNo)liveOddsData[+runner.tabNo]=win;}
-    });
-
-    // ── Scratching cross-reference ──
-    // TAB API marks scratched runners — detect any NEW scratchings not in CSV
-    const newlyScratched=[];
-    const rank1Name=currentRace.horses.filter(h=>!h.scratched)
-      .map(h=>{const{total}=scoreHorse(h);return{name:h.name,total};})
-      .sort((a,b)=>b.total-a.total)[0]?.name;
-
-    tabRunners.forEach(runner=>{
-      if(runner.scratched||runner.isScratched){
-        const name=(runner.runnerName||'').toUpperCase().trim();
-        // Find this horse in our race
-        const horse=currentRace.horses.find(h=>
-          fuzzyMatch(h.name.toUpperCase(),name)||
-          String(h.tab)===String(runner.tabNo)
-        );
-        if(horse&&!horse.scratched){
-          horse.scratched=true;
-          horse.lateScratching=true;
-          newlyScratched.push(horse.name);
-        }
+    (book?.runners||[]).forEach(runner=>{
+      const meta=targetMarket.runners?.find(r=>r.selectionId===runner.selectionId);
+      const name=(meta?.runnerName||'').toUpperCase().trim();
+      const price=runner.ex?.availableToBack?.[0]?.price;
+      if(name&&price){
+        liveOddsData[name]=price;
+        if(meta?.metadata?.CLOTH_NUMBER) liveOddsData[+meta.metadata.CLOTH_NUMBER]=price;
       }
     });
 
-    // ── Alert on new scratchings ──
-    if(newlyScratched.length>0){
-      const wasRank1=newlyScratched.some(n=>n.toUpperCase()===rank1Name?.toUpperCase());
-      showScratchingAlert(newlyScratched, wasRank1);
-    }
-
-    const oddsCount=Object.values(liveOddsData).filter(v=>typeof v==='number').length/2|0;
-    const scrMsg=newlyScratched.length>0?` · ${newlyScratched.length} new scratch${newlyScratched.length>1?'ings':'ing'}`:'';
-    toast(`✓ Live odds: ${oddsCount} runners${scrMsg}`,'success');
+    const count=Object.keys(liveOddsData).filter(k=>isNaN(+k)).length;
+    toast(`✓ Betfair live prices: ${count} runners`,'success');
     render(currentRace);
-  }catch(e){toast(`Live odds: ${e.message}`,'error');console.error('fetchLiveOdds error:',e);}
-  finally{btn.classList.remove('loading');}
+  }catch(e){
+    // Betfair needs auth — fall back to Racing Australia SP after results
+    toast('Betfair: '+e.message+' — use Results for SP','error');
+    console.error('fetchLiveOdds:',e);
+  }finally{btn.classList.remove('loading');}
 }
+
+
 
 // Fuzzy name match — handles NZ/IRE/GB suffixes
 function fuzzyMatch(a,b){
@@ -2151,46 +2144,85 @@ async function openResultsModal(){
 
   title.textContent=`R${currentRace.num} — ${currentRace.name||'Race '+currentRace.num}`;
   sub.textContent=`${currentRace.dist}m · ${currentRace.cls} · ${currentRace.venue} · ${currentRace.date}`;
-  body.innerHTML=`<div class="modal-loading"><span class="spinner">⏳</span>Fetching results from TAB...</div>`;
+  body.innerHTML=`<div class="modal-loading"><span class="spinner">⏳</span>Fetching results from Racing Australia...</div>`;
   modal.classList.add('open');
 
   const btn=document.getElementById('resultsBtn');
   btn.classList.add('loading');
 
   try{
-    const raceNum=currentRace.num;
-    let resultsMap={};
+    const raceNum=+currentRace.num;
+    const cacheKey=currentRace.venue+'_R'+raceNum;
 
     // Check cache
-    if(resultsCache[raceNum]){
-      resultsMap=resultsCache[raceNum];
-    }else{
-      const date=formatDate(currentRace.date);
-      const jur2=getJurisdiction(currentRace.venue);
-      const r1=await tabFetch(`https://api.tab.com.au/v1/tab-info-service/racing/dates/${date}/meetings?jurisdiction=${jur2}`);
-      if(!r1.ok)throw new Error(`TAB API ${r1.status||'error'}`);
-      const d1=await r1.json();
-      const meeting=findMeeting(d1.meetings||[],currentRace.venue.toUpperCase());
-      if(!meeting)throw new Error(`Venue not found: ${currentRace.venue}`);
-      const race=meeting.races?.find(r=>String(r.raceNumber)===String(raceNum));
-      if(!race?.raceLink)throw new Error(`Race not found`);
-      const r2=await tabFetch(`https://api.tab.com.au${race.raceLink}?jurisdiction=${jur2}`);
-      const d2=await r2.json();
-
-      const src=d2.results||d2.runners||[];
-      src.forEach(item=>{
-        const name=(item.runnerName||'').toUpperCase().trim();
-        const pos=+(item.finishingPosition??item.position??0);
-        const sp=parseFloat(item.parimutuel?.returnWin||item.fixedOdds?.returnWin||item.startingPrice||0);
-        const margin=item.margin||item.finishingMargin||'';
-        if(name&&pos>0){
-          resultsMap[name]={pos,sp,margin,tabNo:item.tabNo,jockey:item.jockeyName||''};
-        }
-      });
-      resultsCache[raceNum]=resultsMap;
+    if(resultsCache[cacheKey]){
+      renderResultsModal(resultsCache[cacheKey]);
+      return;
     }
 
+    // Build Racing Australia URL — same format as VBA Module_RaceResultsScraper
+    // https://racingaustralia.horse/FreeFields/Results.aspx?Key=2026May16,QLD,Doomben
+    const raw=currentRace.date||'';
+    const dateObj=raw?new Date(formatDate(raw)):new Date();
+    const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const dateStr=dateObj.getFullYear()+months[dateObj.getMonth()]+
+                  String(dateObj.getDate()).padStart(2,'0');
+
+    // State mapping — same as VBA states array
+    const stateMap={
+      'QLD':['DOOMBEN','EAGLE FARM','IPSWICH','GOLD COAST','TOOWOOMBA','SUNSHINE COAST',
+              'ROCKHAMPTON','TOWNSVILLE','CAIRNS','EMERALD','HOME HILL','TENNANT CREEK'],
+      'NSW':['RANDWICK','ROSEHILL','WARWICK FARM','KEMBLA GRANGE','GRAFTON','HAWKESBURY',
+              'NEWCASTLE','LISMORE','SCONE','MUSWELLBROOK','GOSFORD','ARMIDALE','TAMWORTH'],
+      'VIC':['FLEMINGTON','CAULFIELD','MOONEE VALLEY','SANDOWN','GEELONG','BALLARAT',
+              'BENDIGO','WODONGA','MORNINGTON','PAKENHAM'],
+      'SA':['MORPHETTVILLE','GAWLER','MURRAY BRIDGE','BALAKLAVA'],
+      'WA':['BELMONT PARK','ASCOT','PINJARRA','BUNBURY','CARNARVON'],
+      'TAS':['ELWICK','LAUNCESTON'],
+      'ACT':['THOROUGHBRED PARK'],
+    };
+
+    // Find state for venue
+    const venueUpper=currentRace.venue.toUpperCase();
+    let detectedState='QLD';
+    for(const[state,venues] of Object.entries(stateMap)){
+      if(venues.some(v=>venueUpper.includes(v)||v.includes(venueUpper.split(' ')[0]))){
+        detectedState=state; break;
+      }
+    }
+
+    // Try all states if needed (same as VBA)
+    const statesOrder=[detectedState,...Object.keys(stateMap).filter(s=>s!==detectedState)];
+    const venueName=currentRace.venue.replace(/\s+/g,'%20');
+
+    let htmlContent='';
+    for(const state of statesOrder){
+      const raUrl=`https://racingaustralia.horse/FreeFields/Results.aspx?Key=${dateStr},${state},${currentRace.venue.replace(/\s+/g,'%20')}`;
+      try{
+        // Use proxy for HTML (Racing Australia blocks direct cross-origin)
+        const proxyUrl=`https://api.codetabs.com/v1/proxy/?quest=${encodeURIComponent(raUrl)}`;
+        const resp=await fetch(proxyUrl,{headers:{'Accept':'text/html'}});
+        if(resp.ok){
+          const html=await resp.text();
+          if(html.includes('Finish F1')||html.includes("class='Finish")||
+             html.includes('race-strip-fields')){
+            htmlContent=html; break;
+          }
+        }
+      }catch(err){
+        console.log('RA try',state,'failed:',err.message);
+      }
+    }
+
+    if(!htmlContent){
+      throw new Error('Results not available yet — try after the race has run');
+    }
+
+    // Parse HTML — same patterns as VBA ParseRaceSection
+    const resultsMap=parseRacingAustraliaHTML(htmlContent, raceNum);
+    resultsCache[cacheKey]=resultsMap;
     renderResultsModal(resultsMap);
+
   }catch(e){
     body.innerHTML=`<div class="modal-loading" style="color:var(--red)">
       <span>⚠</span><br>${e.message}<br><br>
@@ -2199,6 +2231,52 @@ async function openResultsModal(){
   }finally{
     btn.classList.remove('loading');
   }
+}
+
+// Parse Racing Australia HTML — mirrors VBA Module_RaceResultsScraper logic
+function parseRacingAustraliaHTML(html, targetRaceNum){
+  const resultsMap={};
+
+  // Find race section by race number anchor
+  // Pattern: R1, R2 etc as section headers
+  const racePattern=new RegExp(
+    `[Rr]ace\\s*${targetRaceNum}[^\\d].*?(?=[Rr]ace\\s*${targetRaceNum+1}[^\\d]|$)`,
+    'si'
+  );
+  let section=html;
+  const raceMatch=html.match(racePattern);
+  if(raceMatch) section=raceMatch[0];
+
+  // Extract rows with finish positions
+  // Pattern: class='Finish F1'>1 or class="Finish F1">1
+  const rowPattern=/<tr[^>]*>[\s\S]*?<\/tr>/gi;
+  const rows=section.match(rowPattern)||[];
+
+  rows.forEach(row=>{
+    // Get finish position
+    const fpMatch=row.match(/class=["']Finish\s+F(\d+)["']>\s*(\d+)/i)||
+                  row.match(/class=["']Finish["'][^>]*>\s*(\d+)/i);
+    if(!fpMatch) return;
+    const pos=parseInt(fpMatch[fpMatch.length-1],10);
+    if(isNaN(pos)||pos<1||pos>30) return;
+
+    // Get horse name — <td class="horse">NAME</td>
+    const nameMatch=row.match(/<td[^>]*class=["']horse["'][^>]*>\s*([^<]+)\s*<\/td>/i);
+    if(!nameMatch) return;
+    const name=nameMatch[1].trim().toUpperCase();
+
+    // Get starting price — last <td> with $ or number
+    const spMatch=row.match(/\$([0-9]+\.?[0-9]*)[FNf]?\s*<\/td>/g);
+    const sp=spMatch?parseFloat(spMatch[spMatch.length-1].replace(/[^0-9.]/g,'')):0;
+
+    // Get margin — pattern: "L</td>" preceded by the margin text
+    const marginMatch=row.match(/([0-9.]+(?:\s*[LH])?|Long Neck|Short Neck|Neck|Head|SH|NSE)\s*<\/td>/i);
+    const margin=pos===1?'Winner':marginMatch?marginMatch[1].trim():'';
+
+    if(name) resultsMap[name]={pos,sp,margin};
+  });
+
+  return resultsMap;
 }
 
 function renderResultsModal(resultsMap){
