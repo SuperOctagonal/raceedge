@@ -1578,7 +1578,8 @@ function buildRaces({hdrs,rows},fname){
   buildMeetingTabs(keys);
   buildMeetingList(keys);
   buildUpNext();
-  setTimeout(()=>{if(currentRace)fetchLiveOdds();},800);
+  // Live odds fetch disabled until Australian server is configured
+  // setTimeout(()=>{if(currentRace)fetchLiveOdds();},800);
 
   toast(`✓ ${keys.length} races · ${rows.length} runners from ${fname}`,'success');
 }
@@ -1946,6 +1947,19 @@ function renderUpNext(){
       <div class="rr-rank1">🥇 ${rank1Name}${rank1Odds?' <span>'+rank1Odds+'</span>':''}</div>
     </div>`;
   }).join('');
+}
+
+// Get rank 1 horse for a race (used by dashboard + upnext)
+function getTopHorse(rc){
+  const active=(rc.horses||[]).filter(h=>!h.scratched);
+  if(!active.length) return null;
+  try{
+    const scored=active.map(h=>{
+      const s=scoreHorse(h);
+      return{name:h.name,total:+(s.total)||0};
+    }).filter(h=>h.total>0).sort((a,b)=>b.total-a.total);
+    return scored[0]||null;
+  }catch(e){return null;}
 }
 
 // ═══ PACE MAP — mirrors VBA Module_Pace_Analysis ═══
@@ -2800,22 +2814,11 @@ function showDashboard(){
   const live=allRacesSorted.filter(r=>r.jumpTime&&(now-r.jumpTime)<600000&&r.jumpTime<=now);
   const past=allRacesSorted.filter(r=>r.jumpTime&&(now-r.jumpTime)>=600000);
 
-  // ── Get rank1 for a race ──
-  function getRank1(rc){
-    const active=(rc.horses||[]).filter(h=>!h.scratched);
-    if(!active.length)return null;
-    try{
-      const scored=active.map(h=>{
-        const s=scoreHorse(h);
-        return{name:h.name,total:s.total};
-      }).sort((a,b)=>b.total-a.total);
-      return scored[0]||null;
-    }catch(e){return null;}
-  }
+  // getRank1 → use top-level getTopHorse(rc)
 
   // ── Race card ──
   function raceCard({key,rc,jumpTime},highlight){
-    const rank1=getRank1(rc);
+    const rank1=getTopHorse(rc);
     const scr=rc.horses.filter(h=>h.scratched).length;
     const runners=rc.horses.filter(h=>!h.scratched).length;
     const diff=jumpTime?jumpTime-now:null;
@@ -2855,15 +2858,17 @@ function showDashboard(){
   raceKeys.forEach(k=>{
     const rc=allRaces[k];
     const active=rc.horses.filter(h=>!h.scratched);
-    const scored=active.map(h=>{const{total}=scoreHorse(h);return{...h,total};}).sort((a,b)=>b.total-a.total);
-    if(scored[0]){
-      const mkt=scored[0].rawOdds;
-      const myO=calculateMatrixOdds(active.length,0);
-      if(mkt&&myO){
+    if(!active.length) return;
+    try{
+      const scored=active.map(h=>{const s=scoreHorse(h);return{...h,total:s.total};}).sort((a,b)=>b.total-a.total);
+      const oddsArr=calculateMatrixOdds(scored);
+      const myO=oddsArr&&oddsArr[0]?+oddsArr[0]:0;
+      const mkt=scored[0]?+scored[0].rawOdds:0;
+      if(mkt>0&&myO>0){
         const pct=(mkt-myO)/myO*100;
         if(pct>=50) alerts.push({horse:scored[0].name,key:k,rc,myO,mkt,pct});
       }
-    }
+    }catch(e){}
   });
 
   // ── HTML ──
@@ -3016,7 +3021,7 @@ function switchNav(tab){
   });
   var pages={
     racing: function(){ if(currentRace)render(currentRace); else document.getElementById('main').innerHTML='<div class="empty"><div class="empty-icon">🏇</div><div class="empty-title">Race Scorer</div><div class="empty-sub">Upload your EveryRace CSV to begin.</div></div>'; },
-    dashboard: showDashboard,
+    dashboard: function(){ document.getElementById('main').innerHTML=''; showDashboard(); },
     analysis: showAnalysis,
     betlog: showBetLog,
     results: showResultsHistory,
