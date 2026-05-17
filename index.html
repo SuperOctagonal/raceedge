@@ -3456,234 +3456,125 @@ function showHorseForm(e, idx){
   if(!card || !h) return;
 
   var pct = function(a,b){ return b>0 ? Math.round(a/b*100)+'%' : '0%'; };
-  var rec4 = function(s,w,p,extra){ return s+'-'+w+'-'+(p||0)+(extra!=null?'-'+extra:''); };
 
   // Career
-  var careerRec = rec4(h.starts, h.wins, h.seconds, h.thirds);
+  var careerRec = h.starts+'-'+h.wins+'-'+(h.seconds||0)+'-'+(h.thirds||0);
   var winSR = pct(h.wins, h.starts);
   var placeSR = pct((h.wins||0)+(h.places||0), h.starts);
 
-  // Course — starts-wins-places format
+  // Course / Distance
   var cS=h.courseStarts||0, cW=h.courseWins||0;
-  var courseRec = cS+'-'+cW;
-
-  // Distance
   var dS=h.distStarts||0, dW=h.distWins||0;
+  var courseRec = cS+'-'+cW;
   var distRec = dS+'-'+dW;
 
-  // Track conditions — starts-wins-places
+  // Track conditions — S-W-P
   var gS=h.goodStarts||0, gW=h.goodWins||0, gP=h.goodPlaces||0;
   var sS=h.softStarts||0, sW=h.softWins||0, sP=h.softPlaces||0;
   var hvS=h.heavyStarts||0, hvW=h.heavyWins||0, hvP=h.heavyPlaces||0;
   var fmS=h.firmStarts||0, fmW=h.firmWins||0, fmP=h.firmPlaces||0;
-  var gRec = gS+'-'+gW+'-'+gP;
-  var sRec = sS+'-'+sW+'-'+sP;
-  var hvRec = hvS+'-'+hvW+'-'+hvP;
-  var fmRec = fmS+'-'+fmW+'-'+fmP;
+  var gRec=gS+'-'+gW+'-'+gP, sRec=sS+'-'+sW+'-'+sP;
+  var hvRec=hvS+'-'+hvW+'-'+hvP, fmRec=fmS+'-'+fmW+'-'+fmP;
 
-  // Prize — strip commas for Prize Money column
-  var totalPrize = h['Total Prizemoney'];
-  var avgPrize = h['Average Prizemoney'];
-  var fmtPrize = function(v){ if(!v&&v!==0) return '--'; return '$'+(v>=1000?(v/1000).toFixed(0)+'k':v); };
-  var totStr = fmtPrize(totalPrize);
-  var avgStr = fmtPrize(avgPrize);
-
-  // Meta
-  var days = h['Days Since Last Start'];
-  var daysStr = days ? days+'d ago' : '--';
-  var bp = h['BP'] || '?';
-  var wt = h['Weight'] ? h['Weight']+'kg' : '--';
-  var spArr = (Array.isArray(h.lastSP)?h.lastSP:[h.lastSP]).filter(function(v){return v!=null&&v>0;});
-  var avgSP = spArr.length>0 ? '$'+(spArr.reduce(function(a,b){return a+b;},0)/spArr.length).toFixed(2) : '--';
-
-  // Recent runs — always show all 4, with full detail from lastRunDetails
-  var runLabels = ['Last run','2 runs ago','3 runs ago','4 runs ago'];
-  var runsHTML = '<div class="hfc-run-hdr"><span>Run</span><span>Track / Dist / Class</span><span>SP</span><span>Margin</span><span>Rtg</span></div>';
-  var anyRun = false;
-  for(var ri=0; ri<4; ri++){
-    var pos = h.lastFin ? h.lastFin[ri] : null;
-    var sp = Array.isArray(h.lastSP) ? h.lastSP[ri] : (ri===0?h.lastSP:null);
-    var dtl = h.lastRunDetails ? h.lastRunDetails[ri] : null;
-    var date = dtl&&dtl.date ? dtl.date : '';
-    var dist = dtl&&dtl.dist ? dtl.dist+'m' : '';
-    var crse = dtl&&dtl.crse ? dtl.crse : '';
-    var cls = dtl&&dtl.cls ? dtl.cls : '';
-    var margin = dtl&&dtl.margin!=null ? dtl.margin : (ri===0?h.lastMargin:null);
-    var rating = dtl&&dtl.rating ? dtl.rating : null;
-    var runWt = dtl&&dtl.wt ? dtl.wt+'kg' : '';
-
-    // Skip if truly no data at all
-    if(!pos && !sp && !date && !dist) {
-      if(ri===0) { runsHTML += '<div style="font-size:9px;color:#9ca3af;padding:4px 5px">No run history in CSV</div>'; }
-      continue;
-    }
-    anyRun = true;
-
-    var pc = pos===1 ? 'p1' : (pos&&pos<=3) ? 'p23' : 'px';
-    var rc2 = pos===1 ? 'w' : '';
-    var posStr = pos ? pos : '—';
-    var spStr = sp && !isNaN(+sp) ? '$'+(+sp).toFixed(2) : '—';
-    var mgStr = margin!=null ? margin+'L' : '—';
-    var rtgStr = rating ? rating.toFixed(1) : '—';
-    var detail = [crse,dist,cls].filter(Boolean).join(' · ');
-    var dateShort = date ? date.replace(/(\d+)\/(\d+)\/(\d+)/,'$1/$2') : '';
-    // Show pos/field — we don't have field size per run from CSV, just show pos
-    var posField = pos ? pos : '—';
-
-    runsHTML += '<div class="hfc-run '+rc2+'">';
-    runsHTML += '<div class="hfc-rpos '+pc+'">'+posField+'</div>';
-    runsHTML += '<div class="hfc-ri">'+(dateShort?'<span style="font-size:7px;color:#9ca3af">'+dateShort+'</span><br>':'')+(detail||runLabels[ri])+(runWt?'<span style="font-size:7px;color:#9ca3af"> · '+runWt+'</span>':'')+'</div>';
-    runsHTML += '<div class="hfc-rsp">'+spStr+'</div>';
-    runsHTML += '<div class="hfc-rm">'+mgStr+'</div>';
-    runsHTML += '<div class="hfc-rdtl">'+rtgStr+'</div>';
-    runsHTML += '</div>';
-  }
-
-  var html = '';
-  // Header — name + barrier·weight inline
-  html += '<div class="hfc-hdr"><div class="hfc-name">'+h.name+' <span style="font-size:10px;font-weight:500;opacity:.75">('+bp+') · '+wt+'</span></div><div style="font-size:9px;color:rgba(255,255,255,.6)">'+daysStr+'</div></div>';
-
-  // Prize + SP row
-  html += '<div class="hfc-prize-row"><span>Total Prize: <b>'+totStr+'</b></span><span>Avg Prize: <b>'+avgStr+'</b></span><span>Avg SP: <b>'+avgSP+'</b></span></div>';
-
-  // Jockey + Trainer
-  html += '<div class="hfc-meta"><span>J: <b>'+(h.jname||'--')+'</b></span><span>T: <b>'+(h.trainer||'--')+'</b></span></div>';
-
-  // Row 1: Career record
-  html += '<div class="hfc-stats">';
-  html += '<div class="hfc-stat"><div class="hfc-sv">'+careerRec+'</div><div class="hfc-sl">Career S-W-2-3</div></div>';
-  html += '<div class="hfc-stat"><div class="hfc-sv '+(parseInt(winSR)>=20?'g':'')+'">'+winSR+'</div><div class="hfc-sl">Win SR</div></div>';
-  html += '<div class="hfc-stat"><div class="hfc-sv '+(parseInt(placeSR)>=40?'g':'')+'">'+placeSR+'</div><div class="hfc-sl">Place SR</div></div>';
-  html += '<div class="hfc-stat"><div class="hfc-sv">'+avgSP+'</div><div class="hfc-sl">Avg SP</div></div>';
-  html += '</div>';
-
-  // Row 2: Course + Distance
-  html += '<div class="hfc-stats" style="border-top:1px solid #e5e7eb">';
-  html += '<div class="hfc-stat"><div class="hfc-sv">'+courseRec+'</div><div class="hfc-sl">Course S-W</div></div>';
-  html += '<div class="hfc-stat"><div class="hfc-sv">'+pct(cW,cS)+'</div><div class="hfc-sl">Course SR</div></div>';
-  html += '<div class="hfc-stat"><div class="hfc-sv">'+distRec+'</div><div class="hfc-sl">Dist S-W</div></div>';
-  html += '<div class="hfc-stat"><div class="hfc-sv">'+pct(dW,dS)+'</div><div class="hfc-sl">Dist SR</div></div>';
-  html += '</div>';
-
-  // Row 3: Track conditions — S-W-P format
-  // Track cond — colour best condition
-  var bestCond='', bestWinPct=0;
-  if(gS>0&&gW/gS>bestWinPct){bestWinPct=gW/gS;bestCond='good';}
-  if(sS>0&&sW/sS>bestWinPct){bestWinPct=sW/sS;bestCond='soft';}
-  if(hvS>0&&hvW/hvS>bestWinPct){bestWinPct=hvW/hvS;bestCond='heavy';}
-  if(fmS>0&&fmW/fmS>bestWinPct){bestWinPct=fmW/fmS;bestCond='firm';}
+  // Best condition highlight
+  var bestCond='', bestPct=0;
+  if(gS>0&&gW/gS>bestPct){bestPct=gW/gS;bestCond='good';}
+  if(sS>0&&sW/sS>bestPct){bestPct=sW/sS;bestCond='soft';}
+  if(hvS>0&&hvW/hvS>bestPct){bestPct=hvW/hvS;bestCond='heavy';}
+  if(fmS>0&&fmW/fmS>bestPct){bestPct=fmW/fmS;bestCond='firm';}
   var condBg={good:'#f0fdf4',soft:'#fffbeb',heavy:'#f3f4f6',firm:'#fff7ed'};
   var mkCond=function(rec,cond,label,color){
     var bg=bestCond===cond?'background:'+condBg[cond]+';':'';
     return '<div class="hfc-stat" style="'+bg+'"><div class="hfc-sv">'+rec+'</div><div class="hfc-sl" style="color:'+color+'">'+label+'</div></div>';
   };
-  html += '<div class="hfc-stats" style="border-top:1px solid #e5e7eb">';
-  html += mkCond(fmRec,'firm','Firm S-W-P','#b45309');
-  html += mkCond(gRec,'good','Good S-W-P','#059669');
-  html += mkCond(sRec,'soft','Soft S-W-P','#d97706');
-  html += mkCond(hvRec,'heavy','Heavy S-W-P','#6b7280');
 
-  html += '</div>';
-  // Recent runs — always show all 4, with full detail from lastRunDetails
-  var runLabels = ['Last run','2 runs ago','3 runs ago','4 runs ago'];
-  var runsHTML = '<div class="hfc-run-hdr"><span>Run</span><span>Track / Dist / Class</span><span>SP</span><span>Margin</span><span>Rtg</span></div>';
-  var anyRun = false;
-  for(var ri=0; ri<4; ri++){
-    var pos = h.lastFin ? h.lastFin[ri] : null;
-    var sp = Array.isArray(h.lastSP) ? h.lastSP[ri] : (ri===0?h.lastSP:null);
-    var dtl = h.lastRunDetails ? h.lastRunDetails[ri] : null;
-    var date = dtl&&dtl.date ? dtl.date : '';
-    var dist = dtl&&dtl.dist ? dtl.dist+'m' : '';
-    var crse = dtl&&dtl.crse ? dtl.crse : '';
-    var cls = dtl&&dtl.cls ? dtl.cls : '';
-    var margin = dtl&&dtl.margin!=null ? dtl.margin : (ri===0?h.lastMargin:null);
-    var rating = dtl&&dtl.rating ? dtl.rating : null;
-    var runWt = dtl&&dtl.wt ? dtl.wt+'kg' : '';
+  // Prize
+  var totalPrize=h['Total Prizemoney'], avgPrize=h['Average Prizemoney'];
+  var fmtP=function(v){if(!v&&v!==0)return'--';return'$'+(v>=1000?(v/1000).toFixed(0)+'k':v);};
+  var totStr=fmtP(totalPrize), avgStr=fmtP(avgPrize);
 
-    // Skip if truly no data at all
-    if(!pos && !sp && !date && !dist) {
-      if(ri===0) { runsHTML += '<div style="font-size:9px;color:#9ca3af;padding:4px 5px">No run history in CSV</div>'; }
-      continue;
-    }
-    anyRun = true;
-
-    var pc = pos===1 ? 'p1' : (pos&&pos<=3) ? 'p23' : 'px';
-    var rc2 = pos===1 ? 'w' : '';
-    var posStr = pos ? pos : '—';
-    var spStr = sp && !isNaN(+sp) ? '$'+(+sp).toFixed(2) : '—';
-    var mgStr = margin!=null ? margin+'L' : '—';
-    var rtgStr = rating ? rating.toFixed(1) : '—';
-    var detail = [crse,dist,cls].filter(Boolean).join(' · ');
-    var dateShort = date ? date.replace(/(\d+)\/(\d+)\/(\d+)/,'$1/$2') : '';
-    // Show pos/field — we don't have field size per run from CSV, just show pos
-    var posField = pos ? pos : '—';
-
-    runsHTML += '<div class="hfc-run '+rc2+'">';
-    runsHTML += '<div class="hfc-rpos '+pc+'">'+posField+'</div>';
-    runsHTML += '<div class="hfc-ri">'+(dateShort?'<span style="font-size:7px;color:#9ca3af">'+dateShort+'</span><br>':'')+(detail||runLabels[ri])+(runWt?'<span style="font-size:7px;color:#9ca3af"> · '+runWt+'</span>':'')+'</div>';
-    runsHTML += '<div class="hfc-rsp">'+spStr+'</div>';
-    runsHTML += '<div class="hfc-rm">'+mgStr+'</div>';
-    runsHTML += '<div class="hfc-rdtl">'+rtgStr+'</div>';
-    runsHTML += '</div>';
-  }
-
-  var html = '';
-  // Header — name + barrier·weight inline
-  html += '<div class="hfc-hdr"><div class="hfc-name">'+h.name+' <span style="font-size:10px;font-weight:500;opacity:.75">('+bp+') · '+wt+'</span></div><div style="font-size:9px;color:rgba(255,255,255,.6)">'+daysStr+'</div></div>';
-
-  // Prize + SP row
-  html += '<div class="hfc-prize-row"><span>Total Prize: <b>'+totStr+'</b></span><span>Avg Prize: <b>'+avgStr+'</b></span><span>Avg SP: <b>'+avgSP+'</b></span></div>';
-
-  // Jockey + Trainer
-  html += '<div class="hfc-meta"><span>J: <b>'+(h.jname||'--')+'</b></span><span>T: <b>'+(h.trainer||'--')+'</b></span></div>';
-
-  // Row 1: Career record
-  html += '<div class="hfc-stats">';
-  html += '<div class="hfc-stat"><div class="hfc-sv">'+careerRec+'</div><div class="hfc-sl">Career S-W-2-3</div></div>';
-  html += '<div class="hfc-stat"><div class="hfc-sv '+(parseInt(winSR)>=20?'g':'')+'">'+winSR+'</div><div class="hfc-sl">Win SR</div></div>';
-  html += '<div class="hfc-stat"><div class="hfc-sv '+(parseInt(placeSR)>=40?'g':'')+'">'+placeSR+'</div><div class="hfc-sl">Place SR</div></div>';
-  html += '<div class="hfc-stat"><div class="hfc-sv">'+avgSP+'</div><div class="hfc-sl">Avg SP</div></div>';
-  html += '</div>';
-
-  // Row 2: Course + Distance
-  html += '<div class="hfc-stats" style="border-top:1px solid #e5e7eb">';
-  html += '<div class="hfc-stat"><div class="hfc-sv">'+courseRec+'</div><div class="hfc-sl">Course S-W</div></div>';
-  html += '<div class="hfc-stat"><div class="hfc-sv">'+pct(cW,cS)+'</div><div class="hfc-sl">Course SR</div></div>';
-  html += '<div class="hfc-stat"><div class="hfc-sv">'+distRec+'</div><div class="hfc-sl">Dist S-W</div></div>';
-  html += '<div class="hfc-stat"><div class="hfc-sv">'+pct(dW,dS)+'</div><div class="hfc-sl">Dist SR</div></div>';
-  html += '</div>';
-
-  // Row 3: Track conditions — S-W-P format
-  // Track cond — colour best condition
-  var bestCond='', bestWinPct=0;
-  if(gS>0&&gW/gS>bestWinPct){bestWinPct=gW/gS;bestCond='good';}
-  if(sS>0&&sW/sS>bestWinPct){bestWinPct=sW/sS;bestCond='soft';}
-  if(hvS>0&&hvW/hvS>bestWinPct){bestWinPct=hvW/hvS;bestCond='heavy';}
-  html += '<div class="hfc-stats" style="border-top:1px solid #e5e7eb">';
-  html += '<div class="hfc-stat'+(bestCond==="good"?" hfc-best":"")+'" style="'+(bestCond==="good"?"background:#f0fdf4;":"")+'">';
-  html += '<div class="hfc-sv">'+gRec+'</div><div class="hfc-sl" style="color:#059669">Good S-W-P</div></div>';
-  html += '<div class="hfc-stat'+(bestCond==="soft"?" hfc-best":"")+'" style="'+(bestCond==="soft"?"background:#fffbeb;":"")+'">';
-  html += '<div class="hfc-sv">'+sRec+'</div><div class="hfc-sl" style="color:#d97706">Soft S-W-P</div></div>';
-  html += '<div class="hfc-stat'+(bestCond==="heavy"?" hfc-best":"")+'" style="'+(bestCond==="heavy"?"background:#f3f4f6;":"")+'">';
-  html += '<div class="hfc-sv">'+hvRec+'</div><div class="hfc-sl" style="color:#6b7280">Heavy S-W-P</div></div>';
-  html += '<div class="hfc-stat"><div class="hfc-sv">'+(h.synthStarts>0?h.synthStarts+'-'+h.synthWins+'-'+h.synthPlaces:'—')+'</div><div class="hfc-sl" style="color:#7c3aed">Synth S-W-P</div></div>';
-  html += '</div>';
+  // Meta
+  var days=h['Days Since Last Start'], daysStr=days?days+'d ago':'--';
+  var bp=h['BP']||'?', wt=h['Weight']?h['Weight']+'kg':'--';
+  var spArr=(Array.isArray(h.lastSP)?h.lastSP:[h.lastSP]).filter(function(v){return v!=null&&v>0;});
+  var avgSP=spArr.length>0?'$'+(spArr.reduce(function(a,b){return a+b;},0)/spArr.length).toFixed(2):'--';
 
   // Recent runs
-  html += '<div class="hfc-runs"><div class="hfc-rt">Recent Runs</div>'+runsHTML+'</div>';
-  html += '<div class="hfc-foot"><span style="font-size:9px;color:#9ca3af">EveryRace data · PuntingForm coming soon</span></div>';
+  var runsHTML='<div class="hfc-run-hdr"><span>Pos</span><span>Date · Track · Dist · Class</span><span>SP</span><span>Margin</span><span>Rtg</span></div>';
+  for(var ri=0;ri<4;ri++){
+    var pos=h.lastFin?h.lastFin[ri]:null;
+    var sp=Array.isArray(h.lastSP)?h.lastSP[ri]:(ri===0?h.lastSP:null);
+    var dtl=h.lastRunDetails?h.lastRunDetails[ri]:null;
+    var date=dtl&&dtl.date?dtl.date:'';
+    var dist2=dtl&&dtl.dist?dtl.dist+'m':'';
+    var crse=dtl&&dtl.crse?dtl.crse:'';
+    var cls=dtl&&dtl.cls?dtl.cls:'';
+    var margin=dtl&&dtl.margin!=null?dtl.margin:(ri===0?h.lastMargin:null);
+    var rating=dtl&&dtl.rating?dtl.rating:null;
+    var runWt=dtl&&dtl.wt?dtl.wt+'kg':'';
+    if(!pos&&!sp&&!date&&!dist2) continue;
+    var pc=pos===1?'p1':(pos&&pos<=3)?'p23':'px';
+    var rc2=pos===1?'w':'';
+    var posStr=pos?pos:'—';
+    var spStr=sp&&!isNaN(+sp)?'$'+(+sp).toFixed(2):'—';
+    var mgStr=margin!=null?margin+'L':'—';
+    var rtgStr=rating?rating.toFixed(1):'—';
+    var dateShort=date?date.replace(/(\d{2})\/(\d{2})\/(\d{4})/,'$1/$2'):'';
+    var detail=[dateShort,crse,dist2,cls].filter(Boolean).join(' · ');
+    runsHTML+='<div class="hfc-run '+rc2+'">';
+    runsHTML+='<div class="hfc-rpos '+pc+'">'+posStr+'</div>';
+    runsHTML+='<div class="hfc-ri">'+(detail||'—')+(runWt?'<span style="font-size:7px;color:#9ca3af"> '+runWt+'</span>':'')+'</div>';
+    runsHTML+='<div class="hfc-rsp">'+spStr+'</div>';
+    runsHTML+='<div class="hfc-rm">'+mgStr+'</div>';
+    runsHTML+='<div class="hfc-rdtl">'+rtgStr+'</div>';
+    runsHTML+='</div>';
+  }
+  if(runsHTML.indexOf('hfc-run ') === -1) runsHTML+='<div style="font-size:9px;color:#9ca3af;padding:4px 5px">No run history in CSV</div>';
 
-  card.innerHTML = html;
-  card.style.display = 'block';
+  var html='';
+  html+='<div class="hfc-hdr"><div class="hfc-name">'+h.name+' <span style="font-size:10px;font-weight:500;opacity:.75">('+bp+') · '+wt+'</span></div><div style="font-size:9px;color:rgba(255,255,255,.6)">'+daysStr+'</div></div>';
+  html+='<div class="hfc-prize-row"><span>Total Prize: <b>'+totStr+'</b></span><span>Avg Prize: <b>'+avgStr+'</b></span><span>Avg SP: <b>'+avgSP+'</b></span></div>';
+  html+='<div class="hfc-meta"><span>J: <b>'+(h.jname||'--')+'</b></span><span>T: <b>'+(h.trainer||'--')+'</b></span></div>';
 
-  var cardW = 400;
-  var left = e.clientX + 14;
-  var top2 = e.clientY - 100;
-  if(left+cardW > window.innerWidth-8) left = e.clientX-cardW-14;
-  if(top2 < 8) top2 = 8;
-  if(top2+560 > window.innerHeight) top2 = window.innerHeight-565;
-  card.style.left = left+'px';
-  card.style.top = top2+'px';
+  // Career
+  html+='<div class="hfc-stats">';
+  html+='<div class="hfc-stat"><div class="hfc-sv">'+careerRec+'</div><div class="hfc-sl">Career S-W-2-3</div></div>';
+  html+='<div class="hfc-stat"><div class="hfc-sv '+(parseInt(winSR)>=20?'g':'')+'">'+winSR+'</div><div class="hfc-sl">Win SR</div></div>';
+  html+='<div class="hfc-stat"><div class="hfc-sv '+(parseInt(placeSR)>=40?'g':'')+'">'+placeSR+'</div><div class="hfc-sl">Place SR</div></div>';
+  html+='<div class="hfc-stat"><div class="hfc-sv">'+avgSP+'</div><div class="hfc-sl">Avg SP</div></div>';
+  html+='</div>';
+
+  // Course + Distance
+  html+='<div class="hfc-stats" style="border-top:1px solid #e5e7eb">';
+  html+='<div class="hfc-stat"><div class="hfc-sv">'+courseRec+'</div><div class="hfc-sl">Course S-W</div></div>';
+  html+='<div class="hfc-stat"><div class="hfc-sv">'+pct(cW,cS)+'</div><div class="hfc-sl">Course SR</div></div>';
+  html+='<div class="hfc-stat"><div class="hfc-sv">'+distRec+'</div><div class="hfc-sv"></div><div class="hfc-sl">Dist S-W</div></div>';
+  html+='<div class="hfc-stat"><div class="hfc-sv">'+pct(dW,dS)+'</div><div class="hfc-sl">Dist SR</div></div>';
+  html+='</div>';
+
+  // Track conditions — Firm · Good · Soft · Heavy
+  html+='<div class="hfc-stats" style="border-top:1px solid #e5e7eb">';
+  html+=mkCond(fmRec,'firm','Firm S-W-P','#b45309');
+  html+=mkCond(gRec,'good','Good S-W-P','#059669');
+  html+=mkCond(sRec,'soft','Soft S-W-P','#d97706');
+  html+=mkCond(hvRec,'heavy','Heavy S-W-P','#6b7280');
+  html+='</div>';
+
+  // Recent runs
+  html+='<div class="hfc-runs"><div class="hfc-rt">Recent Runs</div>'+runsHTML+'</div>';
+  html+='<div class="hfc-foot"><span style="font-size:9px;color:#9ca3af">EveryRace data · PuntingForm coming soon</span></div>';
+
+  card.innerHTML=html;
+  card.style.display='block';
+
+  var cardW=440;
+  var left=e.clientX+14;
+  var top2=e.clientY-100;
+  if(left+cardW>window.innerWidth-8) left=e.clientX-cardW-14;
+  if(top2<8) top2=8;
+  if(top2+560>window.innerHeight) top2=window.innerHeight-565;
+  card.style.left=left+'px';
+  card.style.top=top2+'px';
 }
 function hideHorseForm(){
   formCardTimer = setTimeout(function(){
