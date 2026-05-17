@@ -1553,7 +1553,7 @@ function buildRaces({hdrs,rows},fname){
       'Wrat':safeNum(col(r,'Wrat')),
       'Trat':safeNum(col(r,'Trat')),
       'Average Prizemoney':safeNum(col(r,'Average Prizemoney')),
-      'Total Prizemoney':safeNum(col(r,'Total Prizemoney'))||safeNum(col(r,'Career Prizemoney'))||(col(r,'Prize Money')?safeNum((col(r,'Prize Money')||'').replace(/,/g,'')):null)||null,
+      'Total Prizemoney':safeNum(col(r,'Total Prizemoney'))||safeNum(col(r,'Career Prizemoney'))||(col(r,'prize')?safeNum((col(r,'prize')||'').replace(/,/g,'')):null)||null,
       'BP':safeNum(col(r,'BP')),
       'Weight':safeNum(col(r,'Weight')),
       'Days Since Last Start':safeNum(col(r,'Days Since Last Start')),
@@ -1578,6 +1578,7 @@ function buildRaces({hdrs,rows},fname){
       goodWins:gw||0, goodStarts:gs||0, goodPlaces:safeNum(col(r,'Good Places'))||0,
       softWins:sw||0, softStarts:ss||0, softPlaces:safeNum(col(r,'Soft Places'))||0,
       heavyWins:hw||0, heavyStarts:hs||0, heavyPlaces:safeNum(col(r,'Heavy Places'))||0,
+      synthStarts:0, synthWins:0, synthPlaces:0,
       avgSP, spWeight,
       avgFin, finWeight,
       jocWin:jocStarts>0?jocWins/jocStarts:null,
@@ -3522,9 +3523,11 @@ function showHorseForm(e, idx){
     var rtgStr = rating ? rating.toFixed(1) : '—';
     var detail = [crse,dist,cls].filter(Boolean).join(' · ');
     var dateShort = date ? date.replace(/(\d+)\/(\d+)\/(\d+)/,'$1/$2') : '';
+    // Show pos/field — we don't have field size per run from CSV, just show pos
+    var posField = pos ? pos : '—';
 
     runsHTML += '<div class="hfc-run '+rc2+'">';
-    runsHTML += '<div class="hfc-rpos '+pc+'">'+posStr+'</div>';
+    runsHTML += '<div class="hfc-rpos '+pc+'">'+posField+'</div>';
     runsHTML += '<div class="hfc-ri">'+(dateShort?'<span style="font-size:7px;color:#9ca3af">'+dateShort+'</span><br>':'')+(detail||runLabels[ri])+(runWt?'<span style="font-size:7px;color:#9ca3af"> · '+runWt+'</span>':'')+'</div>';
     runsHTML += '<div class="hfc-rsp">'+spStr+'</div>';
     runsHTML += '<div class="hfc-rm">'+mgStr+'</div>';
@@ -3559,11 +3562,19 @@ function showHorseForm(e, idx){
   html += '</div>';
 
   // Row 3: Track conditions — S-W-P format
+  // Track cond — colour best condition
+  var bestCond='', bestWinPct=0;
+  if(gS>0&&gW/gS>bestWinPct){bestWinPct=gW/gS;bestCond='good';}
+  if(sS>0&&sW/sS>bestWinPct){bestWinPct=sW/sS;bestCond='soft';}
+  if(hvS>0&&hvW/hvS>bestWinPct){bestWinPct=hvW/hvS;bestCond='heavy';}
   html += '<div class="hfc-stats" style="border-top:1px solid #e5e7eb">';
-  html += '<div class="hfc-stat"><div class="hfc-sv">'+gRec+'</div><div class="hfc-sl" style="color:#059669">Good S-W-P</div></div>';
-  html += '<div class="hfc-stat"><div class="hfc-sv">'+sRec+'</div><div class="hfc-sl" style="color:#d97706">Soft S-W-P</div></div>';
-  html += '<div class="hfc-stat"><div class="hfc-sv">'+hvRec+'</div><div class="hfc-sl" style="color:#6b7280">Heavy S-W-P</div></div>';
-  html += '<div class="hfc-stat"><div class="hfc-sv">—</div><div class="hfc-sl" style="color:#7c3aed">Synth S-W-P</div></div>';
+  html += '<div class="hfc-stat'+(bestCond==="good"?" hfc-best":"")+'" style="'+(bestCond==="good"?"background:#f0fdf4;":"")+'">';
+  html += '<div class="hfc-sv">'+gRec+'</div><div class="hfc-sl" style="color:#059669">Good S-W-P</div></div>';
+  html += '<div class="hfc-stat'+(bestCond==="soft"?" hfc-best":"")+'" style="'+(bestCond==="soft"?"background:#fffbeb;":"")+'">';
+  html += '<div class="hfc-sv">'+sRec+'</div><div class="hfc-sl" style="color:#d97706">Soft S-W-P</div></div>';
+  html += '<div class="hfc-stat'+(bestCond==="heavy"?" hfc-best":"")+'" style="'+(bestCond==="heavy"?"background:#f3f4f6;":"")+'">';
+  html += '<div class="hfc-sv">'+hvRec+'</div><div class="hfc-sl" style="color:#6b7280">Heavy S-W-P</div></div>';
+  html += '<div class="hfc-stat"><div class="hfc-sv">'+(h.synthStarts>0?h.synthStarts+'-'+h.synthWins+'-'+h.synthPlaces:'—')+'</div><div class="hfc-sl" style="color:#7c3aed">Synth S-W-P</div></div>';
   html += '</div>';
 
   // Recent runs
