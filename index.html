@@ -104,7 +104,7 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bor
 /* ── TABLE VIEW — Option A: Excel spreadsheet style ── */
 .tbl-wrap{flex:1;overflow:auto;background:#e8eaed;margin:0;padding:0}
 .race-tbl{
-  width:max-content;min-width:100%;border-collapse:collapse;
+  width:100%;border-collapse:collapse;
   font-family:'Segoe UI',system-ui,sans-serif;font-size:11px;
   background:#fff;border:1px solid #bcc0c8;
 }
@@ -169,7 +169,7 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bor
 .fpx{background:#e2e8f0;color:#94a3b8}
 
 /* Record */
-.race-tbl td.c-rec{width:68px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:#64748b}
+.race-tbl td.c-rec{width:68px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:#111827}
 
 /* Score group cells — uniform size, score + rank inline */
 .race-tbl td.c-grp{width:56px;text-align:center;position:relative;cursor:help;padding:0 6px!important}
@@ -182,10 +182,10 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bor
 /* Weight / Time score */
 
 /* Output cells — all same 11px */
-.race-tbl td.c-score{width:42px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700}
-.race-tbl td.c-myodds{width:50px;text-align:right;padding-right:8px!important;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#15803d}
-.race-tbl td.c-liveodds{width:46px;text-align:right;padding-right:8px!important;font-family:'JetBrains Mono',monospace;font-size:11px}
-.race-tbl td.c-val{width:48px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700}
+.race-tbl td.c-score{width:38px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700}
+.race-tbl td.c-myodds{width:46px;text-align:right;padding-right:8px!important;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:#15803d}
+.race-tbl td.c-liveodds{width:44px;text-align:right;padding-right:8px!important;font-family:'JetBrains Mono',monospace;font-size:11px}
+.race-tbl td.c-val{width:44px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700}
 .race-tbl td.c-bet{width:46px;text-align:center;padding:0 4px!important}
 .race-tbl td.c-pace{width:110px;min-width:0;padding:0 6px!important;white-space:nowrap}
 
@@ -2221,7 +2221,7 @@ function render(rc){
       <th style="width:28px">#</th>
       <th class="th-horse" style="width:170px;min-width:0;text-align:left">Horse / Jockey / Trainer</th>
       <th style="width:72px">Last 4</th>
-      <th style="width:76px">Record</th>
+      <th style="width:68px">Record</th>
       <th class="th-form" style="width:62px">Form</th>
       <th class="th-speed" style="width:62px">Speed</th>
       <th class="th-cond" style="width:62px" id="th-cond">${tcLabel}</th>
