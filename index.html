@@ -692,10 +692,12 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bor
   /* Right rail - hide on mobile */
   .rightrail { display:none !important }
 
-  /* Mobile scroll - override desktop overflow:hidden */
+  /* Mobile scroll - override ALL overflow:hidden */
   html, body { height:auto !important; overflow-y:auto !important; overflow-x:hidden !important }
-  .layout { overflow:visible !important; height:auto !important }
-  .main { min-height:calc(100vh - 160px);overflow:visible;padding-bottom:72px }
+  .layout { overflow:visible !important; height:auto !important; min-height:0 }
+  .main { overflow:visible !important; height:auto !important; min-height:0; padding-bottom:72px }
+  /* Kill flex:1 scroll containers so content flows naturally */
+  .main > div { flex:none !important; overflow:visible !important; height:auto !important; max-height:none !important }
   body { padding-bottom:56px }
 
   /* Race table - hide non-essential columns on mobile */
@@ -3353,17 +3355,19 @@ function switchNav(tab){
     }
   });
   var main=document.getElementById('main');
+  // Allow scrolling on pages with long content
   if(tab==='racing'){
+    main.style.overflowY='hidden';
     if(currentRace)render(currentRace);
     else main.innerHTML='<div class="empty"><div class="empty-icon">🏇</div><div class="empty-title">Race Scorer</div><div class="empty-sub">Upload your EveryRace CSV to begin.</div></div>';
-  } else if(tab==='dashboard'){main.innerHTML='';showDashboard();}
-  else if(tab==='analysis')showAnalysis();
-  else if(tab==='betlog')showBetLog();
-  else if(tab==='results')showResultsHistory();
-  else if(tab==='alerts')showValueAlerts();
-  else if(tab==='settings')showSettings();
-  else if(tab==='trackcond')showTrackConditions();
-  else if(tab==='help')showHelp();
+  } else if(tab==='dashboard'){main.style.overflowY='auto';main.innerHTML='';showDashboard();}
+  else if(tab==='analysis'){main.style.overflowY='auto';showAnalysis();}
+  else if(tab==='betlog'){main.style.overflowY='auto';showBetLog();}
+  else if(tab==='results'){main.style.overflowY='auto';showResultsHistory();}
+  else if(tab==='alerts'){main.style.overflowY='auto';showValueAlerts();}
+  else if(tab==='settings'){main.style.overflowY='auto';showSettings();}
+  else if(tab==='trackcond'){main.style.overflowY='auto';showTrackConditions();}
+  else if(tab==='help'){main.style.overflowY='auto';showHelp();}
 }
 
 function showAnalysis(){
