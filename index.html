@@ -2416,6 +2416,9 @@ function render(rc){
   </thead>`;
 
   main.innerHTML=hdrHTML+`<div class="tbl-wrap"><table class="race-tbl">${tblHeader}<tbody>${rowsHTML}${scrHTML}</tbody></table></div>`;
+  // Show pills on mobile, hide on desktop
+  var pills=document.getElementById('mob-race-pills');
+  if(pills) pills.style.display=window.innerWidth<=768?'flex':'none';
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -4537,13 +4540,12 @@ function mobTabNav(tab){
 }
 
 function mobSetTC(cond){
-  // Sync with desktop track condition buttons
+  // Sync mobile button active state
   document.querySelectorAll('.mob-tc-btn').forEach(function(b){b.classList.remove('active')});
   event.target.classList.add('active');
-  // Trigger the desktop TC buttons
-  var map={'Good':'tcGood','Soft':'tcSoft','Heavy':'tcHeavy','Synth':'tcSynth'};
-  var desktopBtn=document.getElementById(map[cond]);
-  if(desktopBtn) desktopBtn.click();
+  // Trigger the desktop TC function directly
+  var map={'Good':'good','Soft':'soft','Heavy':'heavy','Synth':'synthetic'};
+  if(map[cond]) setTrackCond(map[cond]);
 }
 
 // Init mobile UI on load
