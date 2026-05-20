@@ -692,12 +692,26 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bor
   /* Right rail - hide on mobile */
   .rightrail { display:none !important }
 
-  /* Main content */
-  .main { min-height:calc(100vh - 160px);overflow:visible;padding-bottom:56px }
+  /* Mobile scroll - override desktop overflow:hidden */
+  html, body { height:auto !important; overflow-y:auto !important; overflow-x:hidden !important }
+  .layout { overflow:visible !important; height:auto !important }
+  .main { min-height:calc(100vh - 160px);overflow:visible;padding-bottom:72px }
+  body { padding-bottom:56px }
+
+  /* Race table - hide non-essential columns on mobile */
+  .race-tbl .c-rec,
+  .race-tbl .c-grp,
+  .race-tbl .c-val,
+  .race-tbl .th-rec,
+  .race-tbl .th-form,
+  .race-tbl .th-speed,
+  .race-tbl .th-cond,
+  .race-tbl .th-conn,
+  .race-tbl .th-val { display:none }
 
   /* Race table - horizontal scroll */
   .tbl-wrap { overflow-x:auto;-webkit-overflow-scrolling:touch }
-  .race-tbl { min-width:700px }
+  .race-tbl { min-width:380px }
   .race-tbl td.c-horse { width:120px !important;max-width:120px !important }
   .race-tbl td.c-grp { width:48px !important }
   .race-tbl td.c-pace { width:80px !important }
@@ -2375,7 +2389,7 @@ function render(rc){
       <th style="width:28px">#</th>
       <th class="th-horse" style="width:170px;min-width:0;text-align:left">Horse / Jockey / Trainer</th>
       <th style="width:72px">Last 4</th>
-      <th style="width:68px">Record</th>
+      <th class="th-rec" style="width:68px">Record</th>
       <th class="th-form" style="width:62px">Form</th>
       <th class="th-speed" style="width:62px">Speed</th>
       <th class="th-cond" style="width:62px" id="th-cond">${tcLabel}</th>
@@ -2383,7 +2397,7 @@ function render(rc){
       <th style="width:46px">Score</th>
       <th style="width:50px">My $</th>
       <th style="width:50px">Live $</th>
-      <th style="width:52px">Value</th>
+      <th class="th-val" style="width:52px">Value</th>
       <th style="width:52px"></th>
       <th style="width:110px;text-align:left;padding-left:6px">Pace</th>
     </tr>
