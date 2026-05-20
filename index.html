@@ -619,11 +619,110 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bor
 .rcard.compact .out-mkt{font-size:9px;color:#374151;text-decoration:line-through}
 .rcard.compact .out-val{font-size:8px;padding:1px 3px;font-weight:700;border-radius:3px}
 .rcard.compact .out-odds{display:flex;align-items:center;gap:3px;flex-wrap:nowrap}
-.rcard.compact .rc-output{padding:2px 8px;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;gap:2px;padding-top:6px}.rh-sub{color:#374151!important}.li{color:#374151!important}.hstarts{color:#374151!important}.grp-score.lo,.grp-score.mid{color:#374151!important}.out-mkt{color:#374151!important}.rcard.compact .out-mkt{color:#374151!important}.out-val.neu{color:#374151!important}.out-score.rx{color:#6b7280!important}.rr-time{color:#374151!important}.ps-lbl{color:#374151!important}</style>
+.rcard.compact .rc-output{padding:2px 8px;display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start;gap:2px;padding-top:6px}.rh-sub{color:#374151!important}.li{color:#374151!important}.hstarts{color:#374151!important}.grp-score.lo,.grp-score.mid{color:#374151!important}.out-mkt{color:#374151!important}.rcard.compact .out-mkt{color:#374151!important}.out-val.neu{color:#374151!important}.out-score.rx{color:#6b7280!important}.rr-time{color:#374151!important}.ps-lbl{color:#374151!important}
+/* ── MOBILE RESPONSIVE ── */
+@media (max-width: 768px) {
+  /* Nav */
+  .nav-sep { display:none }
+  .navbtn { display:none }
+  #mob-menu-btn { display:flex !important; align-items:center }
+  .nav-right { margin-left:8px }
+  .topnav { padding:0 12px; gap:6px }
+  .brand { font-size:16px }
+
+  /* Mobile nav drawer */
+  #mob-nav-drawer {
+    position:fixed;top:48px;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);
+    z-index:999;display:none
+  }
+  #mob-nav-drawer.open { display:block }
+  #mob-nav-inner {
+    background:#00471b;width:220px;height:100%;display:flex;flex-direction:column;
+    padding:8px 0;overflow-y:auto
+  }
+  .mob-nav-btn {
+    background:none;border:none;color:rgba(255,255,255,.85);font-size:13px;
+    font-weight:600;padding:12px 18px;text-align:left;cursor:pointer;
+    font-family:'Space Grotesk',sans-serif;border-bottom:0.5px solid rgba(255,255,255,.1)
+  }
+  .mob-nav-btn.active { color:#fbbf24;background:rgba(255,255,255,.05) }
+  .mob-nav-btn:active { background:rgba(255,255,255,.1) }
+
+  /* Meeting/race tabs */
+  .meetingtabs { font-size:9px }
+  .mtab { padding:7px 8px; font-size:9px }
+  .racetabs { padding:0 8px }
+  .rtab { padding:7px 8px; font-size:10px }
+
+  /* Layout - stack vertically */
+  .layout { grid-template-columns:1fr !important; overflow:visible }
+  
+  /* Sidebar - hidden by default on mobile, shown as drawer */
+  .leftrail {
+    display:none;position:fixed;top:48px;left:0;right:0;bottom:0;
+    z-index:998;overflow-y:auto;width:100% !important;
+    border-right:none;box-shadow:0 4px 20px rgba(0,0,0,.3)
+  }
+  .leftrail.mob-open { display:flex !important }
+  #mob-sidebar-btn { display:block !important }
+
+  /* Right rail - hide on mobile */
+  .rightrail { display:none !important }
+
+  /* Main content */
+  .main { min-height:calc(100vh - 160px);overflow:visible }
+
+  /* Race table - horizontal scroll */
+  .tbl-wrap { overflow-x:auto;-webkit-overflow-scrolling:touch }
+  .race-tbl { min-width:700px }
+  .race-tbl td.c-horse { width:120px !important;max-width:120px !important }
+  .race-tbl td.c-grp { width:48px !important }
+  .race-tbl td.c-pace { width:80px !important }
+
+  /* Race header */
+  .rr-header { padding:10px 12px }
+  .rr-title { font-size:14px }
+
+  /* Dashboard */
+  .db-top-grid { grid-template-columns:repeat(2,1fr) !important }
+  .db-body-grid { grid-template-columns:1fr !important }
+  .db-bottom-grid { grid-template-columns:repeat(2,1fr) !important }
+  .db-right-panel { display:none }
+
+  /* Track conditions table */
+  .tc-races { display:none }
+
+  /* Horse popup - full width on mobile */
+  .horse-form-card { 
+    width:calc(100vw - 16px) !important;
+    left:8px !important;
+    top:auto !important;
+    bottom:8px !important;
+    max-height:70vh;
+    overflow-y:auto
+  }
+
+  /* Bet log */
+  .bl-row { grid-template-columns:1fr 1fr !important }
+
+  /* General touch targets */
+  button { min-height:36px }
+  .tc-btn { padding:6px 0 !important }
+  .navbtn { min-height:44px }
+}
+
+@media (max-width: 480px) {
+  .db-top-grid { grid-template-columns:repeat(2,1fr) !important }
+  .db-bottom-grid { grid-template-columns:1fr !important }
+  .rr-title { font-size:13px }
+  .race-tbl td.c-horse { width:100px !important;max-width:100px !important }
+}
+</style>
 </head>
 <body>
 <div class="topnav">
   <div class="brand" onclick="doLogout()" title="Go to home" style="cursor:pointer">Race <span>Edge</span></div>
+  <button id="mob-menu-btn" onclick="toggleMobMenu()" style="display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px 8px;margin-left:auto;line-height:1">☰</button>
   <div class="nav-sep"></div>
   <button class="navbtn active" id="navRacing" onclick="switchNav('racing')">Racing</button>
   <button class="navbtn" id="navDash" onclick="switchNav('dashboard')">Dashboard</button>
@@ -639,10 +738,24 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bor
     <button class="nav-pill gold" id="resultsBtn" onclick="openResultsModal()" style="display:none">🏁 Results</button>
   </div>
 </div>
+<div id="mob-nav-drawer" onclick="closeMobMenuOnBg(event)">
+  <div id="mob-nav-inner">
+    <button class="mob-nav-btn active" id="mobNavRacing" onclick="mobNav('racing')">Racing</button>
+    <button class="mob-nav-btn" id="mobNavDash" onclick="mobNav('dashboard')">Dashboard</button>
+    <button class="mob-nav-btn" id="mobNavAnalysis" onclick="mobNav('analysis')">Analysis</button>
+    <button class="mob-nav-btn" id="mobNavBetLog" onclick="mobNav('betlog')">Bet Log</button>
+    <button class="mob-nav-btn" id="mobNavResults" onclick="mobNav('results')">Results</button>
+    <button class="mob-nav-btn" id="mobNavAlerts" onclick="mobNav('alerts')">Alerts</button>
+    <button class="mob-nav-btn" id="mobNavSettings" onclick="mobNav('settings')">Settings</button>
+    <button class="mob-nav-btn" id="mobNavTrackCond" onclick="mobNav('trackcond')">Track Conditions</button>
+    <button class="mob-nav-btn" id="mobNavHelp" onclick="mobNav('help')">How It Works</button>
+  </div>
+</div>
 <div id="meetingNav" style="display:none">
   <div class="meetingtabs" id="meetingTabs"></div>
   <div class="racetabs" id="raceTabs"></div>
 </div>
+<div id="mob-sidebar-btn" style="display:none;background:#00471b;color:#fff;border:none;width:100%;padding:8px;font-size:11px;font-weight:600;cursor:pointer;text-align:left;padding-left:16px" onclick="toggleMobSidebar()">⚙ CSV · Track Condition · Factors</div>
 <div class="layout">
   <div class="leftrail">
     <div class="lr-section">
@@ -2907,7 +3020,7 @@ function showDashboard(){
 
   // ── TOP STATS ──
   html += `<div style="padding:16px 16px 0">`;
-  html += `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:12px">`;
+  html += `<div class="db-top-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:12px">`;
   html += `<div style="background:#f1f5f9;border:1.5px solid #cbd5e1;border-radius:12px;padding:10px 12px;text-align:center"><div style="font-size:14px;font-weight:500;color:#334155">${record}</div><div style="font-size:10px;color:#64748b;margin-top:2px">S-W-2-3</div></div>`;
   html += `<div style="background:#dcfce7;border:1.5px solid #86efac;border-radius:12px;padding:10px 12px;text-align:center"><div style="font-size:14px;font-weight:500;color:#166534">${winSR}%</div><div style="font-size:10px;color:#166534;margin-top:2px;opacity:.75">Win strike</div></div>`;
   html += `<div style="background:#ccfbf1;border:1.5px solid #5eead4;border-radius:12px;padding:10px 12px;text-align:center"><div style="font-size:14px;font-weight:500;color:#0f766e">${placeSR}%</div><div style="font-size:10px;color:#0f766e;margin-top:2px;opacity:.75">Place strike</div></div>`;
@@ -2918,7 +3031,7 @@ function showDashboard(){
   html += `</div>`;
 
   // ── BODY: GRID + RIGHT PANEL ──
-  html += `<div style="display:grid;grid-template-columns:1fr 155px;gap:8px;margin-bottom:12px">`;
+  html += `<div class="db-body-grid" style="display:grid;grid-template-columns:1fr 155px;gap:8px;margin-bottom:12px">`;
 
   // Race grid
   html += `<div style="background:#f8faff;border:1.5px solid #dbeafe;border-radius:14px;overflow:hidden">`;
@@ -2996,7 +3109,7 @@ function showDashboard(){
   html += `</div>`;
 
   // Right panel
-  html += `<div style="display:flex;flex-direction:column;gap:8px">`;
+  html += `<div class="db-right-panel" style="display:flex;flex-direction:column;gap:8px">`;
 
   // Next up
   html += `<div style="background:#f0fdf4;border:1.5px solid #86efac;border-radius:14px;padding:11px 12px;flex:1">`;
@@ -3028,7 +3141,7 @@ function showDashboard(){
   html += `</div>`; // end body grid
 
   // ── BOTTOM 4 PANELS ──
-  html += `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding-bottom:16px">`;
+  html += `<div class="db-bottom-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding-bottom:16px">`;
 
   // Strike by odds
   const oddsRanges = [[1.1,2,'$1.10–$2'],[2,3,'$2–$3'],[3,5,'$3–$5'],[5,8,'$5–$8'],[8,12,'$8–$12'],[12,999,'$12+']];
@@ -4337,6 +4450,52 @@ document.addEventListener('keydown', function(e){
   if(ls && ls.style.display !== 'none' && e.key === 'Enter') doLogin();
 });
 
+
+// ── MOBILE NAV ──
+function toggleMobMenu(){
+  var d=document.getElementById('mob-nav-drawer');
+  d.classList.toggle('open');
+}
+function closeMobMenuOnBg(e){
+  if(e.target===document.getElementById('mob-nav-drawer'))
+    document.getElementById('mob-nav-drawer').classList.remove('open');
+}
+function mobNav(tab){
+  document.getElementById('mob-nav-drawer').classList.remove('open');
+  // Update mobile nav active states
+  ['Racing','Dash','Analysis','BetLog','Results','Alerts','Settings','TrackCond','Help'].forEach(function(n){
+    var el=document.getElementById('mobNav'+n);
+    if(el){
+      var match=(n.toLowerCase()===tab)||(n==='Racing'&&tab==='racing')||(n==='BetLog'&&tab==='betlog')||(n==='Dash'&&tab==='dashboard')||(n==='Settings'&&tab==='settings')||(n==='Help'&&tab==='help')||(n==='Results'&&tab==='results')||(n==='Alerts'&&tab==='alerts')||(n==='Analysis'&&tab==='analysis')||(n==='TrackCond'&&tab==='trackcond');
+      el.classList.toggle('active',match);
+    }
+  });
+  switchNav(tab);
+}
+function toggleMobSidebar(){
+  var lr=document.querySelector('.leftrail');
+  if(lr) lr.classList.toggle('mob-open');
+}
+
+// Close sidebar when clicking outside on mobile
+document.addEventListener('click',function(e){
+  if(window.innerWidth>768) return;
+  var lr=document.querySelector('.leftrail');
+  var btn=document.getElementById('mob-sidebar-btn');
+  if(lr&&lr.classList.contains('mob-open')&&!lr.contains(e.target)&&e.target!==btn){
+    lr.classList.remove('mob-open');
+  }
+});
+
+// Fix horse popup for touch
+document.addEventListener('DOMContentLoaded',function(){
+  document.addEventListener('click',function(e){
+    var card=document.getElementById('horseFormCard');
+    if(card&&card.style.display!=='none'){
+      if(!card.contains(e.target)) hideHorseForm();
+    }
+  });
+});
 </script>
 </body>
 </html>
