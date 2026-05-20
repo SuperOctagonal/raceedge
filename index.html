@@ -1,4 +1,3 @@
-<!-- v2-nav-fix -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,10 +13,9 @@ body{background:#f0f2f4;color:#111827;font-family:'Space Grotesk',sans-serif;dis
 .brand{font-family:'Bebas Neue';font-size:22px;letter-spacing:3px;color:#fff;text-transform:uppercase;line-height:1;flex-shrink:0}
 .brand span{color:#fbbf24}
 .nav-sep{width:1px;height:20px;background:rgba(255,255,255,.2)}
-.navbtn{background:none;border:none;color:rgba(255,255,255,.8);font-family:'Space Grotesk';font-size:9px;font-weight:600;padding:4px 7px;border-radius:4px;cursor:pointer;text-transform:uppercase;letter-spacing:.3px;transition:all .15s;flex-shrink:0;white-space:nowrap}
+.navbtn{background:none;border:none;color:rgba(255,255,255,.8);font-family:'Space Grotesk';font-size:10px;font-weight:600;padding:5px 10px;border-radius:4px;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;transition:all .15s;flex-shrink:0;white-space:nowrap}
 .navbtn:hover,.navbtn.active{background:#fff;color:#00471b;font-weight:800;border-radius:4px}
-.nav-right{margin-left:auto;display:flex;gap:7px;align-items:center;flex-shrink:0}
-#mob-nav-drawer{display:none}
+.nav-right{margin-left:auto;display:flex;gap:7px;align-items:center}
 .nav-pill{border:1px solid rgba(255,255,255,.3);background:none;color:#fff;border-radius:20px;padding:4px 14px;font-size:10px;font-weight:600;cursor:pointer;font-family:'Space Grotesk';transition:all .2s;display:flex;align-items:center;gap:5px;letter-spacing:.3px}
 .nav-pill:hover{border-color:#fff;background:rgba(255,255,255,.1)}
 .nav-pill.gold{background:#fbbf24;color:#78350f;border-color:#fbbf24}
@@ -632,31 +630,52 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bor
   .lp-hero-sub { font-size:14px }
   .lp-cta-primary, .lp-cta-secondary { padding:12px 24px; font-size:13px; width:100% }
   .lp-hero-stats { gap:24px; flex-wrap:wrap }
-  /* App Nav */
+  /* App Nav - hide desktop elements */
   .nav-sep { display:none }
   .navbtn { display:none }
-  #mob-menu-btn { display:flex !important; align-items:center }
-  .nav-right { margin-left:8px }
-  .topnav { padding:0 12px; gap:6px }
-  .brand { font-size:16px }
+  #mob-menu-btn { display:none !important }
+  .nav-right { margin-left:auto }
+  .topnav { padding:0 10px; gap:6px; height:44px }
+  .brand { font-size:15px }
 
-  /* Mobile nav drawer */
-  #mob-nav-drawer {
-    position:fixed;top:48px;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);
-    z-index:999;display:none
+  /* Hide old drawer */
+  #mob-nav-drawer { display:none !important }
+  #mob-sidebar-btn { display:none !important }
+
+  /* Bottom tab bar */
+  #mob-tab-bar {
+    display:flex;position:fixed;bottom:0;left:0;right:0;
+    background:#00471b;border-top:2px solid #003314;
+    z-index:1000;height:56px;
   }
-  #mob-nav-drawer.open { display:block }
-  #mob-nav-inner {
-    background:#00471b;width:220px;height:100%;display:flex;flex-direction:column;
-    padding:8px 0;overflow-y:auto
+  .mob-tab {
+    flex:1;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:2px;background:none;border:none;
+    color:rgba(255,255,255,.6);cursor:pointer;font-family:'Space Grotesk',sans-serif;
+    font-size:9px;font-weight:600;letter-spacing:.3px;padding:4px 2px;
+    transition:color .15s;-webkit-tap-highlight-color:transparent;
   }
-  .mob-nav-btn {
-    background:none;border:none;color:rgba(255,255,255,.85);font-size:13px;
-    font-weight:600;padding:12px 18px;text-align:left;cursor:pointer;
-    font-family:'Space Grotesk',sans-serif;border-bottom:0.5px solid rgba(255,255,255,.1)
+  .mob-tab .mob-tab-icon { font-size:18px;line-height:1 }
+  .mob-tab.active { color:#fbbf24 }
+  .mob-tab:active { background:rgba(255,255,255,.08) }
+
+  /* CSV strip below topnav */
+  #mob-csv-strip {
+    display:flex;align-items:center;gap:8px;
+    background:#1a2634;padding:6px 12px;border-bottom:1px solid #2d3a47;
+    font-size:10px;color:rgba(255,255,255,.7);font-family:'Space Grotesk',sans-serif;
   }
-  .mob-nav-btn.active { color:#fbbf24;background:rgba(255,255,255,.05) }
-  .mob-nav-btn:active { background:rgba(255,255,255,.1) }
+  #mob-csv-strip label {
+    background:#fbbf24;color:#78350f;border-radius:5px;padding:4px 10px;
+    font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0
+  }
+  #mob-csv-strip .mob-tc-btns { display:flex;gap:4px;margin-left:auto }
+  #mob-csv-strip .mob-tc-btn {
+    background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);
+    color:#fff;border-radius:4px;padding:3px 8px;font-size:9px;font-weight:600;
+    cursor:pointer;font-family:'Space Grotesk',sans-serif
+  }
+  #mob-csv-strip .mob-tc-btn.active { background:#fbbf24;color:#78350f;border-color:#fbbf24 }
 
   /* Meeting/race tabs */
   .meetingtabs { font-size:9px }
@@ -667,20 +686,14 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bor
   /* Layout - stack vertically */
   .layout { grid-template-columns:1fr !important; overflow:visible }
   
-  /* Sidebar - hidden by default on mobile, shown as drawer */
-  .leftrail {
-    display:none;position:fixed;top:48px;left:0;right:0;bottom:0;
-    z-index:998;overflow-y:auto;width:100% !important;
-    border-right:none;box-shadow:0 4px 20px rgba(0,0,0,.3)
-  }
-  .leftrail.mob-open { display:flex !important }
-  #mob-sidebar-btn { display:block !important }
+  /* Sidebar - hidden on mobile */
+  .leftrail { display:none !important }
 
   /* Right rail - hide on mobile */
   .rightrail { display:none !important }
 
   /* Main content */
-  .main { min-height:calc(100vh - 160px);overflow:visible }
+  .main { min-height:calc(100vh - 160px);overflow:visible;padding-bottom:56px }
 
   /* Race table - horizontal scroll */
   .tbl-wrap { overflow-x:auto;-webkit-overflow-scrolling:touch }
@@ -732,7 +745,7 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bor
 <body>
 <div class="topnav">
   <div class="brand" onclick="doLogout()" title="Go to home" style="cursor:pointer">Race <span>Edge</span></div>
-  <button id="mob-menu-btn" onclick="toggleMobMenu()" style="display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px 8px;margin-left:auto;line-height:1">☰</button>
+  <button id="mob-menu-btn" style="display:none"></button>
   <div class="nav-sep"></div>
   <button class="navbtn active" id="navRacing" onclick="switchNav('racing')">Racing</button>
   <button class="navbtn" id="navDash" onclick="switchNav('dashboard')">Dashboard</button>
@@ -748,24 +761,41 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bor
     <button class="nav-pill gold" id="resultsBtn" onclick="openResultsModal()" style="display:none">🏁 Results</button>
   </div>
 </div>
-<div id="mob-nav-drawer" onclick="closeMobMenuOnBg(event)">
-  <div id="mob-nav-inner">
-    <button class="mob-nav-btn active" id="mobNavRacing" onclick="mobNav('racing')">Racing</button>
-    <button class="mob-nav-btn" id="mobNavDash" onclick="mobNav('dashboard')">Dashboard</button>
-    <button class="mob-nav-btn" id="mobNavAnalysis" onclick="mobNav('analysis')">Analysis</button>
-    <button class="mob-nav-btn" id="mobNavBetLog" onclick="mobNav('betlog')">Bet Log</button>
-    <button class="mob-nav-btn" id="mobNavResults" onclick="mobNav('results')">Results</button>
-    <button class="mob-nav-btn" id="mobNavAlerts" onclick="mobNav('alerts')">Alerts</button>
-    <button class="mob-nav-btn" id="mobNavSettings" onclick="mobNav('settings')">Settings</button>
-    <button class="mob-nav-btn" id="mobNavTrackCond" onclick="mobNav('trackcond')">Track Conditions</button>
-    <button class="mob-nav-btn" id="mobNavHelp" onclick="mobNav('help')">How It Works</button>
+<div id="mob-nav-drawer"></div>
+<!-- Bottom tab bar (mobile only) -->
+<div id="mob-tab-bar" style="display:none">
+  <button class="mob-tab active" id="mobTab-racing" onclick="mobTabNav('racing')">
+    <span class="mob-tab-icon">🏇</span>Racing
+  </button>
+  <button class="mob-tab" id="mobTab-dashboard" onclick="mobTabNav('dashboard')">
+    <span class="mob-tab-icon">📊</span>Dashboard
+  </button>
+  <button class="mob-tab" id="mobTab-betlog" onclick="mobTabNav('betlog')">
+    <span class="mob-tab-icon">📝</span>Bet Log
+  </button>
+  <button class="mob-tab" id="mobTab-analysis" onclick="mobTabNav('analysis')">
+    <span class="mob-tab-icon">📈</span>Analysis
+  </button>
+  <button class="mob-tab" id="mobTab-settings" onclick="mobTabNav('settings')">
+    <span class="mob-tab-icon">⚙️</span>More
+  </button>
+</div>
+<!-- CSV + Track Condition strip (mobile only, shows on Racing tab) -->
+<div id="mob-csv-strip" style="display:none">
+  <label for="fileIn">📂 Load CSV</label>
+  <span id="mob-file-hint" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;font-size:9px">No file loaded</span>
+  <div class="mob-tc-btns">
+    <button class="mob-tc-btn active" onclick="mobSetTC('Good')">Good</button>
+    <button class="mob-tc-btn" onclick="mobSetTC('Soft')">Soft</button>
+    <button class="mob-tc-btn" onclick="mobSetTC('Heavy')">Heavy</button>
+    <button class="mob-tc-btn" onclick="mobSetTC('Synth')">Synth</button>
   </div>
 </div>
 <div id="meetingNav" style="display:none">
   <div class="meetingtabs" id="meetingTabs"></div>
   <div class="racetabs" id="raceTabs"></div>
 </div>
-<div id="mob-sidebar-btn" style="display:none;background:#00471b;color:#fff;border:none;width:100%;padding:8px;font-size:11px;font-weight:600;cursor:pointer;text-align:left;padding-left:16px" onclick="toggleMobSidebar()">⚙ CSV · Track Condition · Factors</div>
+<div id="mob-sidebar-btn" style="display:none"></div>
 <div class="layout">
   <div class="leftrail">
     <div class="lr-section">
@@ -4462,30 +4492,46 @@ document.addEventListener('keydown', function(e){
 
 
 // ── MOBILE NAV ──
-function toggleMobMenu(){
-  var d=document.getElementById('mob-nav-drawer');
-  d.classList.toggle('open');
-}
-function closeMobMenuOnBg(e){
-  if(e.target===document.getElementById('mob-nav-drawer'))
-    document.getElementById('mob-nav-drawer').classList.remove('open');
-}
-function mobNav(tab){
-  document.getElementById('mob-nav-drawer').classList.remove('open');
-  // Update mobile nav active states
-  ['Racing','Dash','Analysis','BetLog','Results','Alerts','Settings','TrackCond','Help'].forEach(function(n){
-    var el=document.getElementById('mobNav'+n);
-    if(el){
-      var match=(n.toLowerCase()===tab)||(n==='Racing'&&tab==='racing')||(n==='BetLog'&&tab==='betlog')||(n==='Dash'&&tab==='dashboard')||(n==='Settings'&&tab==='settings')||(n==='Help'&&tab==='help')||(n==='Results'&&tab==='results')||(n==='Alerts'&&tab==='alerts')||(n==='Analysis'&&tab==='analysis')||(n==='TrackCond'&&tab==='trackcond');
-      el.classList.toggle('active',match);
-    }
-  });
+function toggleMobMenu(){}
+function closeMobMenuOnBg(e){}
+function mobNav(tab){ switchNav(tab); }
+function toggleMobSidebar(){}
+
+function mobTabNav(tab){
+  // Update tab bar active state
+  document.querySelectorAll('.mob-tab').forEach(function(b){b.classList.remove('active')});
+  var btn=document.getElementById('mobTab-'+tab);
+  if(btn) btn.classList.add('active');
+  // Show/hide CSV strip (only on racing tab)
+  var strip=document.getElementById('mob-csv-strip');
+  if(strip) strip.style.display=(tab==='racing')?'flex':'none';
   switchNav(tab);
 }
-function toggleMobSidebar(){
-  var lr=document.querySelector('.leftrail');
-  if(lr) lr.classList.toggle('mob-open');
+
+function mobSetTC(cond){
+  // Sync with desktop track condition buttons
+  document.querySelectorAll('.mob-tc-btn').forEach(function(b){b.classList.remove('active')});
+  event.target.classList.add('active');
+  // Trigger the desktop TC buttons
+  var map={'Good':'tcGood','Soft':'tcSoft','Heavy':'tcHeavy','Synth':'tcSynth'};
+  var desktopBtn=document.getElementById(map[cond]);
+  if(desktopBtn) desktopBtn.click();
 }
+
+// Init mobile UI on load
+(function initMobile(){
+  if(window.innerWidth>768) return;
+  var tabBar=document.getElementById('mob-tab-bar');
+  if(tabBar) tabBar.style.display='flex';
+  var strip=document.getElementById('mob-csv-strip');
+  if(strip) strip.style.display='flex';
+  // Keep file hint in sync
+  var fileIn=document.getElementById('fileIn');
+  if(fileIn) fileIn.addEventListener('change',function(){
+    var hint=document.getElementById('mob-file-hint');
+    if(hint&&fileIn.files[0]) hint.textContent=fileIn.files[0].name;
+  });
+})();
 
 // Close sidebar when clicking outside on mobile
 document.addEventListener('click',function(e){
