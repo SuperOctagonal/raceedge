@@ -623,6 +623,7 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bor
 /* ── MOBILE RESPONSIVE ── */
 #mob-tab-bar { display:none }
 #mob-csv-strip { display:none }
+#mob-page-nav { display:none }
 @media (max-width: 900px) {
   /* Landing page - prevent horizontal overflow */
   #landing { overflow-x:hidden; max-width:100vw }
@@ -640,6 +641,29 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bor
   .lp-footer { padding:32px 16px !important }
   /* Prevent any element causing horizontal overflow */
   .lp-features-grid, .lp-how-grid { grid-template-columns:1fr !important }
+  /* Mobile top page nav */
+  #mob-page-nav {
+    display:flex !important;
+    background:#003d17;
+    border-bottom:0.5px solid #002d10;
+    overflow-x:auto;
+    scrollbar-width:none;
+    flex-shrink:0;
+  }
+  #mob-page-nav::-webkit-scrollbar { display:none }
+  .mob-pn {
+    color:rgba(255,255,255,.55);
+    font-size:8px;
+    font-weight:600;
+    padding:5px 10px;
+    white-space:nowrap;
+    cursor:pointer;
+    font-family:'Space Grotesk',sans-serif;
+    border-bottom:1.5px solid transparent;
+    flex-shrink:0;
+  }
+  .mob-pn.active { color:#fbbf24; border-bottom-color:#fbbf24; }
+
   /* App Nav - hide desktop elements */
   .nav-sep { display:none }
   .navbtn { display:none }
@@ -769,6 +793,20 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bor
   .navbtn { min-height:44px }
 }
 
+@media (max-width: 900px) and (orientation: landscape) {
+  /* In landscape, hide bottom tab bar - top nav handles navigation */
+  #mob-tab-bar { display:none !important }
+  /* Give back the 56px bottom padding */
+  .main { padding-bottom:10px !important }
+  body { padding-bottom:0 !important }
+  /* Allow scrolling in landscape */
+  html, body { overflow-y:auto !important }
+  .layout { display:block !important; overflow:visible !important }
+  /* Shrink the top bars to save vertical space */
+  .topnav { height:36px !important }
+  #mob-page-nav .mob-pn { padding:3px 8px !important; font-size:7px !important }
+}
+
 @media (max-width: 480px) {
   .db-top-grid { grid-template-columns:repeat(2,1fr) !important }
   .db-bottom-grid { grid-template-columns:1fr !important }
@@ -851,6 +889,16 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bor
   </div>
 </div>
 <div id="mob-nav-drawer"></div>
+<!-- Mobile top page nav (mobile only) -->
+<div id="mob-page-nav" style="display:none">
+  <button class="mob-pn active" id="mobPn-racing" onclick="mobTabNav('racing')">Racing</button>
+  <button class="mob-pn" id="mobPn-dashboard" onclick="mobTabNav('dashboard')">Dashboard</button>
+  <button class="mob-pn" id="mobPn-betlog" onclick="mobTabNav('betlog')">Bet Log</button>
+  <button class="mob-pn" id="mobPn-analysis" onclick="mobTabNav('analysis')">Analysis</button>
+  <button class="mob-pn" id="mobPn-results" onclick="mobTabNav('results')">Results</button>
+  <button class="mob-pn" id="mobPn-alerts" onclick="mobTabNav('alerts')">Alerts</button>
+  <button class="mob-pn" id="mobPn-settings" onclick="mobTabNav('settings')">Settings</button>
+</div>
 <!-- Bottom tab bar (mobile only) -->
 <div id="mob-tab-bar" style="display:none">
   <button class="mob-tab active" id="mobTab-racing" onclick="mobTabNav('racing')">
@@ -871,14 +919,8 @@ input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;bor
 </div>
 <!-- CSV + Track Condition strip (mobile only, shows on Racing tab) -->
 <div id="mob-csv-strip" style="display:none">
-  <label for="fileIn">📂 Load CSV</label>
-  <span id="mob-file-hint" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;font-size:9px">No file loaded</span>
-  <div class="mob-tc-btns">
-    <button class="mob-tc-btn active" onclick="mobSetTC('Good')">Good</button>
-    <button class="mob-tc-btn" onclick="mobSetTC('Soft')">Soft</button>
-    <button class="mob-tc-btn" onclick="mobSetTC('Heavy')">Heavy</button>
-    <button class="mob-tc-btn" onclick="mobSetTC('Synth')">Synth</button>
-  </div>
+  <label for="fileIn" id="mob-csv-label">📂 Load CSV</label>
+  <span id="mob-file-hint" style="font-size:9px;color:rgba(255,255,255,.6)"></span>
 </div>
 <!-- Mobile sheet overlay -->
 <div class="mob-sheet-overlay" id="mobSheetOverlay" onclick="mobCloseSheet()"></div>
@@ -2574,25 +2616,25 @@ function renderMobile(rc,results,scratched,hasLive,liveOddsData){
           <div style="font-size:${isTop3?'10':'9'}px;color:#374151;margin-top:1px">${wt} · ${jShort} · ${r.trainer||''}</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;padding:${dataPad};border-top:0.5px solid #f3f4f6">
-        <div style="flex:1;text-align:center;border-right:0.5px solid #f3f4f6;padding:0 2px">
-          <div style="font-size:8px;color:#374151;text-transform:uppercase;letter-spacing:.3px;margin-bottom:1px">Score</div>
-          <div style="font-size:${scoreSz};font-weight:700;color:#111827;font-family:'JetBrains Mono',monospace;line-height:1">${r.totalFromGroups.toFixed(1)}</div>
+      <div style="display:flex;align-items:center;padding:2px 4px;border-top:0.5px solid #f3f4f6;gap:0">
+        <div style="flex:1;text-align:center;border-right:0.5px solid #f3f4f6;padding:1px 0">
+          <div style="font-size:5px;color:#374151;text-transform:uppercase;letter-spacing:.1px;line-height:1.3">Score</div>
+          <div style="font-size:9px;font-weight:700;color:#111827;font-family:'JetBrains Mono',monospace;line-height:1">${r.totalFromGroups.toFixed(1)}</div>
         </div>
-        <div style="flex:1;text-align:center;border-right:0.5px solid #f3f4f6;padding:0 2px">
-          <div style="font-size:8px;color:#374151;text-transform:uppercase;letter-spacing:.3px;margin-bottom:1px">Edge $</div>
-          <div style="font-size:${scoreSz};font-weight:700;color:#059669;font-family:'JetBrains Mono',monospace;line-height:1">${myO?'$'+formatRacingOdds(myO):'—'}</div>
+        <div style="flex:1;text-align:center;border-right:0.5px solid #f3f4f6;padding:1px 0">
+          <div style="font-size:5px;color:#374151;text-transform:uppercase;letter-spacing:.1px;line-height:1.3">Edge $</div>
+          <div style="font-size:9px;font-weight:700;color:#059669;font-family:'JetBrains Mono',monospace;line-height:1">${myO?'$'+formatRacingOdds(myO):'—'}</div>
         </div>
-        <div style="flex:1;text-align:center;border-right:0.5px solid #f3f4f6;padding:0 2px">
-          <div style="font-size:8px;color:#374151;text-transform:uppercase;letter-spacing:.3px;margin-bottom:1px">Live $</div>
-          <div style="font-size:${scoreSz};font-weight:700;color:#1d4ed8;font-family:'JetBrains Mono',monospace;line-height:1">${dispOdds?'$'+dispOdds:'—'}</div>
+        <div style="flex:1;text-align:center;border-right:0.5px solid #f3f4f6;padding:1px 0">
+          <div style="font-size:5px;color:#374151;text-transform:uppercase;letter-spacing:.1px;line-height:1.3">Live $</div>
+          <div style="font-size:9px;font-weight:700;color:#1d4ed8;font-family:'JetBrains Mono',monospace;line-height:1">${dispOdds?'$'+dispOdds:'—'}</div>
         </div>
-        <div style="flex:1;text-align:center;border-right:0.5px solid #f3f4f6;padding:0 2px">
-          <div style="font-size:8px;color:#374151;text-transform:uppercase;letter-spacing:.3px;margin-bottom:1px">Value</div>
-          <div style="font-size:${isTop3?'11':'10'}px;font-weight:700;${valStyle};line-height:1;padding-top:1px">${valStr}</div>
+        <div style="flex:1;text-align:center;border-right:0.5px solid #f3f4f6;padding:1px 0">
+          <div style="font-size:5px;color:#374151;text-transform:uppercase;letter-spacing:.1px;line-height:1.3">Value</div>
+          <div style="font-size:9px;font-weight:700;${valStyle};line-height:1">${valStr}</div>
         </div>
-        <div style="flex:0 0 auto;padding-left:5px">
-          <button onclick="quickAddBet(event,${i})" style="background:#00471b;color:#fff;border:none;border-radius:5px;padding:${isTop3?'5px 8px':'4px 7px'};font-size:${isTop3?'10':'9'}px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:'Space Grotesk',sans-serif">Log Bet</button>
+        <div style="flex:0 0 auto;padding-left:2px">
+          <button onclick="quickAddBet(event,${i})" style="background:#00471b;color:#fff;border:none;border-radius:2px;padding:1px 3px;font-size:5px;font-weight:700;cursor:pointer;white-space:nowrap;line-height:13px">Log Bet</button>
         </div>
       </div>
       ${paceSection}
@@ -4792,10 +4834,14 @@ function mobNav(tab){ switchNav(tab); }
 function toggleMobSidebar(){}
 
 function mobTabNav(tab){
-  // Update tab bar active state
+  // Update bottom tab bar active state
   document.querySelectorAll('.mob-tab').forEach(function(b){b.classList.remove('active')});
   var btn=document.getElementById('mobTab-'+tab);
   if(btn) btn.classList.add('active');
+  // Update top page nav active state
+  document.querySelectorAll('.mob-pn').forEach(function(b){b.classList.remove('active')});
+  var pn=document.getElementById('mobPn-'+tab);
+  if(pn) pn.classList.add('active');
   // Show/hide CSV strip (only on racing tab)
   var strip=document.getElementById('mob-csv-strip');
   if(strip) strip.style.display=(tab==='racing')?'flex':'none';
@@ -4816,13 +4862,19 @@ function mobSetTC(cond){
   if(window.innerWidth>900) return;
   var tabBar=document.getElementById('mob-tab-bar');
   if(tabBar) tabBar.style.display='flex';
+  var pageNav=document.getElementById('mob-page-nav');
+  if(pageNav) pageNav.style.display='flex';
   var strip=document.getElementById('mob-csv-strip');
   if(strip) strip.style.display='flex';
-  // Keep file hint in sync
+  // Hide Load CSV label after file loaded, show tick
   var fileIn=document.getElementById('fileIn');
   if(fileIn) fileIn.addEventListener('change',function(){
-    var hint=document.getElementById('mob-file-hint');
-    if(hint&&fileIn.files[0]) hint.textContent=fileIn.files[0].name;
+    if(fileIn.files&&fileIn.files[0]){
+      var lbl=document.getElementById('mob-csv-label');
+      var hint=document.getElementById('mob-file-hint');
+      if(lbl) lbl.style.display='none';
+      if(hint){ hint.textContent='✓ Loaded'; hint.style.color='#4ade80'; }
+    }
   });
 })();
 
