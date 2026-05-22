@@ -2514,19 +2514,22 @@ function renderMobile(rc,results,scratched,hasLive,liveOddsData){
   const tc=window.currentTrackCond||'good';
   const tcLabel={'good':'Good','soft':'Soft','heavy':'Heavy','synthetic':'Synth'}[tc]||'Good';
 
-  const hdr=`<div style="padding:5px 10px;background:#fff;border-bottom:0.5px solid #e5e7eb">
-    <div style="font-size:11px;font-weight:700;color:#111827;font-family:'Space Grotesk',sans-serif;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${rc.venue||''} R${rc.num} — ${rc.name||'Race '+rc.num}</div>
-    <div style="font-size:8px;color:#374151;margin-top:2px;display:flex;gap:4px;flex-wrap:wrap;align-items:center">
-      <span style="background:#d1fae5;color:#065f46;border-radius:2px;padding:0 4px;font-size:8px;font-weight:600">${rc.dist}m</span>
-      <span style="background:#f1f5f9;color:#374151;border-radius:2px;padding:0 4px;font-size:8px">${rc.cls}</span>
-      <span style="background:#f1f5f9;color:#374151;border-radius:2px;padding:0 4px;font-size:8px">$${rc.prize}</span>
+  const hdr=`<div style="padding:4px 8px;background:#fff;border-bottom:0.5px solid #e5e7eb">
+    <div style="font-size:10px;font-weight:700;color:#111827;font-family:'Space Grotesk',sans-serif;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${rc.venue||''} R${rc.num} — ${rc.name||'Race '+rc.num}</div>
+    <div style="font-size:7px;color:#374151;margin-top:2px;display:flex;gap:3px;flex-wrap:wrap;align-items:center">
+      <span style="background:#d1fae5;color:#065f46;border-radius:2px;padding:0 3px;font-size:7px;font-weight:600">${rc.dist}m</span>
+      <span style="background:#f1f5f9;color:#374151;border-radius:2px;padding:0 3px;font-size:7px">${rc.cls}</span>
+      <span style="background:#f1f5f9;color:#374151;border-radius:2px;padding:0 3px;font-size:7px">$${rc.prize}</span>
       <span>${rc.time} · ${results.length} runners</span>
     </div>
   </div>`;
 
-  const pills=`<div style="display:flex;gap:4px;padding:4px 8px;background:#f8fafc;border-bottom:0.5px solid #e5e7eb;overflow-x:auto;scrollbar-width:none">
-    <button onclick="mobShowSheet('pace')" style="background:#fff;border:0.5px solid #cbd5e1;border-radius:10px;padding:2px 9px;font-size:9px;font-weight:600;color:#111827;white-space:nowrap;cursor:pointer">Pace Map</button>
-    <button id="mob-tc-pill" onclick="mobShowSheet('trackcond')" style="background:#fff;border:0.5px solid #cbd5e1;border-radius:10px;padding:2px 9px;font-size:9px;font-weight:600;color:#111827;white-space:nowrap;cursor:pointer">Track: ${tcLabel}</button>
+  // Pills with J/T and Pace toggles
+  const pills=`<div id="mob-pills-row" style="display:flex;gap:3px;padding:3px 7px;background:#f8fafc;border-bottom:0.5px solid #e5e7eb;overflow-x:auto;scrollbar-width:none">
+    <button id="mpill-jt" onclick="mobToggle('jt')" style="background:#fff;border:0.5px solid #cbd5e1;border-radius:10px;padding:2px 8px;font-size:8px;font-weight:600;color:#111827;white-space:nowrap;cursor:pointer;flex-shrink:0">J/T</button>
+    <button id="mpill-pace" onclick="mobToggle('pace')" style="background:#00471b;border:0.5px solid #00471b;border-radius:10px;padding:2px 8px;font-size:8px;font-weight:600;color:#fff;white-space:nowrap;cursor:pointer;flex-shrink:0">Pace</button>
+    <button onclick="mobShowSheet('pace')" style="background:#fff;border:0.5px solid #cbd5e1;border-radius:10px;padding:2px 8px;font-size:8px;font-weight:600;color:#111827;white-space:nowrap;cursor:pointer;flex-shrink:0">Pace Map</button>
+    <button id="mob-tc-pill" onclick="mobShowSheet('trackcond')" style="background:#fff;border:0.5px solid #cbd5e1;border-radius:10px;padding:2px 8px;font-size:8px;font-weight:600;color:#111827;white-space:nowrap;cursor:pointer;flex-shrink:0">Track: ${tcLabel}</button>
   </div>`;
 
   const cards=results.map((r,i)=>{
@@ -2561,20 +2564,19 @@ function renderMobile(rc,results,scratched,hasLive,liveOddsData){
 
     const pm=calcPaceMap(r,rc.venue,+rc.dist,tc);
     const pmBarW=pm?pm.pct+'%':'0%';
-    const paceH=isTop3?'3px':'2px';
-    const paceSection=pm?`<div style="display:flex;align-items:center;gap:4px;padding:1px 5px 2px;border-top:0.5px solid #f9fafb">
+
+    // J/T row - hidden by default, toggled by pill
+    const jtRow=`<div class="mob-jt-row" style="display:none;font-size:7px;color:#374151;padding:0 5px 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${wt} · ${jShort} · ${r.trainer||''}</div>`;
+
+    // Pace bar - shown by default, toggled by pill
+    const paceRow=pm?`<div class="mob-pace-row" style="display:flex;align-items:center;gap:4px;padding:1px 5px 2px;border-top:0.5px solid #f9fafb">
       <span style="font-size:6px;font-weight:700;min-width:18px;color:${pm.color}">${pm.role.slice(0,3).toUpperCase()}</span>
-      <div style="flex:1;height:${paceH};background:#f1f5f9;border-radius:1px;overflow:hidden">
+      <div style="flex:1;height:3px;background:#f1f5f9;border-radius:1px;overflow:hidden">
         <div style="width:${pmBarW};height:100%;background:${pm.color};border-radius:1px"></div>
       </div>
     </div>`:'';
 
-    // Top row: rank + tab + name + barrier + form
-    // Sub row (top3 only): weight + jockey + trainer
-    // Data row: Score | Edge$ | Live$ | Value | LogBet
-    const subRow='';
-
-    return `<div style="background:#fff;border-radius:${isTop3?'5':'4'}px;${cardBorder};overflow:hidden">
+    return `<div style="background:#fff;border-radius:4px;${cardBorder};overflow:hidden">
       <div style="display:flex;align-items:center;padding:2px 5px 1px;gap:3px">
         <span style="width:${isTop3?'12':'10'}px;height:${isTop3?'12':'10'}px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:${isTop3?'7':'6'}px;font-weight:700;flex-shrink:0;background:${rankBg};color:${rankColor}">${rank}</span>
         <span style="background:#1e40af;color:#fff;font-size:6px;font-weight:700;padding:0 2px;border-radius:1px;flex-shrink:0;line-height:10px">${r.tab||''}</span>
@@ -2583,7 +2585,7 @@ function renderMobile(rc,results,scratched,hasLive,liveOddsData){
         ${ccHTML}
         <span style="font-size:8px;color:#374151;font-family:'JetBrains Mono',monospace;flex-shrink:0;margin-left:2px">${formStr||'FS'}</span>
       </div>
-      ${subRow}
+      ${jtRow}
       <div style="display:flex;align-items:center;padding:1px 4px 2px;border-top:0.5px solid #f3f4f6;gap:0">
         <div style="flex:1;text-align:center;border-right:0.5px solid #f3f4f6;padding:0">
           <div style="font-size:5px;color:#374151;text-transform:uppercase;line-height:1.2">Score</div>
@@ -2601,15 +2603,18 @@ function renderMobile(rc,results,scratched,hasLive,liveOddsData){
           <div style="font-size:5px;color:#374151;text-transform:uppercase;line-height:1.2">Value</div>
           <div style="font-size:9px;font-weight:700;${valStyle};line-height:1">${valStr}</div>
         </div>
-        <button onclick="quickAddBet(event,${i})" style="background:#00471b;color:#fff;border:none;border-radius:2px;padding:1px 3px;font-size:5px;font-weight:700;cursor:pointer;white-space:nowrap;line-height:13px;flex-shrink:0;margin-left:2px">Log Bet</button>
+        <button onclick="quickAddBet(event,${i})" style="background:#00471b;color:#fff;border:none;border-radius:2px;padding:0px 2px;font-size:4px;font-weight:700;cursor:pointer;white-space:nowrap;line-height:12px;flex-shrink:0;margin-left:2px;letter-spacing:.2px">Log Bet</button>
       </div>
-      ${paceSection}
+      ${paceRow}
     </div>`;
   }).join('');
 
   const scrHTML=scratched.length?`<div style="padding:4px 10px;font-size:9px;color:#374151;text-align:center">Scratched: ${scratched.map(h=>h.name).join(' · ')}</div>`:'';
   window._lastMobileResults=results;
   window._lastMobileRc=rc;
+  // Restore pill states
+  const jtOn=window._mobJTon||false;
+  const paceOn=window._mobPaceOn!==false;
   const upItems=Array.from(document.querySelectorAll('#upNextList .rr-item')).slice(0,4);
   let upHtml='';
   if(upItems.length){
@@ -2618,8 +2623,30 @@ function renderMobile(rc,results,scratched,hasLive,liveOddsData){
       <div>${upItems.map(el=>el.outerHTML).join('')}</div>
     </div>`;
   }
-  main.innerHTML=`<div style="display:block">${hdr}${pills}<div style="display:flex;flex-direction:column;gap:1px;padding:2px 4px 4px;background:#f1f5f9">${cards}${scrHTML}</div>${upHtml}<div style="height:52px"></div></div>`;
+  main.innerHTML=`<div style="display:block">${hdr}${pills}<div style="display:flex;flex-direction:column;gap:1px;padding:2px 4px 4px;background:#f1f5f9">${cards}${scrHTML}</div>${upHtml}<div style="height:36px"></div></div>`;
+  // Apply saved pill states after render
+  if(jtOn) mobToggle('jt',true);
+  if(!paceOn) mobToggle('pace',true);
 }
+
+function mobToggle(type, silent){
+  if(type==='jt'){
+    window._mobJTon=!window._mobJTon;
+    var on=window._mobJTon;
+    var pill=document.getElementById('mpill-jt');
+    if(pill){ pill.style.background=on?'#00471b':'#fff'; pill.style.color=on?'#fff':'#111827'; pill.style.borderColor=on?'#00471b':'#cbd5e1'; }
+    document.querySelectorAll('.mob-jt-row').forEach(function(el){ el.style.display=on?'block':'none'; });
+  }
+  if(type==='pace'){
+    window._mobPaceOn=!window._mobPaceOn;
+    if(window._mobPaceOn===undefined) window._mobPaceOn=false;
+    var on=window._mobPaceOn;
+    var pill=document.getElementById('mpill-pace');
+    if(pill){ pill.style.background=on?'#00471b':'#fff'; pill.style.color=on?'#fff':'#111827'; pill.style.borderColor=on?'#00471b':'#cbd5e1'; }
+    document.querySelectorAll('.mob-pace-row').forEach(function(el){ el.style.display=on?'flex':'none'; });
+  }
+}
+
 
 function mobShowSheet(type){
   const overlay=document.getElementById('mobSheetOverlay');
@@ -4821,6 +4848,9 @@ function mobSetTC(cond){
   if(window.innerWidth>900) return;
   var tabBar=document.getElementById('mob-tab-bar');
   if(tabBar) tabBar.style.display='flex';
+  // Init pill toggle states
+  window._mobJTon=false;
+  window._mobPaceOn=true;
   var strip=document.getElementById('mob-csv-strip');
   if(strip) strip.style.display='flex';
   // Hide Load CSV label after file loaded, show tick
