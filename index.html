@@ -629,7 +629,7 @@ function renderRaceTable(rc, results, scratched, hasLive, liveOddsData) {
       <div class="rc rc-pace" style="font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px">Pace</div>
       <div class="rc rc-btn"></div>
     </div>
-    <div class="runner-body">\${rows}\${scrHTML}</div>
+    <div class="runner-body">${rows}${scrHTML}</div>
   </div>`;
   document.getElementById('main').innerHTML = header + table;
   generateAISummary(rc, results, tc);
