@@ -305,6 +305,37 @@ body{background:#f1f5f9;color:#111827;font-family:'Space Grotesk',sans-serif;fon
 .filter-row{display:flex;align-items:center;gap:6px;padding:8px 14px;border-bottom:0.5px solid #f3f4f6;background:#fff;flex-wrap:wrap;flex-shrink:0}
 .filter-pill{padding:3px 9px;border-radius:12px;font-size:10px;font-weight:600;border:0.5px solid #e5e7eb;background:#fff;color:#374151;cursor:pointer;white-space:nowrap}
 .filter-pill.active{background:#00471b;color:#fff;border-color:#00471b}
+
+/* ── HORSE FORM CARD ── */
+.horse-form-card,#horseFormCard{display:none;position:fixed;z-index:9999;background:#fff;border:1.5px solid #00471b;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.18);width:440px;overflow:hidden;pointer-events:none;max-height:85vh;overflow-y:auto}
+.hfc-header{background:linear-gradient(135deg,#00471b 0%,#005c23 100%);padding:10px 14px;display:flex;align-items:flex-start;justify-content:space-between}
+.hfc-name{font-size:14px;font-weight:700;color:#fff;letter-spacing:.3px;line-height:1.2}
+.hfc-meta{font-size:10px;color:rgba(255,255,255,.7);margin-top:3px}
+.hfc-badge{background:rgba(255,255,255,.15);color:#fff;border-radius:5px;padding:3px 8px;font-size:10px;font-weight:700;text-align:right}
+.hfc-jt{background:#f8fafc;padding:8px 14px;display:flex;gap:16px;border-bottom:1px solid #f3f4f6}
+.hfc-jt-item{display:flex;flex-direction:column}
+.hfc-jt-lbl{font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px}
+.hfc-jt-val{font-size:11px;font-weight:600;color:#111827}
+.hfc-stats{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid #e5e7eb}
+.hfc-stats-5{grid-template-columns:repeat(5,1fr)}
+.hfc-stat{padding:7px 4px;text-align:center;border-right:1px solid #f3f4f6}
+.hfc-stat:last-child{border-right:none}
+.hfc-sv{font-size:14px;font-weight:800;color:#111827;font-family:'JetBrains Mono',monospace;line-height:1}
+.hfc-sv.green{color:#059669}
+.hfc-sv.red{color:#dc2626}
+.hfc-sl{font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.8px;margin-top:2px}
+.hfc-cond-row{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid #e5e7eb}
+.hfc-runs{padding:8px 14px}
+.hfc-rt{font-size:8px;font-weight:700;color:#9ca3af;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.hfc-runs-tbl{width:100%;border-collapse:collapse}
+.hfc-run-hdr td{font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;padding:3px 4px;border-bottom:1px solid #f3f4f6}
+.hfc-run-row td{padding:4px;font-size:10px}
+.hfc-rnum{width:22px;height:22px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700}
+.hfc-r1{background:linear-gradient(135deg,#fbbf24,#d97706);color:#fff}
+.hfc-r23{background:#86efac;color:#065f46}
+.hfc-rx{background:#f3f4f6;color:#9ca3af}
+.hfc-foot{padding:8px 14px;border-top:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between}
+.hfc-foot span{font-size:9px;color:#9ca3af}
 </style>
 </head>
 <body>
@@ -5055,6 +5086,6 @@ document.addEventListener('DOMContentLoaded',function(){
 <div id="mob-sidebar-btn" style="display:none"></div>
 <div id="mobSheetOverlay" style="display:none"></div>
 <div id="mobSheet" style="display:none"><div id="mobSheetTitle"></div><div id="mobSheetContent"></div></div>
-<div id="horseFormCard" style="display:none;position:fixed;z-index:9999;background:#fff;border:0.5px solid #e5e7eb;border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,.15);width:420px;max-height:80vh;overflow-y:auto;font-size:11px;font-family:Space Grotesk,sans-serif"></div>
+<div id="horseFormCard" style="display:none;position:fixed;z-index:9999;background:#fff;border:1.5px solid #00471b;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.18);width:440px;overflow:hidden;pointer-events:none;max-height:85vh;overflow-y:auto"></div>
 <div id="mob-nav-drawer" style="display:none"></div>
 </body></html>
