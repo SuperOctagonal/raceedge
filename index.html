@@ -92,7 +92,25 @@ body{background:#f1f5f9;color:#111827;font-family:'Space Grotesk',sans-serif;fon
 
 /* ── RUNNER TABLE ── */
 .tbl-wrap{flex:1;overflow-y:auto;overflow-x:hidden}
-.runner-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:11px}
+.runner-table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:11px;max-width:100%}
+/* Flex row runner layout */
+.runner-header{display:flex;align-items:center;padding:5px 0;background:#f8fafc;border-bottom:1px solid #e5e7eb;position:sticky;top:0;z-index:1}
+.runner-body{}
+.rrow{display:flex;align-items:center;border-bottom:0.5px solid #f3f4f6;transition:background .1s;cursor:default}
+.rrow:hover{background:#f9fafb!important}
+.rrow-1:hover{background:#fef3c7!important}
+/* Column widths - all explicit, pace gets flex:1 */
+.rc{padding:5px 6px;display:flex;align-items:center;flex-shrink:0;overflow:hidden}
+.rc-rank{width:30px;justify-content:center}
+.rc-tab{width:28px;justify-content:center}
+.rc-horse{flex:1;min-width:0;flex-shrink:1;flex-direction:column;align-items:flex-start}
+.rc-form{width:46px;justify-content:center}
+.rc-score{width:54px;justify-content:flex-end}
+.rc-edge{width:64px;justify-content:flex-end}
+.rc-live{width:64px;justify-content:flex-end}
+.rc-val{width:60px;justify-content:flex-end}
+.rc-pace{flex:1;min-width:120px;gap:6px;display:flex;align-items:center}
+.rc-btn{width:72px;justify-content:flex-end;flex-shrink:0}
 .runner-table th{background:#f8fafc;padding:5px 6px;font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;border-bottom:0.5px solid #e5e7eb;white-space:nowrap;position:sticky;top:0;z-index:1}
 .runner-table th.r{text-align:right}
 .runner-table th.c{text-align:center}
@@ -110,9 +128,9 @@ body{background:#f1f5f9;color:#111827;font-family:'Space Grotesk',sans-serif;fon
 .rkn{background:#f3f4f6;color:#9ca3af}
 
 /* Horse name */
-.horse-name{font-size:12px;font-weight:600;color:#111827;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:195px}
+.horse-name{font-size:12px;font-weight:600;color:#111827;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .horse-name:hover{color:#00471b;text-decoration:underline}
-.horse-detail{font-size:9px;color:#9ca3af;margin-top:1px}
+.horse-detail{font-size:9px;color:#9ca3af;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* Value colours */
 .val-pos{color:#059669;font-weight:600}
@@ -152,9 +170,9 @@ body{background:#f1f5f9;color:#111827;font-family:'Space Grotesk',sans-serif;fon
 .ai-text{font-size:10px;color:#374151;line-height:1.6}
 
 /* ── PAGE CONTENT ── */
-.page-wrap{flex:1;overflow-y:auto;padding:16px}
-.page-title{font-size:18px;font-weight:600;margin-bottom:4px}
-.page-sub{font-size:12px;color:#6b7280;margin-bottom:16px}
+.page-wrap{flex:1;overflow-y:auto;padding:10px 14px}
+.page-title{font-size:15px;font-weight:600;margin-bottom:2px}
+.page-sub{font-size:11px;color:#6b7280;margin-bottom:10px}
 
 /* Cards */
 .card{background:#fff;border:0.5px solid #e5e7eb;border-radius:10px;padding:14px}
@@ -171,19 +189,19 @@ body{background:#f1f5f9;color:#111827;font-family:'Space Grotesk',sans-serif;fon
 /* Today page */
 .meeting-grid{display:grid;gap:10px}
 .meeting-card{background:#fff;border:0.5px solid #e5e7eb;border-radius:10px;overflow:hidden}
-.meeting-card-header{background:#1a2634;padding:8px 12px;display:flex;align-items:center;justify-content:space-between}
-.meeting-card-name{font-size:12px;font-weight:600;color:#fff}
+.meeting-card-header{background:#1a2634;padding:5px 10px;display:flex;align-items:center;justify-content:space-between}
+.meeting-card-name{font-size:11px;font-weight:600;color:#fff}
 .meeting-card-tc{font-size:9px;font-weight:600;padding:2px 6px;border-radius:8px}
 .races-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:0}
-.race-cell{padding:8px 10px;border-right:0.5px solid #f3f4f6;border-bottom:0.5px solid #f3f4f6;cursor:pointer;transition:background .1s}
-.race-cell:hover{background:#f9fafb}
-.race-cell-num{font-size:11px;font-weight:700;color:#111827}
-.race-cell-time{font-size:9px;color:#9ca3af;margin-top:1px}
-.race-cell-horse{font-size:9px;color:#059669;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.race-cell{padding:5px 7px;border-right:0.5px solid #f3f4f6;border-bottom:0.5px solid #f3f4f6;cursor:pointer;transition:background .1s;min-width:70px}
+.race-cell:hover{background:#f0fdf4}
+.race-cell-num{font-size:10px;font-weight:700;color:#111827}
+.race-cell-time{font-size:8px;color:#9ca3af;margin-top:1px}
+.race-cell-horse{font-size:9px;color:#059669;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* Top picks */
-.pick-card{background:#fff;border:0.5px solid #e5e7eb;border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px}
-.pick-rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.pick-card{background:#fff;border:0.5px solid #e5e7eb;border-radius:8px;padding:8px 10px;display:flex;align-items:center;gap:8px}
+.pick-rank{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
 .pick-r1{background:#fbbf24;color:#78350f}
 .pick-r2{background:#e5e7eb;color:#374151}
 .pick-r3{background:#fed7aa;color:#92400e}
@@ -551,7 +569,8 @@ function renderRaceTable(rc, results, scratched, hasLive, liveOddsData) {
   const rows = results.map((r, i) => {
     const rank = i + 1;
     const rkClass = rank===1?'rk1':rank===2?'rk2':rank===3?'rk3':'rkn';
-    const rowClass = rank===1?'rank1':'';
+    const rowBg = rank===1?'background:#fffbeb;':'';
+    const rowBorder = rank===1?'border-left:3px solid #fbbf24;':'border-left:3px solid transparent;';
 
     const myO = r.myOdds;
     const liveOdd = hasLive && (liveOddsData[(r.name||'').toUpperCase()] || liveOddsData[+r.tab]);
@@ -567,68 +586,51 @@ function renderRaceTable(rc, results, scratched, hasLive, liveOddsData) {
     const pm = calcPaceMap(r, rc.venue, +rc.dist, tc);
     const pmBarW = pm ? pm.pct + '%' : '0%';
     const fins = (r.lastFin||[]).slice(0,6).map(v => v===null||v===undefined||v===''?'': (+v>9?'0':String(+v))).join('');
-
     const bp = r['BP'] || r.BP || '';
     const jFirst = (r.jname||'-').split(' ');
     const jShort = jFirst.length > 1 ? jFirst[0][0] + '. ' + jFirst.slice(1).join(' ') : (r.jname||'-');
 
-    return `<tr class="${rowClass}" data-idx="${i}">
-      <td style="text-align:center"><span class="rk ${rkClass}">${rank}</span></td>
-      <td style="text-align:center"><span style="background:#1e40af;color:#fff;font-size:8px;font-weight:700;padding:1px 3px;border-radius:2px">${r.tab||''}</span></td>
-      <td style="overflow:hidden">
-        <div class="horse-name" onclick="showHorseForm(event,${i})">${r.name}${bp?' <span style="font-weight:400;color:#9ca3af;font-size:10px">('+bp+')</span>':''}</div>
-        <div class="horse-detail">${(r['Weight']||'')}kg · ${jShort} · ${r.trainer||''}</div>
-      </td>
-      <td style="text-align:center"><span style="font-size:10px;color:#374151;font-family:'JetBrains Mono'">${fins||'FS'}</span></td>
-      <td style="text-align:right"><span class="score-val">${r.totalFromGroups.toFixed(1)}</span></td>
-      <td style="text-align:right"><span class="odds-val" style="color:#059669">${myO ? '$'+formatRacingOdds(myO) : '—'}</span></td>
-      <td style="text-align:right"><span class="odds-val" style="color:#1d4ed8">${dispOdds ? '$'+dispOdds : '—'}</span></td>
-      <td style="text-align:right"><span class="${valClass}">${valStr}</span></td>
-      <td>
-        <div class="pace-bar-wrap">
-          <div style="display:flex;align-items:center;gap:5px">
-            <span class="pace-lbl" style="color:${pm?pm.color:'#9ca3af'};min-width:22px;font-size:9px">${pm?pm.role.slice(0,3).toUpperCase():'—'}</span>
-            <div class="pace-bar-track" style="flex:1"><div class="pace-bar-fill" style="width:${pmBarW};background:${pm?pm.color:'#e5e7eb'}"></div></div>
-          </div>
+    return `<div class="rrow ${rank===1?'rrow-1':''}" style="${rowBg}${rowBorder}" data-idx="${i}">
+      <div class="rc rc-rank"><span class="rk ${rkClass}">${rank}</span></div>
+      <div class="rc rc-tab"><span style="background:#1e40af;color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:2px">${r.tab||''}</span></div>
+      <div class="rc rc-horse">
+        <div class="horse-name" onclick="showHorseForm(event,${i})">${r.name}${bp?` <span style="font-weight:400;color:#9ca3af;font-size:10px">(${bp})</span>`:''}</div>
+        <div class="horse-detail">${r['Weight']||''}kg · ${jShort} · ${r.trainer||''}</div>
+      </div>
+      <div class="rc rc-form"><span style="font-family:'JetBrains Mono';font-size:10px;color:#6b7280">${fins||'FS'}</span></div>
+      <div class="rc rc-score"><span class="score-val">${r.totalFromGroups.toFixed(1)}</span></div>
+      <div class="rc rc-edge"><span class="odds-val" style="color:#059669">${myO?'$'+formatRacingOdds(myO):'—'}</span></div>
+      <div class="rc rc-live"><span class="odds-val" style="color:#1d4ed8">${dispOdds?'$'+dispOdds:'—'}</span></div>
+      <div class="rc rc-val"><span class="${valClass}">${valStr}</span></div>
+      <div class="rc rc-pace">
+        <span style="font-size:9px;font-weight:700;color:${pm?pm.color:'#9ca3af'};width:28px;flex-shrink:0;display:inline-block">${pm?pm.role.slice(0,3).toUpperCase():'—'}</span>
+        <div style="flex:1;height:10px;background:#f1f5f9;border-radius:5px;overflow:hidden">
+          <div style="width:${pmBarW};height:100%;background:${pm?pm.color:'#e5e7eb'};border-radius:5px"></div>
         </div>
-      </td>
-      <td><button class="log-btn" onclick="quickAddBet(event,${i})">Log Bet</button></td>
-    </tr>`;
+      </div>
+      <div class="rc rc-btn"><button class="log-btn" onclick="quickAddBet(event,${i})">Log Bet</button></div>
+    </div>`;
   }).join('');
 
-  const scrHTML = scratched.length ? `<tr><td colspan="10" style="padding:8px 14px;font-size:10px;color:#9ca3af;text-align:center">
-    Scratched: ${scratched.map(h=>h.name).join(' · ')}</td></tr>` : '';
+  const scrHTML = scratched.length ? `<div style="padding:8px 14px;font-size:10px;color:#9ca3af;text-align:center;border-top:0.5px solid #f3f4f6">
+    Scratched: ${scratched.map(h=>h.name).join(' · ')}</div>` : '';
+
 
   const table = `<div class="tbl-wrap">
-    <table class="runner-table">
-      <colgroup>
-        <col style="width:28px">
-        <col style="width:22px">
-        <col style="width:200px">
-        <col style="width:46px">
-        <col style="width:54px">
-        <col style="width:62px">
-        <col style="width:62px">
-        <col style="width:60px">
-        <col>
-        <col style="width:68px">
-      </colgroup>
-      <thead><tr>
-        <th class="c">#</th>
-        <th class="c">Tab</th>
-        <th>Horse / Jockey / Trainer</th>
-        <th class="c">Form</th>
-        <th class="r">Score</th>
-        <th class="r">Edge $</th>
-        <th class="r">Live $</th>
-        <th class="r">Value</th>
-        <th>Pace</th>
-        <th></th>
-      </tr></thead>
-      <tbody>${rows}${scrHTML}</tbody>
-    </table>
+    <div class="runner-header">
+      <div class="rc rc-rank" style="font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px">#</div>
+      <div class="rc rc-tab" style="font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px">Tab</div>
+      <div class="rc rc-horse" style="font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px">Horse / Jockey / Trainer</div>
+      <div class="rc rc-form" style="font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px;justify-content:center">Form</div>
+      <div class="rc rc-score" style="font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px;justify-content:flex-end">Score</div>
+      <div class="rc rc-edge" style="font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px;justify-content:flex-end">Edge $</div>
+      <div class="rc rc-live" style="font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px;justify-content:flex-end">Live $</div>
+      <div class="rc rc-val" style="font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px;justify-content:flex-end">Value</div>
+      <div class="rc rc-pace" style="font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px">Pace</div>
+      <div class="rc rc-btn"></div>
+    </div>
+    <div class="runner-body">\${rows}\${scrHTML}</div>
   </div>`;
-
   document.getElementById('main').innerHTML = header + table;
   generateAISummary(rc, results, tc);
 }
@@ -726,12 +728,12 @@ function showToday() {
     const tcColor = {good:'#d1fae5',soft:'#fef9c3',heavy:'#dbeafe',synthetic:'#f3e8ff'}[tc]||'#d1fae5';
     const tcText = {good:'#065f46',soft:'#713f12',heavy:'#1e3a8a',synthetic:'#4c1d95'}[tc]||'#065f46';
 
-    html += `<div class="meeting-card" style="margin-bottom:8px">
+    html += `<div class="meeting-card" style="margin-bottom:6px">
       <div class="meeting-card-header">
         <span class="meeting-card-name">${venue}</span>
         <span class="meeting-card-tc" style="background:${tcColor};color:${tcText}">${tcLabel}</span>
       </div>
-      <div class="races-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr))">`;
+      <div class="races-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(65px,1fr))">`;
 
     keys.forEach(k => {
       const rc = allRaces[k];
