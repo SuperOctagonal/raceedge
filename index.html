@@ -493,25 +493,50 @@ function buildSidebarMeetings() {
   document.getElementById('lr-meetings-sec').style.display = 'block';
   document.getElementById('lr-races-sec').style.display = 'none';
   const el = document.getElementById('lr-meetings');
-  el.innerHTML = Object.entries(allVenues).map(([venue, keys]) =>
-    `<div class="lr-meeting" onclick="selectMeeting('${venue}')" id="lrm-${venue.replace(/[^a-z0-9]/gi,'_')}">
-      <span>${venue}</span><span class="lr-meeting-count">${keys.length}R</span>
-    </div>`
-  ).join('');
+  el.innerHTML = Object.entries(allVenues).map(([venue, keys]) => {
+    const safeId = venue.replace(/[^a-z0-9]/gi,'_');
+    const racesHTML = keys.map(k => {
+      const rc = allRaces[k];
+      if (!rc) return '';
+      return `<div class="lr-race" onclick="selectRace(allRaces['${k}'],'${k}')" id="lrr-${k}" style="padding:3px 6px 3px 14px;border-radius:3px;font-size:9px;color:rgba(255,255,255,.4);cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:1px">
+        <span>R${rc.num} <span style="opacity:.7">${rc.name?rc.name.substring(0,14):''}</span></span>
+        <span style="font-size:8px;color:rgba(255,255,255,.25)">${rc.time||''}</span>
+      </div>`;
+    }).join('');
+    return `<div id="lrm-wrap-${safeId}">
+      <div class="lr-meeting" onclick="toggleMeeting('${safeId}')" id="lrm-${safeId}" style="display:flex;align-items:center;justify-content:space-between;padding:4px 6px;border-radius:4px;font-size:10px;color:rgba(255,255,255,.45);cursor:pointer;margin-bottom:1px">
+        <span>${venue}</span>
+        <div style="display:flex;align-items:center;gap:4px">
+          <span style="font-size:8px;color:rgba(255,255,255,.25)">${keys.length}R</span>
+          <span id="lrm-arrow-${safeId}" style="font-size:9px;color:rgba(255,255,255,.25)">▶</span>
+        </div>
+      </div>
+      <div id="lrm-races-${safeId}" style="display:none">${racesHTML}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggleMeeting(safeId) {
+  const racesEl = document.getElementById('lrm-races-' + safeId);
+  const arrow = document.getElementById('lrm-arrow-' + safeId);
+  const meetingEl = document.getElementById('lrm-' + safeId);
+  if (!racesEl) return;
+  const isOpen = racesEl.style.display !== 'none';
+  // Close all
+  document.querySelectorAll('[id^="lrm-races-"]').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('[id^="lrm-arrow-"]').forEach(el => el.textContent = '▶');
+  document.querySelectorAll('.lr-meeting').forEach(el => { el.style.color='rgba(255,255,255,.45)'; el.style.background=''; });
+  if (!isOpen) {
+    racesEl.style.display = 'block';
+    if (arrow) arrow.textContent = '▼';
+    if (meetingEl) { meetingEl.style.color='#fff'; meetingEl.style.background='rgba(255,255,255,.08)'; meetingEl.style.fontWeight='600'; }
+  }
 }
 
 function buildSidebarRaces(venue) {
-  const keys = allVenues[venue] || [];
-  document.getElementById('lr-races-sec').style.display = 'block';
-  const el = document.getElementById('lr-races');
-  el.innerHTML = keys.map(k => {
-    const rc = allRaces[k];
-    if (!rc) return '';
-    return `<div class="lr-race" onclick="selectRace(allRaces['${k}'],'${k}')" id="lrr-${k}">
-      <span>R${rc.num} ${rc.name ? rc.name.substring(0,16) : ''}</span>
-      <span class="lr-race-time">${rc.time||''}</span>
-    </div>`;
-  }).join('');
+  // Races now built inline in buildSidebarMeetings - just expand the right meeting
+  const safeId = venue.replace(/[^a-z0-9]/gi,'_');
+  toggleMeeting(safeId);
 }
 
 // After CSV loads, update sidebar
@@ -530,15 +555,24 @@ function onCSVLoaded(fname) {
 // ── RACE RENDER (override to update sidebar) ──
 const _origSelectRace = typeof selectRace === 'function' ? selectRace : null;
 function _afterSelectRace(rc, key) {
-  // Update sidebar race active state
-  document.querySelectorAll('.lr-race').forEach(el => el.classList.remove('active'));
-  const el = document.getElementById('lrr-' + key);
-  if (el) el.classList.add('active');
-  // Update sidebar meeting active state
-  document.querySelectorAll('.lr-meeting').forEach(el => el.classList.remove('active'));
-  const mEl = document.getElementById('lrm-' + (rc.venue||'').replace(/[^a-z0-9]/gi,'_'));
-  if (mEl) mEl.classList.add('active');
-  buildSidebarRaces(rc.venue);
+  // Expand the meeting in sidebar
+  const safeId = (rc.venue||'').replace(/[^a-z0-9]/gi,'_');
+  const racesEl = document.getElementById('lrm-races-' + safeId);
+  const arrow = document.getElementById('lrm-arrow-' + safeId);
+  const meetingEl = document.getElementById('lrm-' + safeId);
+  if (racesEl && racesEl.style.display === 'none') {
+    // Close others first
+    document.querySelectorAll('[id^="lrm-races-"]').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('[id^="lrm-arrow-"]').forEach(el => el.textContent = '▶');
+    document.querySelectorAll('.lr-meeting').forEach(el => { el.style.color='rgba(255,255,255,.45)'; el.style.background=''; el.style.fontWeight=''; });
+    racesEl.style.display = 'block';
+    if (arrow) arrow.textContent = '▼';
+    if (meetingEl) { meetingEl.style.color='#fff'; meetingEl.style.background='rgba(255,255,255,.08)'; meetingEl.style.fontWeight='600'; }
+  }
+  // Highlight active race
+  document.querySelectorAll('.lr-race').forEach(el => { el.style.color='rgba(255,255,255,.4)'; el.style.background=''; el.style.fontWeight=''; });
+  const rEl = document.getElementById('lrr-' + key);
+  if (rEl) { rEl.style.color='#4ade80'; rEl.style.fontWeight='600'; }
 }
 
 // ── RACE TABLE RENDER ──
@@ -5021,6 +5055,6 @@ document.addEventListener('DOMContentLoaded',function(){
 <div id="mob-sidebar-btn" style="display:none"></div>
 <div id="mobSheetOverlay" style="display:none"></div>
 <div id="mobSheet" style="display:none"><div id="mobSheetTitle"></div><div id="mobSheetContent"></div></div>
-<div id="horseFormCard" style="display:none"></div>
+<div id="horseFormCard" style="display:none;position:fixed;z-index:9999;background:#fff;border:0.5px solid #e5e7eb;border-radius:10px;box-shadow:0 4px 24px rgba(0,0,0,.15);width:420px;max-height:80vh;overflow-y:auto;font-size:11px;font-family:Space Grotesk,sans-serif"></div>
 <div id="mob-nav-drawer" style="display:none"></div>
 </body></html>
