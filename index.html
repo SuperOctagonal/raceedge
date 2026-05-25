@@ -594,7 +594,7 @@ function renderRaceTable(rc, results, scratched, hasLive, liveOddsData) {
       <div class="rc rc-rank"><span class="rk ${rkClass}">${rank}</span></div>
       <div class="rc rc-tab"><span style="background:#1e40af;color:#fff;font-size:8px;font-weight:700;padding:1px 4px;border-radius:2px">${r.tab||''}</span></div>
       <div class="rc rc-horse">
-        <div class="horse-name" onclick="showHorseForm(event,${i})">${r.name}${bp?` <span style="font-weight:400;color:#9ca3af;font-size:10px">(${bp})</span>`:''}</div>
+        <div class="horse-name" onmouseenter="showHorseForm(event,${i})" onmouseleave="hideHorseForm()" style="cursor:pointer">${r.name}${bp?` <span style="font-weight:400;color:#9ca3af;font-size:10px">(${bp})</span>`:''}</div>
         <div class="horse-detail">${r['Weight']||''}kg · ${jShort} · ${r.trainer||''}</div>
       </div>
       <div class="rc rc-form"><span style="font-family:'JetBrains Mono';font-size:10px;color:#6b7280">${fins||'FS'}</span></div>
@@ -892,77 +892,168 @@ function showPaceMapPage() {
 // ── MY BETS PAGE ──
 function showMyBets() {
   const log = (typeof betLog !== 'undefined' && Array.isArray(betLog)) ? betLog : [];
-  const log_clean = log.map(b=>({...b, odds:parseFloat(b.odds)||0, stake:parseFloat(b.stake)||0}));
-  const wins = log_clean.filter(b=>b.result==='W');
-  const losses = log_clean.filter(b=>b.result==='L');
-  const places = log_clean.filter(b=>b.result==='P');
-  const settled = log_clean.filter(b=>b.result);
-
-  const profit = wins.reduce((s,b)=>(s+((b.odds-1)*b.stake)),0) - losses.reduce((s,b)=>s+b.stake,0) + places.reduce((s,b)=>s+(b.stake*0.5-b.stake),0);
+  const lc = log.map(b=>({...b, odds:parseFloat(b.odds)||0, stake:parseFloat(b.stake)||0}));
+  const settled = lc.filter(b=>b.result&&b.result!=='pending');
+  const wins = settled.filter(b=>b.result==='W'||b.result==='Win');
+  const losses = settled.filter(b=>b.result==='L'||b.result==='Loss');
+  const places = settled.filter(b=>b.result==='P'||b.result==='Place');
+  const profit = wins.reduce((s,b)=>(s+(b.odds-1)*b.stake),0)
+                + places.reduce((s,b)=>(s+b.stake*0.5-b.stake),0)
+                - losses.reduce((s,b)=>s+b.stake,0);
   const totalStaked = settled.reduce((s,b)=>s+b.stake,0);
-  const roi = totalStaked > 0 ? (profit / totalStaked * 100) : 0;
-  const winPct = settled.length ? (wins.length/settled.length*100) : 0;
-  const totalStake = log_clean.reduce((s,b)=>s+b.stake,0);
+  const roi = totalStaked>0?(profit/totalStaked*100):0;
+  const winPct = settled.length?(wins.length/settled.length*100):0;
+  const totalStake = lc.reduce((s,b)=>s+b.stake,0);
+  const avgOdds = lc.length?(lc.reduce((s,b)=>s+b.odds,0)/lc.length):0;
+
+  // ROI by odds range
+  const ranges = [
+    {label:'$2–$4', min:2, max:4},
+    {label:'$4–$8', min:4, max:8},
+    {label:'$8–$15', min:8, max:15},
+    {label:'$15+', min:15, max:999}
+  ];
+  const rangeStats = ranges.map(r => {
+    const rb = settled.filter(b=>b.odds>=r.min&&b.odds<r.max);
+    const rw = rb.filter(b=>b.result==='W'||b.result==='Win');
+    const rp = rb.reduce((s,b)=>(b.result==='W'||b.result==='Win'?(s+(b.odds-1)*b.stake):(b.result==='L'||b.result==='Loss'?s-b.stake:s+(b.stake*0.5-b.stake))),0);
+    const rs = rb.reduce((s,b)=>s+b.stake,0);
+    const rroi = rs>0?(rp/rs*100):null;
+    return {...r, count:rb.length, wins:rw.length, roi:rroi, profit:rp};
+  });
 
   const main = document.getElementById('main');
-  main.innerHTML = `<div class="page-wrap">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-      <div><div class="page-title">My Bets</div><div class="page-sub">${log.length} bets logged</div></div>
+  main.innerHTML = `<div style="display:flex;flex-direction:column;height:100%;overflow:hidden">
+
+    <!-- Header bar -->
+    <div style="background:#fff;border-bottom:0.5px solid #e5e7eb;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+      <div>
+        <div style="font-size:16px;font-weight:700;color:#111827">My Bets</div>
+        <div style="font-size:11px;color:#9ca3af;margin-top:1px">${log.length} bets logged${settled.length?' · '+settled.length+' settled':''}</div>
+      </div>
       <div style="display:flex;gap:6px">
         <button class="export-btn" onclick="exportBetsPDF()"><i class="ti ti-file-type-pdf" style="font-size:13px"></i> PDF</button>
         <button class="export-btn" onclick="exportBetsCSV()"><i class="ti ti-table" style="font-size:13px"></i> CSV</button>
         <button class="export-btn" onclick="copyBetsToClipboard()"><i class="ti ti-copy" style="font-size:13px"></i> Copy</button>
-        <button class="export-btn" onclick="showAddBet()"><i class="ti ti-plus" style="font-size:13px"></i> Add bet</button>
       </div>
     </div>
 
-    <div class="bets-stat-grid">
-      <div class="stat-box"><div class="stat-lbl">P&L</div><div class="stat-val ${profit>=0?'pos':'neg'}">${profit>=0?'+':''}$${Math.abs(profit).toFixed(0)}</div></div>
-      <div class="stat-box"><div class="stat-lbl">ROI</div><div class="stat-val ${roi>=0?'pos':'neg'}">${roi.toFixed(1)}%</div></div>
-      <div class="stat-box"><div class="stat-lbl">Win %</div><div class="stat-val">${winPct.toFixed(0)}%</div></div>
-      <div class="stat-box"><div class="stat-lbl">Total stake</div><div class="stat-val">$${totalStake.toFixed(0)}</div></div>
+    <!-- Stats row -->
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:0;background:#fff;border-bottom:0.5px solid #e5e7eb;flex-shrink:0">
+      <div style="padding:12px 16px;border-right:0.5px solid #f3f4f6;text-align:center">
+        <div style="font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">P&L</div>
+        <div style="font-size:20px;font-weight:700;font-family:'JetBrains Mono';color:${profit>=0?'#059669':'#dc2626'}">${profit>=0?'+':''}$${Math.abs(profit).toFixed(0)}</div>
+      </div>
+      <div style="padding:12px 16px;border-right:0.5px solid #f3f4f6;text-align:center">
+        <div style="font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">ROI</div>
+        <div style="font-size:20px;font-weight:700;font-family:'JetBrains Mono';color:${roi>=0?'#059669':'#dc2626'}">${roi.toFixed(1)}%</div>
+      </div>
+      <div style="padding:12px 16px;border-right:0.5px solid #f3f4f6;text-align:center">
+        <div style="font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Win %</div>
+        <div style="font-size:20px;font-weight:700;font-family:'JetBrains Mono'">${winPct.toFixed(0)}%</div>
+      </div>
+      <div style="padding:12px 16px;border-right:0.5px solid #f3f4f6;text-align:center">
+        <div style="font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Bets</div>
+        <div style="font-size:20px;font-weight:700;font-family:'JetBrains Mono'">${log.length}</div>
+      </div>
+      <div style="padding:12px 16px;border-right:0.5px solid #f3f4f6;text-align:center">
+        <div style="font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Staked</div>
+        <div style="font-size:20px;font-weight:700;font-family:'JetBrains Mono'">$${totalStake.toFixed(0)}</div>
+      </div>
+      <div style="padding:12px 16px;text-align:center">
+        <div style="font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Avg odds</div>
+        <div style="font-size:20px;font-weight:700;font-family:'JetBrains Mono'">$${avgOdds.toFixed(2)}</div>
+      </div>
     </div>
 
-    <div class="card">
-      <div style="overflow-x:auto">
-        ${!log.length ? '<div class="empty-state" style="height:120px"><i class="ti ti-notebook"></i><p>No bets logged yet</p></div>' : `
-        <table style="width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed">
-          <thead>
-            <tr style="background:#f8fafc">
-              <th style="padding:6px 10px;text-align:left;font-size:9px;color:#9ca3af;text-transform:uppercase;border-bottom:0.5px solid #e5e7eb">Horse</th>
-              <th style="padding:6px 10px;text-align:left;font-size:9px;color:#9ca3af;text-transform:uppercase;border-bottom:0.5px solid #e5e7eb;width:80px">Race</th>
-              <th style="padding:6px 10px;text-align:right;font-size:9px;color:#9ca3af;text-transform:uppercase;border-bottom:0.5px solid #e5e7eb;width:55px">Odds</th>
-              <th style="padding:6px 10px;text-align:right;font-size:9px;color:#9ca3af;text-transform:uppercase;border-bottom:0.5px solid #e5e7eb;width:55px">Stake</th>
-              <th style="padding:6px 10px;text-align:right;font-size:9px;color:#9ca3af;text-transform:uppercase;border-bottom:0.5px solid #e5e7eb;width:55px">Edge $</th>
-              <th style="padding:6px 10px;text-align:center;font-size:9px;color:#9ca3af;text-transform:uppercase;border-bottom:0.5px solid #e5e7eb;width:55px">Result</th>
-              <th style="padding:6px 10px;text-align:right;font-size:9px;color:#9ca3af;text-transform:uppercase;border-bottom:0.5px solid #e5e7eb;width:60px">P&L</th>
-              <th style="padding:6px 10px;border-bottom:0.5px solid #e5e7eb;width:28px"></th>
-            </tr>
-          </thead>
-          <tbody>
-          ${log.map((b,i) => {
-            const pl = b.result==='W'?(b.odds-1)*b.stake : b.result==='L'?-b.stake : b.result==='P'?b.stake*0.5-b.stake : null;
-            const plStr = pl!==null ? (pl>=0?'+':'')+'$'+Math.abs(pl).toFixed(2) : '—';
-            const plClass = pl===null?'':pl>=0?'bet-result-w':'bet-result-l';
-            const rClass = b.result==='W'?'bet-result-w':b.result==='L'?'bet-result-l':b.result==='P'?'bet-result-p':'';
-            return `<tr style="border-bottom:0.5px solid #f3f4f6">
-              <td style="padding:6px 10px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${b.horse||'—'}</td>
-              <td style="padding:6px 10px;color:#9ca3af;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${b.venue||''} R${b.race||''}</td>
-              <td style="padding:6px 10px;text-align:right;font-family:'JetBrains Mono'">$${b.odds||'—'}</td>
-              <td style="padding:6px 10px;text-align:right;font-family:'JetBrains Mono'">$${b.stake||'—'}</td>
-              <td style="padding:6px 10px;text-align:right;font-family:'JetBrains Mono';color:#059669">${b.myOdds?'$'+formatRacingOdds(b.myOdds):'—'}</td>
-              <td style="padding:6px 10px;text-align:center">
-                ${b.result ? `<span class="${rClass}">${b.result}</span>` :
-                  `<select onchange="updateBetResult(${i},this.value)" style="font-size:9px;border:0.5px solid #e5e7eb;border-radius:3px;padding:1px 3px">
-                    <option value="">—</option><option value="W">W</option><option value="P">P</option><option value="L">L</option>
-                  </select>`}
-              </td>
-              <td style="padding:6px 10px;text-align:right;font-family:'JetBrains Mono'" class="${plClass}">${plStr}</td>
-              <td style="padding:6px 10px;text-align:center"><button onclick="deleteBet(${i})" style="background:none;border:none;cursor:pointer;color:#e5e7eb;font-size:12px;transition:color .1s" onmouseover="this.style.color='#dc2626'" onmouseout="this.style.color='#e5e7eb'"><i class="ti ti-trash"></i></button></td>
-            </tr>`;
-          }).join('')}
-          </tbody>
-        </table>`}
+    <!-- Main content -->
+    <div style="display:grid;grid-template-columns:1fr 200px;flex:1;min-height:0;overflow:hidden">
+
+      <!-- Bet table -->
+      <div style="overflow-y:auto;border-right:0.5px solid #e5e7eb">
+        ${!log.length
+          ? `<div class="empty-state" style="height:200px"><i class="ti ti-notebook" style="font-size:36px"></i><p style="font-size:12px">No bets logged yet.<br>Click Log Bet on any runner.</p></div>`
+          : `<table style="width:100%;border-collapse:collapse;font-size:11px;table-layout:fixed">
+            <thead style="position:sticky;top:0;z-index:1">
+              <tr style="background:#f8fafc">
+                <th style="padding:7px 10px;text-align:left;font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px;border-bottom:0.5px solid #e5e7eb;font-weight:600">Horse</th>
+                <th style="padding:7px 10px;text-align:left;font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px;border-bottom:0.5px solid #e5e7eb;font-weight:600;width:120px">Race</th>
+                <th style="padding:7px 10px;text-align:center;font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px;border-bottom:0.5px solid #e5e7eb;font-weight:600;width:70px">Date</th>
+                <th style="padding:7px 10px;text-align:right;font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px;border-bottom:0.5px solid #e5e7eb;font-weight:600;width:56px">Odds</th>
+                <th style="padding:7px 10px;text-align:right;font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px;border-bottom:0.5px solid #e5e7eb;font-weight:600;width:56px">Stake</th>
+                <th style="padding:7px 10px;text-align:right;font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px;border-bottom:0.5px solid #e5e7eb;font-weight:600;width:56px">Edge $</th>
+                <th style="padding:7px 10px;text-align:center;font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px;border-bottom:0.5px solid #e5e7eb;font-weight:600;width:80px">Result</th>
+                <th style="padding:7px 10px;text-align:right;font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.3px;border-bottom:0.5px solid #e5e7eb;font-weight:600;width:60px">P&L</th>
+                <th style="padding:7px 10px;border-bottom:0.5px solid #e5e7eb;width:28px"></th>
+              </tr>
+            </thead>
+            <tbody>
+            ${(function(){
+              return log.map(function(b,i){
+                var odds = parseFloat(b.odds)||0;
+                var stake = parseFloat(b.stake)||0;
+                var isWin = b.result==='W'||b.result==='Win';
+                var isLoss = b.result==='L'||b.result==='Loss';
+                var isPlace = b.result==='P'||b.result==='Place';
+                var isPending = !b.result||b.result==='pending';
+                var pl = isWin?(odds-1)*stake:isLoss?-stake:isPlace?(stake*0.5-stake):null;
+                var plStr = pl!==null?(pl>=0?'+':'')+'$'+Math.abs(pl).toFixed(2):'—';
+                var plCls = pl===null?'':pl>=0?'color:#059669;font-weight:700':'color:#dc2626;font-weight:700';
+                var venue = b.meeting||b.venue||'';
+                var rowBg = i%2===0?'background:#fff':'background:#fafafa';
+                var resultCell = isPending
+                  ? '<select onchange="updateBetResult('+i+',this.value)" style="font-size:9px;border:0.5px solid #e5e7eb;border-radius:4px;padding:2px 4px;cursor:pointer;font-family:Space Grotesk"><option value=\'pending\'>Pending</option><option value=\'W\'>Win</option><option value=\'P\'>Place</option><option value=\'L\'>Loss</option></select>'
+                  : '<span style="font-size:9px;font-weight:700;padding:2px 8px;border-radius:10px;'+(isWin?'background:#dcfce7;color:#166534':isLoss?'background:#fee2e2;color:#991b1b':'background:#fef9c3;color:#854d0e')+'">'+(isWin?'WIN':isLoss?'LOSS':'PLACE')+'</span>';
+                return '<tr style="'+rowBg+';border-bottom:0.5px solid #f3f4f6">'
+                  +'<td style="padding:7px 10px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(b.horse||'—')+'</td>'
+                  +'<td style="padding:7px 10px;color:#6b7280;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+venue+' '+(b.race||'')+'</td>'
+                  +'<td style="padding:7px 10px;text-align:center;color:#9ca3af;font-size:10px">'+(b.date||'—')+'</td>'
+                  +'<td style="padding:7px 10px;text-align:right;font-family:JetBrains Mono;font-weight:600">'+(odds?'$'+odds.toFixed(2):'—')+'</td>'
+                  +'<td style="padding:7px 10px;text-align:right;font-family:JetBrains Mono">'+(stake?'$'+stake.toFixed(2):'—')+'</td>'
+                  +'<td style="padding:7px 10px;text-align:right;font-family:JetBrains Mono;color:#059669">'+(b.myOdds?'$'+formatRacingOdds(b.myOdds):'—')+'</td>'
+                  +'<td style="padding:7px 10px;text-align:center">'+resultCell+'</td>'
+                  +'<td style="padding:7px 10px;text-align:right;font-family:JetBrains Mono;'+plCls+'">'+plStr+'</td>'
+                  +'<td style="padding:7px 10px;text-align:center"><button onclick="deleteBet('+i+')" style="background:none;border:none;cursor:pointer;color:#d1d5db;font-size:14px;padding:0" onmouseover="this.style.color=\'#dc2626\'" onmouseout="this.style.color=\'#d1d5db\'"><i class=\"ti ti-trash\"></i></button></td>'
+                  +'</tr>';
+              }).join('');
+            })()}
+            </tbody>
+          </table>`}
+      </div>
+
+      <!-- Right panel - ROI analysis -->
+      <div style="background:#f8fafc;padding:12px;overflow-y:auto;display:flex;flex-direction:column;gap:12px">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">ROI by odds range</div>
+          ${(function(){return rangeStats.map(function(r){
+            var roiColor = r.roi===null?'#9ca3af':r.roi>=0?'#059669':'#dc2626';
+            var barW = r.count>0?Math.min(100,Math.abs(r.roi||0)):0;
+            return '<div style="margin-bottom:8px">'
+              +'<div style="display:flex;justify-content:space-between;margin-bottom:3px">'
+              +'<span style="font-size:10px;font-weight:600;color:#374151">'+r.label+'</span>'
+              +'<span style="font-size:10px;font-weight:700;color:'+roiColor+'">'+(r.roi!==null?(r.roi>=0?'+':'')+r.roi.toFixed(0)+'%':'—')+'</span>'
+              +'</div>'
+              +'<div style="height:5px;background:#e5e7eb;border-radius:3px;overflow:hidden">'
+              +'<div style="width:'+barW+'%;height:100%;background:'+roiColor+';border-radius:3px"></div>'
+              +'</div>'
+              +'<div style="font-size:9px;color:#9ca3af;margin-top:2px">'+r.count+' bets · '+r.wins+' wins</div>'
+              +'</div>';
+          }).join('');})()}
+        </div>
+        <div style="border-top:0.5px solid #e5e7eb;padding-top:10px">
+          <div style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Record</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;text-align:center">
+            <div style="background:#dcfce7;border-radius:6px;padding:6px;"><div style="font-size:14px;font-weight:700;color:#166534">${wins.length}</div><div style="font-size:8px;color:#166534">Wins</div></div>
+            <div style="background:#fef9c3;border-radius:6px;padding:6px;"><div style="font-size:14px;font-weight:700;color:#854d0e">${places.length}</div><div style="font-size:8px;color:#854d0e">Places</div></div>
+            <div style="background:#fee2e2;border-radius:6px;padding:6px;"><div style="font-size:14px;font-weight:700;color:#991b1b">${losses.length}</div><div style="font-size:8px;color:#991b1b">Losses</div></div>
+          </div>
+        </div>
+        ${settled.length>0?`<div style="border-top:0.5px solid #e5e7eb;padding-top:10px">
+          <div style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Insight</div>
+          <div style="font-size:10px;color:#374151;line-height:1.6;background:#fff;border-radius:6px;padding:8px;border:0.5px solid #e5e7eb">
+            ${roi>=10?'🟢 Your system is profitable. Keep backing value.':roi>=-10?'🟡 Near break-even. Focus on higher value %':'🔴 Review your bet selection — stick to Rank 1 at $5–$10.'}
+          </div>
+        </div>`:''}
       </div>
     </div>
   </div>`;
@@ -1021,12 +1112,177 @@ function showInsights() {
 
 // ── COMMUNITY PAGE ──
 function showCommunity() {
-  document.getElementById('main').innerHTML = `<div class="page-wrap">
-    <div class="page-title">Community</div>
-    <div class="page-sub">Coming soon — forum, leaderboards and tier system</div>
-    <div class="empty-state"><i class="ti ti-users"></i><p>Community features launching soon</p></div>
+  const main = document.getElementById('main');
+  main.innerHTML = `<div style="display:grid;grid-template-columns:220px 1fr 220px;height:100%;overflow:hidden">
+
+    <!-- LEFT: Profile + sections -->
+    <div style="border-right:0.5px solid #e5e7eb;background:#fff;display:flex;flex-direction:column;overflow-y:auto">
+      <div style="padding:14px;border-bottom:0.5px solid #f3f4f6">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="width:40px;height:40px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#1e40af;flex-shrink:0">A</div>
+          <div>
+            <div style="font-size:13px;font-weight:600">Your Profile</div>
+            <div style="display:inline-flex;align-items:center;gap:3px;padding:2px 6px;border-radius:4px;background:#fef3c7;color:#92400e;font-size:10px;font-weight:500;margin-top:2px">
+              <i class="ti ti-trophy" style="font-size:10px"></i> Adaminaby Maiden
+            </div>
+          </div>
+        </div>
+        <div style="margin-bottom:6px">
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:#9ca3af;margin-bottom:3px"><span>0 pts</span><span>50 pts next tier</span></div>
+          <div style="height:5px;background:#f1f5f9;border-radius:3px;overflow:hidden"><div style="width:2%;height:100%;background:#d97706;border-radius:3px"></div></div>
+        </div>
+        <div style="display:flex;gap:3px;flex-wrap:wrap">
+          <span style="font-size:8px;background:#f1f5f9;color:#6b7280;padding:2px 5px;border-radius:3px">0 pts total</span>
+          <span style="font-size:8px;background:#f1f5f9;color:#6b7280;padding:2px 5px;border-radius:3px">0 bets</span>
+          <span style="font-size:8px;background:#f1f5f9;color:#6b7280;padding:2px 5px;border-radius:3px">0 posts</span>
+        </div>
+      </div>
+      <div style="padding:10px 14px;border-bottom:0.5px solid #f3f4f6">
+        <div style="font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Sections</div>
+        ${(function(){
+          var secs=[['ti-flame',"Today's races",'races'],['ti-bulb','Tips & analysis','tips'],['ti-trophy','Winning bets','wins'],['ti-settings','System feedback','feedback'],['ti-messages','General chat','general']];
+          return secs.map(function(s){
+            var icon=s[0],label=s[1],id=s[2];
+            var active=id==='races'?'background:#f0fdf4;font-weight:500':'';
+            return '<div onclick="setCommunitySection(\''+id+'\')" id="csec-'+id+'" style="display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:6px;cursor:pointer;color:#374151;font-size:12px;margin-bottom:1px;'+active+'">'
+              +'<i class="ti '+icon+'" style="font-size:14px;color:#00471b"></i>'+label
+              +'</div>';
+          }).join('');
+        })()}
+      </div>
+      <div style="padding:10px 14px">
+        <div style="font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">My badges</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px">
+          ${['🏁','🎯','🔥','🌧️','📈','📚','🤝','⚡','👑','🏇'].map((b,i) =>
+            `<div style="width:26px;height:26px;border-radius:5px;${i<1?'background:#fef3c7;border:0.5px solid #fbbf24':'background:#f1f5f9;border:0.5px solid #e5e7eb'};display:flex;align-items:center;justify-content:center;font-size:13px" title="${i<1?'First Post':'Locked'}">${b}</div>`
+          ).join('')}
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTRE: Forum -->
+    <div style="display:flex;flex-direction:column;overflow:hidden">
+      <div style="background:#fff;border-bottom:0.5px solid #e5e7eb;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+        <div>
+          <div style="font-size:14px;font-weight:600">Today's races</div>
+          <div style="font-size:11px;color:#9ca3af;margin-top:1px">Discuss today's races and share analysis</div>
+        </div>
+        <button onclick="showNewPost()" style="display:inline-flex;align-items:center;gap:5px;padding:7px 12px;border-radius:6px;background:#00471b;color:#fff;border:none;font-size:11px;font-weight:600;cursor:pointer;font-family:'Space Grotesk'">
+          <i class="ti ti-pencil" style="font-size:13px"></i> New post
+        </button>
+      </div>
+      <!-- Tab bar -->
+      <div style="background:#fff;border-bottom:0.5px solid #e5e7eb;display:flex;padding:0 14px;flex-shrink:0">
+        ${['Hot','Latest','Top this week','Unanswered'].map((t,i) =>
+          `<div style="padding:8px 12px;font-size:11px;font-weight:${i===0?'600':'500'};color:${i===0?'#00471b':'#9ca3af'};border-bottom:2px solid ${i===0?'#00471b':'transparent'};cursor:pointer;white-space:nowrap">${t}</div>`
+        ).join('')}
+      </div>
+      <!-- Pinned announcement -->
+      <div style="background:#fafafa;border-bottom:0.5px solid #e5e7eb;padding:8px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <i class="ti ti-pin" style="font-size:14px;color:#6b21a8;flex-shrink:0"></i>
+        <div style="font-size:11px;font-weight:500;color:#374151;flex:1">Welcome to RaceEdge Community — share your analysis and climb the tier ladder</div>
+        <span style="font-size:10px;color:#9ca3af">Pinned</span>
+      </div>
+      <!-- Posts -->
+      <div style="flex:1;overflow-y:auto">
+        ${[
+          {user:'JPunter88',tier:'Newcastle BM84',tierBg:'#dcfce7',tierColor:'#166534',cat:'Winning bet',catBg:'#fef9c3',catColor:'#854d0e',title:'Backed Rank 1 at Flemington this morning — $8.50 — bolted in by 3 lengths',votes:89,replies:31,views:687,time:'5h ago',hot:true},
+          {user:'TrackRat_WA',tier:'Ascot Open',tierBg:'#fef3c7',tierColor:'#92400e',cat:'Tips & analysis',catBg:'#dcfce7',catColor:'#166534',title:'Track bias at Doomben today — closers dominating after rail position change',votes:47,replies:23,views:412,time:'2h ago',hot:false},
+          {user:'MeggsK',tier:'Moonee Valley Open',tierBg:'#dbeafe',tierColor:'#1e40af',cat:"Today's races",catBg:'#dbeafe',catColor:'#1e40af',title:'Doomben R6 — system Rank 1 at $12, market has it at $4.50. Value% +166%. Thoughts?',votes:34,replies:19,views:298,time:'3h ago',hot:false},
+          {user:'NewMember247',tier:'Walgett Maiden',tierBg:'#f3f4f6',tierColor:'#374151',cat:'Winning bet',catBg:'#fef9c3',catColor:'#854d0e',title:'First win with the system! Rank 2 at $6.50 at Caulfield — absolutely stoked',votes:12,replies:8,views:143,time:'1h ago',hot:false},
+          {user:'SpringCarnival',tier:'Gosford BM78',tierBg:'#f3f4f6',tierColor:'#374151',cat:'System feedback',catBg:'#f3e8ff',catColor:'#6b21a8',title:'How does the system handle horses returning from a long spell?',votes:8,replies:6,views:97,time:'2 days ago',hot:false},
+        ].map(p => `
+          <div style="display:flex;align-items:flex-start;gap:0;padding:10px 14px;border-bottom:0.5px solid #f3f4f6;cursor:pointer" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background=''">
+            <!-- Vote col -->
+            <div style="display:flex;flex-direction:column;align-items:center;width:36px;flex-shrink:0;gap:1px;padding-top:2px">
+              <button style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:16px;line-height:1;padding:0" onmouseover="this.style.color='#059669'" onmouseout="this.style.color='#9ca3af'">▲</button>
+              <span style="font-size:12px;font-weight:600;color:#111827">${p.votes}</span>
+            </div>
+            <!-- Content -->
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:3px">
+                <span style="font-size:9px;font-weight:600;padding:1px 6px;border-radius:3px;background:${p.catBg};color:${p.catColor}">${p.cat}</span>
+                ${p.hot?'<span style="font-size:9px;font-weight:600;padding:1px 5px;border-radius:10px;background:#fef3c7;color:#92400e">🔥 Hot</span>':''}
+              </div>
+              <div style="font-size:12px;font-weight:500;color:#111827;line-height:1.4;margin-bottom:4px">${p.title}</div>
+              <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <div style="width:18px;height:18px;border-radius:50%;background:${p.tierBg};display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;color:${p.tierColor}">${p.user[0]}</div>
+                <span style="font-size:10px;font-weight:500">${p.user}</span>
+                <span style="font-size:9px;padding:1px 5px;border-radius:3px;background:${p.tierBg};color:${p.tierColor}">${p.tier}</span>
+                <span style="font-size:10px;color:#9ca3af"><i class="ti ti-message" style="font-size:10px"></i> ${p.replies}</span>
+                <span style="font-size:10px;color:#9ca3af"><i class="ti ti-eye" style="font-size:10px"></i> ${p.views}</span>
+                <span style="font-size:10px;color:#9ca3af">${p.time}</span>
+              </div>
+            </div>
+            <!-- Replies pill -->
+            <div style="background:#f1f5f9;border-radius:6px;padding:5px 8px;text-align:center;min-width:40px;flex-shrink:0;margin-left:8px">
+              <div style="font-size:13px;font-weight:600;line-height:1">${p.replies}</div>
+              <div style="font-size:8px;color:#9ca3af">replies</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- RIGHT: Leaderboards -->
+    <div style="border-left:0.5px solid #e5e7eb;background:#fff;overflow-y:auto;display:flex;flex-direction:column;gap:0">
+      <!-- Weekly ROI -->
+      <div style="padding:12px 14px;border-bottom:0.5px solid #f3f4f6">
+        <div style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Weekly ROI</div>
+        <div style="font-size:9px;color:#9ca3af;margin-bottom:8px">Min 5 bets · resets Monday</div>
+        ${[
+          {rank:1,user:'TrackRat_WA',tier:'Ascot Open',roi:'+184%',tierBg:'#fef3c7',tierColor:'#92400e'},
+          {rank:2,user:'JPunter88',tier:'Newcastle BM84',roi:'+147%',tierBg:'#dcfce7',tierColor:'#166534'},
+          {rank:3,user:'MeggsK',tier:'Moonee Valley',roi:'+122%',tierBg:'#dbeafe',tierColor:'#1e40af'},
+          {rank:4,user:'DoombenDaily',tier:'Gold Coast BM84',roi:'+71%',tierBg:'#f3f4f6',tierColor:'#374151'},
+          {rank:5,user:'SpringCarnival',tier:'Gosford BM78',roi:'+44%',tierBg:'#f3f4f6',tierColor:'#374151'},
+        ].map(r => `
+          <div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:0.5px solid #f9fafb">
+            <span style="font-size:10px;font-weight:600;width:14px;text-align:center;color:${r.rank<=3?'#d97706':'#9ca3af'}">${r.rank}</span>
+            <div style="width:22px;height:22px;border-radius:50%;background:${r.tierBg};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:${r.tierColor};flex-shrink:0">${r.user[0]}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.user}</div>
+              <div style="font-size:8px;padding:0 4px;border-radius:2px;background:${r.tierBg};color:${r.tierColor};display:inline-block;margin-top:1px">${r.tier}</div>
+            </div>
+            <span style="font-size:10px;font-weight:700;color:#059669;flex-shrink:0">${r.roi}</span>
+          </div>
+        `).join('')}
+      </div>
+      <!-- Top contributors -->
+      <div style="padding:12px 14px;border-bottom:0.5px solid #f3f4f6">
+        <div style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Top contributors</div>
+        ${[
+          {rank:1,user:'TrackRat_WA',pts:'+2,840',tierBg:'#fef3c7',tierColor:'#92400e'},
+          {rank:2,user:'JPunter88',pts:'+1,920',tierBg:'#dcfce7',tierColor:'#166534'},
+          {rank:3,user:'MeggsK',pts:'+1,540',tierBg:'#dbeafe',tierColor:'#1e40af'},
+          {rank:4,user:'DoombenDaily',pts:'+890',tierBg:'#f3f4f6',tierColor:'#374151'},
+        ].map(r => `
+          <div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:0.5px solid #f9fafb">
+            <span style="font-size:10px;font-weight:600;width:14px;text-align:center;color:${r.rank<=3?'#d97706':'#9ca3af'}">${r.rank}</span>
+            <div style="width:22px;height:22px;border-radius:50%;background:${r.tierBg};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:${r.tierColor};flex-shrink:0">${r.user[0]}</div>
+            <span style="flex:1;font-size:10px;font-weight:600">${r.user}</span>
+            <span style="font-size:10px;color:#6b7280">${r.pts}</span>
+          </div>
+        `).join('')}
+      </div>
+      <!-- Community stats -->
+      <div style="padding:12px 14px">
+        <div style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Community stats</div>
+        ${[['Members online','2,847','#22c55e'],['Posts today','128',null],['Total members','14,203',null]].map(([l,v,c]) =>
+          `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:0.5px solid #f9fafb;font-size:11px">
+            <span style="color:#9ca3af">${l}</span>
+            <span style="font-weight:600;${c?'color:'+c:''}">${v}</span>
+          </div>`
+        ).join('')}
+      </div>
+    </div>
   </div>`;
 }
+
+function showNewPost() { toast('Forum posting coming soon'); }
+function setCommunitySection(id) { showCommunity(); }
+
+
 
 // ── BLACKBOOK PAGE ──
 function showBlackbook() {
@@ -1096,20 +1352,7 @@ function saveApiKey() {
 }
 
 // ── QUICK BET ──
-let _qbIdx = null, _qbType = 'win';
-function quickAddBet(e, idx) {
-  e.stopPropagation();
-  _qbIdx = idx;
-  _qbType = 'win';
-  const h = currentResults[idx];
-  if (!h) return;
-  document.getElementById('qb-horse').textContent = h.name;
-  document.getElementById('qb-odds').value = h.rawOdds ? h.rawOdds.toFixed(2) : '';
-  document.getElementById('qb-stake').value = '';
-  document.querySelectorAll('[id^="qbt-"]').forEach(b=>b.classList.remove('active'));
-  document.getElementById('qbt-win').classList.add('active');
-  document.getElementById('quickBetPanel').classList.add('open');
-}
+
 
 function closeQuickBet() { document.getElementById('quickBetPanel').classList.remove('open'); }
 function setQBT(btn, type) {
@@ -1118,25 +1361,7 @@ function setQBT(btn, type) {
   btn.classList.add('active');
 }
 
-function submitQB() {
-  const h = currentResults && currentResults[_qbIdx];
-  if (!h || !currentRace) { toast('Select a race first'); return; }
-  const odds = parseFloat(document.getElementById('qb-odds').value);
-  const stake = parseFloat(document.getElementById('qb-stake').value);
-  if (!odds || !stake) { toast('Enter odds and stake'); return; }
-  const bet = {
-    horse: h.name, venue: currentRace.venue, race: currentRace.num,
-    date: new Date().toLocaleDateString('en-AU'), type: _qbType,
-    odds, stake, myOdds: h.myOdds || null, rank: (currentResults.indexOf(h)+1),
-    result: null
-  };
-  if (typeof betLog === 'undefined') window.betLog = [];
-  betLog.push(bet);
-  if (typeof saveBetLog === 'function') saveBetLog();
-  if (typeof updateBetBadge === 'function') updateBetBadge();
-  closeQuickBet();
-  toast(`Bet logged — ${h.name} @ $${odds}`);
-}
+
 
 // ── TOAST ──
 function toast(msg, dur=2200) {
