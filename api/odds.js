@@ -1,67 +1,120 @@
-// Vercel serverless function — proxies TAB API server-side (no CORS issues)
-// Deployed at: https://project-hbjpu.vercel.app/api/odds?venue=DOOMBEN&race=5&date=2026-05-16&jur=QLD
+// api/odds.js — Sportsbet live odds scraper
+// Vercel serverless function — called by frontend every 5 mins on race day
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET');
-  
-  const { venue, race, date, jur } = req.query;
-  if (!date || !jur) {
-    return res.status(400).json({ error: 'Missing params: date, jur required' });
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
+  if (req.method === 'OPTIONS') return res.status(200).end();
+
+  const { venue, race, date } = req.query;
+  if (!venue || !race || !date) {
+    return res.status(400).json({ error: 'venue, race, date required' });
   }
 
   try {
-    // Step 1: Get meetings
-    const meetingsUrl = `https://api.tab.com.au/v1/tab-info-service/racing/dates/${date}/meetings?jurisdiction=${jur}`;
-    const m = await fetch(meetingsUrl, {
-      headers: { 
-        'User-Agent': 'Mozilla/5.0',
-        'Accept': 'application/json',
-        'Origin': 'https://www.tab.com.au',
-        'Referer': 'https://www.tab.com.au/'
-      }
-    });
-    if (!m.ok) return res.status(m.status).json({ error: `TAB meetings ${m.status}` });
-    const mData = await m.json();
-
-    // Step 2: Find meeting
-    const meetings = mData.meetings || [];
-    const venueUpper = (venue || '').toUpperCase();
-    const meeting = meetings.find(x =>
-      x.meetingName?.toUpperCase() === venueUpper ||
-      x.meetingName?.toUpperCase().includes(venueUpper.split(' ')[0]) ||
-      x.venueMnemonic?.toUpperCase() === venueUpper.substring(0, 4)
+    // Try to get cached odds from Supabase first (< 3 mins old)
+    const cacheRes = await fetch(
+      `${SUPABASE_URL}/rest/v1/live_odds?venue=eq.${encodeURIComponent(venue)}&race_num=eq.${race}&race_date=eq.${date}&updated_at=gt.${new Date(Date.now()-180000).toISOString()}&select=horse_name,win_odds,place_odds,updated_at`,
+      { headers: { 'apikey': SUPABASE_SERVICE_KEY, 'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}` } }
     );
-    if (!meeting) return res.status(404).json({ error: `Venue not found: ${venue}`, available: meetings.map(x=>x.meetingName) });
+    const cached = await cacheRes.json();
+    if (cached && cached.length > 0) {
+      return res.json({ source: 'cache', odds: cached, updated_at: cached[0].updated_at });
+    }
 
-    // Step 3: Find race
-    const raceObj = meeting.races?.find(r => String(r.raceNumber) === String(race));
-    if (!raceObj?.raceLink) return res.status(404).json({ error: `Race ${race} not found` });
+    // Fetch fresh from Sportsbet
+    const sbOdds = await fetchSportsbetOdds(venue, race, date);
+    if (!sbOdds || !sbOdds.length) {
+      return res.json({ source: 'none', odds: [], message: 'No odds available yet' });
+    }
 
-    // Step 4: Get runners + odds
-    const raceUrl = `https://api.tab.com.au${raceObj.raceLink}?jurisdiction=${jur}`;
-    const r = await fetch(raceUrl, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0',
-        'Accept': 'application/json', 
-        'Origin': 'https://www.tab.com.au',
-        'Referer': 'https://www.tab.com.au/'
-      }
-    });
-    if (!r.ok) return res.status(r.status).json({ error: `TAB race ${r.status}` });
-    const rData = await r.json();
-
-    // Return clean runner odds
-    const runners = (rData.runners || []).map(runner => ({
-      name: runner.runnerName,
-      tabNo: runner.tabNo,
-      scratched: runner.scratched || runner.isScratched || false,
-      win: parseFloat(runner.parimutuel?.returnWin || runner.fixedOdds?.returnWin || 0),
-      place: parseFloat(runner.parimutuel?.returnPlace || runner.fixedOdds?.returnPlace || 0)
+    // Upsert into Supabase
+    const now = new Date().toISOString();
+    const rows = sbOdds.map(o => ({
+      venue, race_num: parseInt(race), race_date: date,
+      horse_name: o.name, win_odds: o.win, place_odds: o.place,
+      source: 'sportsbet', updated_at: now
     }));
 
-    res.status(200).json({ runners, raceLink: raceObj.raceLink });
+    await fetch(`${SUPABASE_URL}/rest/v1/live_odds`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_SERVICE_KEY,
+        'Authorization': `Bearer ${SUPABASE_SERVICE_KEY}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates'
+      },
+      body: JSON.stringify(rows)
+    });
+
+    return res.json({ source: 'sportsbet', odds: sbOdds, updated_at: now });
+
+  } catch (err) {
+    console.error('Odds error:', err);
+    return res.status(500).json({ error: err.message });
+  }
+}
+
+async function fetchSportsbetOdds(venue, race, date) {
+  // Sportsbet public racing API - no auth required
+  // Format: YYYY-MM-DD
+  const dateStr = date; // expects YYYY-MM-DD
+  const venueSlug = venue.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+
+  const url = `https://www.sportsbet.com.au/racing/thoroughbreds/${venueSlug}/${dateStr}/race-${race}`;
+
+  try {
+    // Use their internal API endpoint
+    const apiUrl = `https://www.sportsbet.com.au/api/racing/racing-app/events?venueExternalId=${venueSlug}&raceNumber=${race}&raceDate=${dateStr}&racingCode=R`;
+    const r = await fetch(apiUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'application/json',
+        'Referer': 'https://www.sportsbet.com.au/'
+      }
+    });
+
+    if (!r.ok) {
+      // Try alternate endpoint
+      return await fetchSportsbetAlt(venue, race, date);
+    }
+
+    const data = await r.json();
+    if (!data || !data.runners) return null;
+
+    return data.runners.map(runner => ({
+      name: runner.runnerName || runner.name,
+      tab: runner.runnerNumber || runner.tabNumber,
+      win: runner.winOdds || runner.fixedWin,
+      place: runner.placeOdds || runner.fixedPlace
+    })).filter(r => r.name && r.win);
+
   } catch (e) {
-    res.status(500).json({ error: e.message });
+    return await fetchSportsbetAlt(venue, race, date);
+  }
+}
+
+async function fetchSportsbetAlt(venue, race, date) {
+  // Alternate: try Ladbrokes public API
+  try {
+    const venueCode = venue.toUpperCase().replace(/\s+/g,'').substring(0,4);
+    const url = `https://api.ladbrokes.com.au/v1/racing/races?venue=${encodeURIComponent(venue)}&raceNumber=${race}&date=${date}&code=R`;
+    const r = await fetch(url, {
+      headers: { 'User-Agent': 'Mozilla/5.0', 'Accept': 'application/json' }
+    });
+    if (!r.ok) return null;
+    const data = await r.json();
+    if (!data || !data.runners) return null;
+    return data.runners.map(runner => ({
+      name: runner.name,
+      tab: runner.runnerNumber,
+      win: runner.winOdds,
+      place: runner.placeOdds
+    })).filter(r => r.name && r.win);
+  } catch (e) {
+    return null;
   }
 }
