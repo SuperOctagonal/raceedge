@@ -594,7 +594,7 @@ function navTo(page) {
 
   const isRaces = page === 'races';
   document.getElementById('meetingBar').style.display = 'none';
-  document.getElementById('raceBar').style.display = isRaces ? 'flex' : 'none';
+  document.getElementById('raceBar').style.display = 'none'; // race tabs hidden - sidebar handles navigation
   document.getElementById('leftRail').style.display = isRaces ? 'flex' : 'none';
   document.getElementById('rightRail').style.display = isRaces ? 'flex' : 'none';
   document.getElementById('appBody').className = isRaces ? 'app-body' : 'app-body no-rails';
@@ -1917,6 +1917,15 @@ function buildUpNext() {
 
 // ── INIT ──
 window.addEventListener('DOMContentLoaded', () => {
+  // Brand button direct wiring
+  var brandEl = document.querySelector('.brand');
+  if (brandEl) {
+    brandEl.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      navTo('races');
+    });
+  }
   if (typeof initAuth === 'function') initAuth();
   if (typeof updateBetBadge === 'function') updateBetBadge();
   if (window.innerWidth <= 900) {
