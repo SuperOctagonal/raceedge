@@ -625,6 +625,7 @@ function onCSVLoaded(fname) {
 // ── RACE RENDER (override to update sidebar) ──
 const _origSelectRace = typeof selectRace === 'function' ? selectRace : null;
 function _afterSelectRace(rc, key) {
+  window._raceView = 'field'; // Reset to Field tab on new race selection
   // Expand the meeting in sidebar
   const safeId = (rc.venue||'').replace(/[^a-z0-9]/gi,'_');
   const racesEl = document.getElementById('lrm-races-' + safeId);
@@ -650,7 +651,14 @@ window._raceView = window._raceView || 'field';
 
 function setRaceView(view) {
   window._raceView = view;
-  if (window.currentRace) renderRaceTable(window.currentRace, window._lastResults, window._lastScratched, window._lastHasLive, window._lastLiveOdds);
+  // Use engine render() to re-score and re-render with fresh data
+  if (window.currentRace) {
+    if (typeof render === 'function') {
+      render(window.currentRace);
+    } else if (window._lastResults) {
+      renderRaceTable(window.currentRace, window._lastResults, window._lastScratched, window._lastHasLive, window._lastLiveOdds);
+    }
+  }
 }
 
 // ── RACE TABLE RENDER ──
