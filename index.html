@@ -1176,11 +1176,20 @@ function getTopPicks(n) {
 
 // ── RESULTS PAGE ──
 function showResultsPage() {
-  document.getElementById('main').innerHTML = `<div class="page-wrap">
-    <div class="page-title">Results</div>
-    <div class="page-sub">Today's race results — settle as races complete</div>
-    <div class="empty-state"><i class="ti ti-flag-check"></i><p>Results will appear here as races complete</p></div>
-  </div>`;
+  document.getElementById('main').innerHTML = '<div class="page-wrap">'
+    + '<div class="page-title">Results</div>'
+    + '<div class="page-sub">Settle your bets in My Bets as races finish</div>'
+    + '<div style="background:#fef9c3;border:0.5px solid #fde68a;border-radius:8px;padding:12px 14px;margin-bottom:14px;display:flex;gap:10px">'
+    + '<i class="ti ti-info-circle" style="font-size:18px;color:#d97706;flex-shrink:0"></i>'
+    + '<div><div style="font-size:12px;font-weight:600;color:#92400e;margin-bottom:3px">Live results coming soon</div>'
+    + '<div style="font-size:11px;color:#78350f;line-height:1.6">Automatic race results require a data provider integration. In the meantime, settle your bets manually in <strong>My Bets</strong> — click the result dropdown next to each bet.</div></div></div>'
+    + '<div style="background:#fff;border:0.5px solid #e5e7eb;border-radius:8px;padding:14px;margin-bottom:10px">'
+    + '<div style="font-size:13px;font-weight:600;margin-bottom:6px">How to check results now</div>'
+    + '<div style="font-size:12px;color:#374151;line-height:1.8">1. Visit <strong>racenet.com.au/results</strong> or <strong>tab.com.au</strong> for official results<br>'
+    + '2. Return to <strong>My Bets</strong> and mark each bet Win / Place / Loss<br>'
+    + '3. Your P&amp;L and ROI update automatically</div></div>'
+    + '<div class="empty-state" style="height:140px"><i class="ti ti-flag-check" style="font-size:36px"></i><p style="font-size:12px">Automated results feed — coming soon</p></div>'
+    + '</div>';
 }
 
 // ── PACE MAP PAGE ──
@@ -1705,20 +1714,36 @@ function removeFromBlackbook(i) {
 
 // ── LEARN PAGE ──
 function showLearn() {
-  document.getElementById('main').innerHTML = `<div class="page-wrap">
-    <div class="page-title">Learn</div>
-    <div class="page-sub">How RaceEdge works</div>
-    <div style="display:flex;flex-direction:column;gap:10px">
-      ${[
-        ['ti-horse-toy','Scoring system','Each horse is scored out of 180 points across four groups: Form, Speed, Conditions, and Connections. Horses are ranked by total score.'],
-        ['ti-currency-dollar','Edge $','Your fair value odds — what the horse should be paying based on our model. Compared to live market odds to find value.'],
-        ['ti-chart-bar','Value %','The gap between Edge$ and Live$. Positive % means the market is offering more than your model says the horse is worth — potential value.'],
-        ['ti-map','Pace Map','Visual representation of where each horse will settle in the run — Leader, Presser, Midfield, Closer, Backmarker.'],
-        ['ti-cloud','Track condition','Automatically populated from data. Affects scores — horses with wet track form score higher on Soft/Heavy.'],
-      ].map(([icon,title,desc])=>`<div class="card"><div class="card-title"><i class="ti ${icon}" style="font-size:15px;color:#00471b"></i> ${title}</div><p style="font-size:12px;color:#374151;line-height:1.7">${desc}</p></div>`).join('')}
-    </div>
-  </div>`;
+  var learnItems=[
+    {icon:'ti-layout-list',title:'Field view',desc:'Each horse scored across Form, Speed, Conditions and Connections. Horses ranked by total score. Load any EveryRace CSV file to get started.',live:true},
+    {icon:'ti-currency-dollar',title:'Edge $',desc:'Fair value odds from our proprietary model. Shows what the horse should pay, independent of the market.',live:true},
+    {icon:'ti-chart-bar',title:'Value %',desc:'Gap between Edge$ and SP odds in your CSV. Positive = market paying more than our model. Live odds coming soon.',live:true},
+    {icon:'ti-map',title:'Pace Map',desc:'Barrier-ordered pace positions using TPPC data from EveryRace CSV. Shows Leader, Presser, Midfield, Closer, Backmarker.',live:true},
+    {icon:'ti-horse-toy',title:'Form tab',desc:'Career record, course/distance, track conditions, jockey/trainer combo, prep run record and last 8 runs per horse.',live:true},
+    {icon:'ti-notebook',title:'My Bets',desc:'Log bets, track ROI and P&L, settle races manually, export to CSV.',live:true},
+    {icon:'ti-users',title:'Community',desc:'Forum, leaderboard and 115-tier progression system. Interface built — posting functionality coming soon.',live:false},
+    {icon:'ti-chart-line',title:'Live odds',desc:'Real-time win/place odds from Australian bookmakers. In development.',live:false},
+    {icon:'ti-flag-check',title:'Live results',desc:'Auto-settle bets as races finish. Currently check results manually via racenet.com.au.',live:false},
+    {icon:'ti-clock',title:'Sectionals',desc:'200m split times per runner. Planned via PuntingForm data integration.',live:false},
+  ];
+  var learnHTML=learnItems.map(function(x){
+    var badge=x.live
+      ?'<span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:8px;background:#dcfce7;color:#166534;margin-left:6px">Live</span>'
+      :'<span style="font-size:9px;font-weight:600;padding:2px 7px;border-radius:8px;background:#f1f5f9;color:#6b7280;margin-left:6px">Coming soon</span>';
+    return '<div class="card" style="border-left:3px solid '+(x.live?'#00471b':'#d1d5db')+'">'
+      +'<div class="card-title"><i class="ti '+x.icon+'" style="font-size:15px;color:'+(x.live?'#00471b':'#9ca3af')+'"></i> '+x.title+badge+'</div>'
+      +'<p style="font-size:12px;color:#374151;line-height:1.7">'+x.desc+'</p></div>';
+  }).join('');
+  document.getElementById('main').innerHTML='<div class="page-wrap">'
+    +'<div class="page-title">How RaceEdge works</div>'
+    +'<div class="page-sub">Current features — no surprises</div>'
+    +'<div style="display:flex;flex-direction:column;gap:10px">'
+    +'<div class="card" style="border-left:3px solid #00471b;background:#f0fdf4">'
+    +'<div class="card-title"><i class="ti ti-info-circle" style="font-size:15px;color:#00471b"></i> Early access</div>'
+    +'<p style="font-size:12px;color:#374151;line-height:1.7">RaceEdge is in active development. Everything listed as Live is working now. Coming soon features are in the pipeline.</p>'
+    +'</div>'+learnHTML+'</div></div>';
 }
+
 
 // ── SETTINGS PAGE ──
 function showSettingsPage() {
@@ -1727,11 +1752,9 @@ function showSettingsPage() {
     <div class="page-sub">Account and preferences</div>
     <div class="card" style="margin-bottom:10px">
       <div class="card-title"><i class="ti ti-key" style="font-size:15px"></i> API keys</div>
-      <div class="form-row">
-        <label class="form-label">Odds API key</label>
-        <input class="form-input" id="set-api-key" value="${window.ODDS_API_KEY||''}" placeholder="Enter your Odds API key">
+      <div style="background:#f1f5f9;border-radius:6px;padding:10px 12px;font-size:11px;color:#374151;line-height:1.6">
+        Live odds and results integration is coming. No API key is required for the current version — the app works with EveryRace CSV files.
       </div>
-      <button class="form-btn" onclick="saveApiKey()">Save</button>
     </div>
     <div class="card" style="margin-bottom:10px">
       <div class="card-title"><i class="ti ti-database" style="font-size:15px"></i> Data management</div>
@@ -5199,12 +5222,12 @@ function setTrackCond(cond){
 
 function openLoginModal(){
   var m = document.getElementById('lp-modal-bg');
-  if(m){ m.classList.add('open'); setTimeout(function(){ document.getElementById('login-email').focus(); },100); }
+  if(m){ m.style.display='flex'; setTimeout(function(){ var el=document.getElementById('login-email'); if(el)el.focus(); },100); }
 }
 
 function closeLoginModal(){
   var m = document.getElementById('lp-modal-bg');
-  if(m) m.classList.remove('open');
+  if(m) m.style.display='none';
 }
 
 function doLogin(){
@@ -5246,11 +5269,14 @@ function doLogout(){
 }
 
 function toggleAcctDropdown(){
+  // If not logged in, show login modal instead
+  if(!currentUser) { openLoginModal(); return; }
   var dd = document.getElementById('acct-dropdown');
   if(!dd) return;
-  dd.classList.toggle('open');
+  dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
   if(dd.classList.contains('open') && currentUser){
     document.getElementById('acct-name').textContent = currentUser.name || 'Subscriber';
+    var anf=document.getElementById('acct-name-full'); if(anf) anf.textContent=currentUser.name||'Subscriber';
     document.getElementById('acct-email').textContent = currentUser.email || '';
     document.getElementById('acct-status').textContent = '● ' + (currentUser.status || 'Active Subscriber');
   }
@@ -5470,8 +5496,41 @@ document.addEventListener('DOMContentLoaded',function(){
 <div id="resultsModal" style="display:none"><div id="modalBody"></div><div id="modalTitle"></div><div id="modalSub"></div></div>
 <div id="formModal" style="display:none"></div>
 <div id="login-screen" style="display:none"></div>
-<div id="lp-modal-bg" style="display:none"><input id="login-email"><input id="login-password"><div id="login-error"></div></div>
-<div id="acct-dropdown" style="display:none"><div id="acct-email"></div><div id="acct-status"></div><div id="acct-logout-hdr"></div><button id="acct-pw-btn"></button><button id="acct-email-btn"></button><button id="acct-notif-btn"></button><button id="acct-bill-btn"></button><button id="acct-cancel-btn"></button><button id="acct-logout-btn"></button></div>
+<div id="lp-modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9000;display:none;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:14px;padding:28px;width:360px;max-width:95vw;box-shadow:0 8px 40px rgba(0,0,0,.2)">
+    <div style="text-align:center;margin-bottom:20px">
+      <div style="font-family:'Bebas Neue';font-size:24px;letter-spacing:3px;color:#00471b">Race<span style="color:#fbbf24">Edge</span></div>
+      <div style="font-size:13px;color:#6b7280;margin-top:4px">Sign in to your account</div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="font-size:11px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:4px">Email</label>
+      <input id="login-email" type="email" placeholder="you@email.com" style="width:100%;padding:9px 12px;border:1px solid #d1d5db;border-radius:7px;font-size:13px;font-family:'Space Grotesk';outline:none" onfocus="this.style.borderColor='#00471b'" onblur="this.style.borderColor='#d1d5db'">
+    </div>
+    <div style="margin-bottom:6px">
+      <label style="font-size:11px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:.3px;display:block;margin-bottom:4px">Password</label>
+      <input id="login-password" type="password" placeholder="••••••••" style="width:100%;padding:9px 12px;border:1px solid #d1d5db;border-radius:7px;font-size:13px;font-family:'Space Grotesk';outline:none" onfocus="this.style.borderColor='#00471b'" onblur="this.style.borderColor='#d1d5db'" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div id="login-error" style="display:none;color:#dc2626;font-size:11px;margin-bottom:10px;padding:6px 10px;background:#fee2e2;border-radius:5px"></div>
+    <div style="font-size:11px;color:#9ca3af;margin-bottom:14px">Demo mode — any email and password works</div>
+    <button onclick="doLogin()" style="width:100%;padding:10px;background:#00471b;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Space Grotesk'">Sign in</button>
+    <div style="text-align:center;margin-top:12px">
+      <button onclick="closeLoginModal()" style="background:none;border:none;color:#9ca3af;font-size:12px;cursor:pointer">Cancel</button>
+    </div>
+  </div>
+</div>
+<div id="acct-dropdown" style="display:none;position:fixed;top:48px;right:12px;background:#fff;border:0.5px solid #e5e7eb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);width:240px;z-index:8000;overflow:hidden">
+  <div style="padding:12px 14px;border-bottom:0.5px solid #f3f4f6;background:#f8fafc">
+    <div style="font-size:13px;font-weight:600;color:#111827" id="acct-name-full"></div>
+    <div style="font-size:11px;color:#6b7280;margin-top:1px" id="acct-email"></div>
+    <div style="font-size:10px;font-weight:600;color:#059669;margin-top:3px" id="acct-status"></div>
+  </div>
+  <div style="padding:6px">
+    <button id="acct-logout-hdr" onclick="navTo('mybets');toggleAcctDropdown()" style="width:100%;text-align:left;padding:7px 10px;border:none;background:none;border-radius:6px;cursor:pointer;font-size:12px;color:#374151;font-family:'Space Grotesk'" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">My Bets</button>
+    <button onclick="navTo('settings');toggleAcctDropdown()" style="width:100%;text-align:left;padding:7px 10px;border:none;background:none;border-radius:6px;cursor:pointer;font-size:12px;color:#374151;font-family:'Space Grotesk'" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">Settings</button>
+    <div style="height:0.5px;background:#f3f4f6;margin:4px 0"></div>
+    <button id="acct-logout-btn" onclick="doLogout()" style="width:100%;text-align:left;padding:7px 10px;border:none;background:none;border-radius:6px;cursor:pointer;font-size:12px;color:#dc2626;font-family:'Space Grotesk'" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='none'">Sign out</button>
+  </div>
+</div>
 <div id="mob-sidebar-btn" style="display:none"></div>
 <div id="mobSheetOverlay" style="display:none"></div>
 <div id="mobSheet" style="display:none"><div id="mobSheetTitle"></div><div id="mobSheetContent"></div></div>
