@@ -33,12 +33,16 @@ body{background:#f1f5f9;color:#111827;font-family:'Space Grotesk',sans-serif;fon
 .mtab.active{color:#4ade80;border-bottom-color:#4ade80}
 
 /* ── RACE TABS ── */
-.racebar{background:#fff;height:26px;display:flex;align-items:center;padding:0 8px;overflow-x:auto;flex-shrink:0;scrollbar-width:none;border-bottom:0.5px solid #e5e7eb}
+.racebar{background:#fff;height:36px;display:flex;align-items:stretch;padding:0 8px;overflow-x:auto;flex-shrink:0;scrollbar-width:none;border-bottom:0.5px solid #e5e7eb}
 .racebar::-webkit-scrollbar{display:none}
-.rtab{background:none;border:none;padding:0 10px;font-size:10px;font-weight:600;color:#9ca3af;cursor:pointer;border-bottom:2px solid transparent;height:100%;white-space:nowrap;font-family:'Space Grotesk';transition:all .15s;margin-bottom:-0.5px}
-.rtab:hover{color:#374151}
-.rtab.active{color:#00471b;border-bottom-color:#00471b}
-.rtab.done{color:#d1d5db}
+.rtab{background:none;border:none;padding:0 8px;cursor:pointer;border-bottom:2px solid transparent;height:100%;white-space:nowrap;font-family:'Space Grotesk';transition:all .15s;margin-bottom:-0.5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px}
+.rtab:hover .rtn{color:#374151}
+.rtab.active .rtn{color:#00471b}
+.rtab.active{border-bottom-color:#00471b}
+.rtab.done .rtn{color:#d1d5db}
+.rtn{font-size:10px;font-weight:700;color:#9ca3af;line-height:1}
+.rtime{font-size:8px;color:#c4c9d4;line-height:1}
+.rtab.active .rtime{color:#059669}
 
 /* ── LAYOUT ── */
 .app-body{display:grid;grid-template-columns:148px minmax(0,1fr) 162px;flex:1;min-height:0;overflow:hidden}
@@ -343,7 +347,7 @@ body{background:#f1f5f9;color:#111827;font-family:'Space Grotesk',sans-serif;fon
 .unlock-btn{padding:8px 20px;background:#00471b;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Space Grotesk'}
 
 /* ── HORSE FORM CARD ── */
-.horse-form-card,#horseFormCard{display:none;position:fixed;z-index:9999;background:#fff;border:1.5px solid #00471b;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.18);width:440px;overflow:hidden;pointer-events:none;max-height:85vh;overflow-y:auto}
+.horse-form-card,#horseFormCard{display:none;position:fixed;z-index:99999;background:#fff;border:1.5px solid #00471b;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.2);width:440px;overflow:hidden;pointer-events:none;max-height:80vh;overflow-y:auto}
 .hfc-header{background:linear-gradient(135deg,#00471b 0%,#005c23 100%);padding:10px 14px;display:flex;align-items:flex-start;justify-content:space-between}
 .hfc-name{font-size:14px;font-weight:700;color:#fff;letter-spacing:.3px;line-height:1.2}
 .hfc-meta{font-size:10px;color:rgba(255,255,255,.7);margin-top:3px}
@@ -869,7 +873,7 @@ function renderRaceTable(rc, results, scratched, hasLive, liveOddsData) {
     const scored = results.map(r => {
       const pm = calcPaceMap(r, rc.venue, +rc.dist, tc);
       return {...r, pm};
-    }).filter(r=>r.pm).sort((a,b) => (+a['BP']||+a.tab||99) - (+b['BP']||+b.tab||99));
+    }).sort((a,b) => (+a['BP']||+a.tab||99) - (+b['BP']||+b.tab||99));
 
     const leaderCount = scored.filter(h=>h.pm.role==='Leader').length;
     const presserCount = scored.filter(h=>h.pm.role==='Presser').length;
@@ -877,6 +881,7 @@ function renderRaceTable(rc, results, scratched, hasLive, liveOddsData) {
     const tempoColor = leaderCount>=4?'#dc2626':leaderCount>=2?'#d97706':'#059669';
 
     const bars = scored.map(h => {
+      if (!h.pm) return '';
       const bp = h['BP']||h.BP||'';
       const barrierNum = bp || h.tab || '—';
       return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:0.5px solid #f9fafb">
@@ -5362,6 +5367,6 @@ document.addEventListener('DOMContentLoaded',function(){
 <div id="mob-sidebar-btn" style="display:none"></div>
 <div id="mobSheetOverlay" style="display:none"></div>
 <div id="mobSheet" style="display:none"><div id="mobSheetTitle"></div><div id="mobSheetContent"></div></div>
-<div id="horseFormCard" style="display:none;position:fixed;z-index:9999;background:#fff;border:1.5px solid #00471b;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.18);width:440px;overflow:hidden;pointer-events:none;max-height:85vh;overflow-y:auto"></div>
+<div id="horseFormCard" style="display:none;position:fixed;z-index:99999;background:#fff;border:1.5px solid #00471b;border-radius:10px;box-shadow:0 8px 32px rgba(0,0,0,.2);width:440px;overflow:hidden;pointer-events:none;max-height:80vh;overflow-y:auto"></div>
 <div id="mob-nav-drawer" style="display:none"></div>
 </body></html>
