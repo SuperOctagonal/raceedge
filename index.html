@@ -651,13 +651,16 @@ window._raceView = window._raceView || 'field';
 
 function setRaceView(view) {
   window._raceView = view;
-  // Use engine render() to re-score and re-render with fresh data
-  if (window.currentRace) {
+  // currentRace is a module-level var in the engine, not on window
+  var rc = (typeof currentRace !== 'undefined' && currentRace) ? currentRace : null;
+  if (rc) {
     if (typeof render === 'function') {
-      render(window.currentRace);
+      render(rc);
     } else if (window._lastResults) {
-      renderRaceTable(window.currentRace, window._lastResults, window._lastScratched, window._lastHasLive, window._lastLiveOdds);
+      renderRaceTable(rc, window._lastResults, window._lastScratched, window._lastHasLive, window._lastLiveOdds);
     }
+  } else {
+    console.warn('setRaceView: no currentRace');
   }
 }
 
