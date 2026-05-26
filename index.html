@@ -382,7 +382,7 @@ body{background:#f1f5f9;color:#111827;font-family:'Space Grotesk',sans-serif;fon
 
 <!-- TOP NAV -->
 <div class="topnav">
-  <span class="brand">Race<span>Edge</span></span>
+  <span class="brand" onclick="navTo('races')" style="cursor:pointer">Race<span>Edge</span></span>
   <div class="nav-links">
     <button class="navbtn active" id="nav-races" onclick="navTo('races')">Races</button>
     <button class="navbtn" id="nav-today" onclick="navTo('today')">Today</button>
@@ -396,7 +396,7 @@ body{background:#f1f5f9;color:#111827;font-family:'Space Grotesk',sans-serif;fon
   </div>
   <div class="nav-right">
     <div class="live-badge" id="live-badge"><div class="dot"></div>Live odds</div>
-    <button class="acct-btn" id="acct-btn" onclick="toggleAcctDropdown()"><i class="ti ti-user" style="font-size:14px"></i> <span id="acct-name">Sign in</span></button>
+    <button class="acct-btn" id="acct-btn" onclick="toggleAcctDropdown()" style="min-width:80px"><i class="ti ti-user" style="font-size:14px"></i> <span id="acct-name">Sign in</span></button>
   </div>
 </div>
 
@@ -930,27 +930,37 @@ function renderRaceTable(rc, results, scratched, hasLive, liveOddsData) {
     const tempo = leaderCount>=4?'Hot pace — closers favoured':leaderCount>=2?'Strong tempo — balanced':leaderCount===1?'One leader — likely to hold on':'No leader — slow pace expected';
     const tempoColor = leaderCount>=4?'#dc2626':leaderCount>=2?'#d97706':'#059669';
 
-    const bars = scored.map(h => {
+    const bars = scored.map((h,hi) => {
       if (!h.pm) return '';
       const bp = h['BP']||h.BP||'';
       const barrierNum = bp || h.tab || '—';
-      return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:0.5px solid #f9fafb">
-        <div style="width:34px;flex-shrink:0;text-align:center">
-          <span style="background:#1e40af;color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:3px">${barrierNum}</span>
+      const rank = hi+1;
+      const rkBg = rank===1?'#fbbf24':rank===2?'#d1d5db':rank===3?'#cd7f32':'#f3f4f6';
+      const rkColor = rank<=3?'#374151':'#9ca3af';
+      const myO = h.myOdds ? '$'+formatRacingOdds(h.myOdds) : '—';
+      const spO = h.rawOdds ? '$'+formatRacingOdds(h.rawOdds) : '—';
+      return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid #f9fafb">
+        <div style="width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0;background:${rkBg};color:${rkColor}">${rank}</div>
+        <div style="width:30px;flex-shrink:0;text-align:center">
+          <span style="background:#1e40af;color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:3px">${barrierNum}</span>
         </div>
-        <div style="width:150px;flex-shrink:0;overflow:hidden">
+        <div style="width:140px;flex-shrink:0;overflow:hidden">
           <div style="font-size:11px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${h.name}</div>
           ${h.pm.hasTPPC
-            ? '<div style=\"font-size:8px;color:#9ca3af;margin-top:1px\">F:'+Math.round(h.pm.tppcFront||0)+'% P:'+Math.round(h.pm.tppcOnpc||0)+'% M:'+Math.round(h.pm.tppcMid||0)+'% B:'+Math.round(h.pm.tppcBack||0)+'% <span style=\"color:#059669;font-weight:600\">✓CSV</span></div>'
+            ? '<div style=\"font-size:8px;color:#9ca3af;margin-top:1px\">F:'+Math.round(h.pm.tppcFront||0)+'% P:'+Math.round(h.pm.tppcOnpc||0)+'% M:'+Math.round(h.pm.tppcMid||0)+'% B:'+Math.round(h.pm.tppcBack||0)+'% <span style=\"color:#059669;font-weight:600\">CSV</span></div>'
             : '<div style=\"font-size:8px;color:#d97706;margin-top:1px\">Estimated</div>'}
         </div>
-        <div style="width:70px;flex-shrink:0">
-          <span style="font-size:10px;font-weight:600;color:${h.pm.color};background:${h.pm.color}15;padding:2px 8px;border-radius:10px;white-space:nowrap">${h.pm.role}</span>
+        <div style="width:65px;flex-shrink:0">
+          <span style="font-size:10px;font-weight:600;color:${h.pm.color};background:${h.pm.color}15;padding:2px 7px;border-radius:10px;white-space:nowrap">${h.pm.role}</span>
         </div>
-        <div style="flex:1;height:16px;background:#f1f5f9;border-radius:8px;overflow:hidden">
-          <div style="width:${h.pm.pct}%;height:100%;background:${h.pm.color};border-radius:8px;transition:width .4s ease"></div>
+        <div style="flex:1;height:14px;background:#f1f5f9;border-radius:7px;overflow:hidden">
+          <div style="width:${h.pm.pct}%;height:100%;background:${h.pm.color};border-radius:7px;transition:width .4s ease"></div>
         </div>
-        <span style="font-size:11px;font-weight:700;color:${h.pm.color};min-width:34px;text-align:right">${h.pm.pct}%</span>
+        <span style="font-size:11px;font-weight:700;color:${h.pm.color};min-width:26px;text-align:right">${h.pm.pct}%</span>
+        <div style="width:72px;flex-shrink:0;text-align:right;padding-left:6px;border-left:0.5px solid #f3f4f6">
+          <div style="font-size:10px;font-weight:600;color:#059669">${myO}</div>
+          <div style="font-size:9px;color:#6b7280">SP ${spO}</div>
+        </div>
       </div>`;
     }).join('');
 
@@ -962,10 +972,13 @@ function renderRaceTable(rc, results, scratched, hasLive, liveOddsData) {
           ).join('')}
         </div>
         <div style="display:flex;padding:4px 0;border-bottom:1px solid #e5e7eb;margin-bottom:4px">
-          <div style="width:34px;font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;text-align:center">Bar</div>
-          <div style="width:150px;padding-left:10px;font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase">Horse</div>
-          <div style="width:70px;font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase">Role</div>
+          <div style="width:20px"></div>
+          <div style="width:30px;font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;text-align:center">Bar</div>
+          <div style="width:140px;padding-left:6px;font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase">Horse</div>
+          <div style="width:65px;font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase">Role</div>
           <div style="flex:1;font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase">Pace score</div>
+          <div style="width:26px"></div>
+          <div style="width:72px;font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;text-align:right;padding-left:6px">Edge$ / SP</div>
           <div style="width:34px;font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;text-align:right">%</div>
         </div>
         ${bars || '<p style="color:#9ca3af;font-size:12px;padding:20px 0">No pace data available</p>'}
