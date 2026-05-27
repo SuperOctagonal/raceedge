@@ -386,7 +386,11 @@ body{background:#f1f5f9;color:#111827;font-family:'Space Grotesk',sans-serif;fon
 document.addEventListener('DOMContentLoaded', function() {
   window.addEventListener('load', function() {
     if (!window.Clerk) return;
-    window.Clerk.load().then(function() {
+    window.Clerk.load({
+      appearance: {},
+      afterSignInUrl: window.location.href,
+      afterSignUpUrl: window.location.href,
+    }).then(function() {
       // Handle existing session on page load
       if (window.Clerk.user) {
         var u = window.Clerk.user;
