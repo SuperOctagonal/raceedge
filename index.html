@@ -1,4 +1,4 @@
-<!-- RACEEDGE-BUILD-1779778649 -->
+<!-- WAGING WAR-BUILD-1779778649 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1572,7 +1572,7 @@ function exportBetsCSV() {
   const csv = rows.map(r=>r.join(',')).join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = 'raceedge_bets.csv';
+  a.download = 'wagingwar_bets.csv';
   a.click();
 }
 function copyBetsToClipboard() {
@@ -5402,7 +5402,7 @@ function showSignup(){
 }
 
 function showForgot(){
-  toast('Password reset coming soon — email support@raceedge.com.au', 'success');
+  toast('Password reset coming soon — email support@wagingwar.com.au', 'success');
 }
 
 function showAccountPage(){
