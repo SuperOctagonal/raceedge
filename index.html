@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Waging War v24 — Racing Analytics</title>
+<title>Waging War — Racing Analytics</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <style>
@@ -425,8 +425,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- TOP NAV -->
 <div class="topnav">
-  <span class="brand" onclick="event.preventDefault();event.stopPropagation();navTo('races');" style="cursor:pointer">Waging<span>War</span></span>
+  <span class="brand" onclick="event.preventDefault();event.stopPropagation();navTo('home');" style="cursor:pointer">Waging<span style="color:#fbbf24">War</span></span>
   <div class="nav-links">
+    <button class="navbtn" id="nav-home" onclick="navTo('home')">Home</button>
     <button class="navbtn active" id="nav-races" onclick="navTo('races')">Races</button>
     <button class="navbtn" id="nav-today" onclick="navTo('today')">Today</button>
     <button class="navbtn" id="nav-results" onclick="navTo('results')">Results</button>
@@ -592,6 +593,7 @@ function navTo(page) {
   const btn = document.getElementById('nav-' + page);
   if (btn) btn.classList.add('active');
 
+  if (page === 'home') { showHome(); return; }
   const isRaces = page === 'races';
   document.getElementById('meetingBar').style.display = 'none';
   document.getElementById('raceBar').style.display = 'none'; // race tabs hidden - sidebar handles navigation
@@ -1173,6 +1175,33 @@ function closeTCModal() {
 }
 
 // ── TODAY PAGE ──
+function showHome() {
+  var main = document.getElementById('mainContent');
+  if (!main) return;
+  main.style.overflowY = 'auto';
+  main.innerHTML = '<div style="max-width:900px;margin:0 auto;padding:40px 24px">'
+    + '<div style="text-align:center;margin-bottom:48px">'
+    + '<div style="font-family:Bebas Neue,sans-serif;font-size:56px;letter-spacing:4px;color:#00471b;line-height:1">WAGING<span style="color:#fbbf24">WAR</span></div>'
+    + '<div style="font-size:18px;color:#374151;margin-top:8px;font-weight:500">Outsmart the bookmakers. Back value. Win long term.</div>'
+    + '<div style="margin-top:24px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">'
+    + '<button onclick="navTo(\'races\')" style="background:#00471b;color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer">Load a Race</button>'
+    + '<button onclick="navTo(\'learn\')" style="background:#fff;color:#00471b;border:2px solid #00471b;padding:12px 28px;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer">How It Works</button>'
+    + '</div></div>'
+    + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-bottom:48px">'
+    + '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px"><div style="font-size:28px;margin-bottom:8px">&#127943;</div><div style="font-size:16px;font-weight:600;color:#111827;margin-bottom:6px">Proprietary Scoring</div><div style="font-size:13px;color:#6b7280;line-height:1.6">Every horse scored across Form, Speed, Conditions and Connections. No guesswork — just data.</div></div>'
+    + '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px"><div style="font-size:28px;margin-bottom:8px">&#128176;</div><div style="font-size:16px;font-weight:600;color:#111827;margin-bottom:6px">Edge $ Pricing</div><div style="font-size:13px;color:#6b7280;line-height:1.6">Our model calculates what every horse SHOULD pay. Compare against live market odds to find value.</div></div>'
+    + '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px"><div style="font-size:28px;margin-bottom:8px">&#128202;</div><div style="font-size:16px;font-weight:600;color:#111827;margin-bottom:6px">Value %</div><div style="font-size:13px;color:#6b7280;line-height:1.6">Instantly see where the market is wrong. Green means you have the edge. Back value, not favourites.</div></div>'
+    + '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px"><div style="font-size:28px;margin-bottom:8px">&#128506;</div><div style="font-size:16px;font-weight:600;color:#111827;margin-bottom:6px">Pace Map</div><div style="font-size:13px;color:#6b7280;line-height:1.6">See exactly how each race will be run. Identify leaders, pressers and closers before the jump.</div></div>'
+    + '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px"><div style="font-size:28px;margin-bottom:8px">&#127783;</div><div style="font-size:16px;font-weight:600;color:#111827;margin-bottom:6px">Track Condition Scoring</div><div style="font-size:13px;color:#6b7280;line-height:1.6">Change Good to Heavy and the whole field re-ranks instantly. No other tool does this in real time.</div></div>'
+    + '<div style="background:#fff;border:1px solid #e5e7eb;border-radius:12px;padding:20px"><div style="font-size:28px;margin-bottom:8px">&#128200;</div><div style="font-size:16px;font-weight:600;color:#111827;margin-bottom:6px">Bet Tracking and ROI</div><div style="font-size:13px;color:#6b7280;line-height:1.6">Log every bet. Track your ROI by track, condition, rank and odds range. Know exactly where your edge is.</div></div>'
+    + '</div>'
+    + '<div style="background:#00471b;border-radius:16px;padding:32px;text-align:center;color:#fff">'
+    + '<div style="font-size:22px;font-weight:700;margin-bottom:8px">Ready to wage war on the bookmakers?</div>'
+    + '<div style="font-size:14px;opacity:.8;margin-bottom:20px">Load a race and see the system in action. No credit card required to start.</div>'
+    + '<button onclick="navTo(\'races\')" style="background:#fbbf24;color:#00471b;border:none;padding:12px 32px;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer">Get Started Free</button>'
+    + '</div></div>';
+}
+
 function showToday() {
   const today = new Date();
   const dateStr = today.toLocaleDateString('en-AU', {weekday:'long',day:'numeric',month:'long'});
