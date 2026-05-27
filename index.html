@@ -5348,12 +5348,12 @@ function setTrackCond(cond){
 }
 
 function openLoginModal(){
-  var m = document.getElementById('lp-modal-bg');
-  if(m){
-    document.documentElement.style.overflow='visible';
-    m.style.cssText='display:flex!important;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99999;align-items:center;justify-content:center';
-    setTimeout(function(){ var el=document.getElementById('login-email'); if(el)el.focus(); },100);
+  if(window.Clerk && window.Clerk.loaded){
+    window.Clerk.openSignIn();
+    return;
   }
+  // fallback if Clerk not loaded yet
+  setTimeout(function(){ openLoginModal(); }, 300);
 }
 
 function closeLoginModal(){
