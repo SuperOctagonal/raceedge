@@ -1952,178 +1952,224 @@ function showInsights() {
 
 // ── COMMUNITY PAGE ──
 function showCommunity(){
-  const main=document.getElementById('main');
-  const isMob=window.innerWidth<=900;
-  const u=currentUser||{};
-  const initial=(u.name||'A').charAt(0).toUpperCase();
-  const tiers=[
+  var main=document.getElementById('main');
+  var isMob=window.innerWidth<=900;
+  var u=currentUser||{};
+  var initial=(u.name||'A').charAt(0).toUpperCase();
+  var tiers=[
     {name:'Adaminaby Picnic Maiden',pts:0},{name:'Burrumbeet Maiden',pts:50},{name:'Tumut Maiden',pts:120},
     {name:'Moruya Maiden',pts:1000},{name:'Mildura BM58',pts:2500},{name:'Grafton BM70',pts:15000},
     {name:'Ipswich BM72',pts:25000},{name:'Newcastle BM84',pts:60000},{name:'Flemington Open',pts:85000},
     {name:'Listed',pts:150000},{name:'Group 3',pts:185000},{name:'Group 2',pts:235000},
     {name:'Cox Plate',pts:300000},{name:'Melbourne Cup',pts:5000000}
   ];
-  const userPts=0;
-  const currentTier=tiers.filter(t=>t.pts<=userPts).pop()||tiers[0];
-  const nextTier=tiers.find(t=>t.pts>userPts)||tiers[tiers.length-1];
-  const pctToNext=nextTier.pts>0?Math.min(100,Math.round((userPts/nextTier.pts)*100)):2;
-  const badges=[
-    {icon:'🏁',name:'First Start'},{icon:'🎯',name:'Sharp'},{icon:'🔥',name:'On Fire'},
-    {icon:'📈',name:'In The Black'},{icon:'💎',name:'Big Odds'},{icon:'🌧️',name:'Mudlark'},
-    {icon:'🗣️',name:'First Words'},{icon:'🤝',name:'Ambassador'},{icon:'📚',name:'Scholar'},{icon:'👑',name:'Group 1'},
-  ];
-  const posts=[
+  var userPts=0;
+  var currentTier=tiers.filter(function(t){return t.pts<=userPts;}).pop()||tiers[0];
+  var nextTier=tiers.find(function(t){return t.pts>userPts;})||tiers[tiers.length-1];
+  var pctToNext=nextTier.pts>0?Math.min(100,Math.round((userPts/nextTier.pts)*100)):2;
+  var badges=['🏁','🎯','🔥','📈','💎','🌧️','🗣️','🤝','📚','👑'];
+  var badgeNames=['First Start','Sharp','On Fire','In The Black','Big Odds','Mudlark','First Words','Ambassador','Scholar','Group 1'];
+  var posts=[
     {user:'JPunter88',tier:'Newcastle BM84',tBg:'#dcfce7',tClr:'#166534',cat:'Winning Bet',cBg:'#fef9c3',cClr:'#854d0e',title:'Backed Rank 1 at Flemington — $8.50 — bolted in by 3 lengths',votes:89,replies:31,time:'5h ago',hot:true,sec:'wins'},
     {user:'TrackRat_WA',tier:'Ascot Open',tBg:'#fef3c7',tClr:'#92400e',cat:'Tips & Analysis',cBg:'#dcfce7',cClr:'#166534',title:'Track bias at Doomben today — closers dominating after rail position change',votes:47,replies:23,time:'2h ago',hot:false,sec:'tips'},
-    {user:'MeggsK',tier:'Moonee Valley Open',tBg:'#dbeafe',tClr:'#1e40af',cat:"Today\'s Races",cBg:'#dbeafe',cClr:'#1e40af',title:'Doomben R6 — Rank 1 at $12, market $4.50. Value% +166%. Thoughts?',votes:34,replies:19,time:'3h ago',hot:false,sec:'races'},
-    {user:'NewMember247',tier:'Walgett Maiden',tBg:'#f3f4f6',tClr:'#374151',cat:'Winning Bet',cBg:'#fef9c3',cClr:'#854d0e',title:'First win with the system! Rank 2 at $6.50 at Caulfield — stoked!',votes:12,replies:8,time:'1h ago',hot:false,sec:'wins'},
-    {user:'DoombenDaily',tier:'Gold Coast BM84',tBg:'#f3f4f6',tClr:'#374151',cat:"Today\'s Races",cBg:'#dbeafe',cClr:'#1e40af',title:'Eagle Farm R4 — hot tempo on the pace map, closers should dominate',votes:22,replies:14,time:'45m ago',hot:true,sec:'races'},
+    {user:'MeggsK',tier:'Moonee Valley Open',tBg:'#dbeafe',tClr:'#1e40af',cat:'Today\'s Races',cBg:'#dbeafe',cClr:'#1e40af',title:'Doomben R6 — Rank 1 at $12, market $4.50. Value% +166%. Thoughts?',votes:34,replies:19,time:'3h ago',hot:false,sec:'races'},
+    {user:'NewMember247',tier:'Walgett Maiden',tBg:'#f3f4f6',tClr:'#374151',cat:'Winning Bet',cBg:'#fef9c3',cClr:'#854d0e',title:'First win with the system! Rank 2 at $6.50 at Caulfield',votes:12,replies:8,time:'1h ago',hot:false,sec:'wins'},
+    {user:'DoombenDaily',tier:'Gold Coast BM84',tBg:'#f3f4f6',tClr:'#374151',cat:'Today\'s Races',cBg:'#dbeafe',cClr:'#1e40af',title:'Eagle Farm R4 — hot tempo on pace map, closers should dominate',votes:22,replies:14,time:'45m ago',hot:true,sec:'races'},
     {user:'SpringCarnival',tier:'Gosford BM78',tBg:'#f3f4f6',tClr:'#374151',cat:'System Feedback',cBg:'#f3e8ff',cClr:'#6b21a8',title:'How does the system handle horses returning from a long spell?',votes:8,replies:6,time:'2d ago',hot:false,sec:'feedback'},
   ];
-  const sections=[
-    {id:'all',icon:'ti-layout-list',label:'All Posts'},{id:'races',icon:'ti-horse-toy',label:"Today\'s Races"},
-    {id:'tips',icon:'ti-bulb',label:'Tips & Analysis'},{id:'wins',icon:'ti-trophy',label:'Winning Bets'},
-    {id:'feedback',icon:'ti-settings',label:'System Feedback'},{id:'chat',icon:'ti-messages',label:'General Chat'},
+  var sections=[
+    {id:'all',icon:'ti-layout-list',label:'All Posts'},
+    {id:'races',icon:'ti-horse-toy',label:'Today\'s Races'},
+    {id:'tips',icon:'ti-bulb',label:'Tips & Analysis'},
+    {id:'wins',icon:'ti-trophy',label:'Winning Bets'},
+    {id:'feedback',icon:'ti-settings',label:'System Feedback'},
+    {id:'chat',icon:'ti-messages',label:'General Chat'},
   ];
-  const lb=[
+  var lb=[
     {rank:1,user:'TrackRat_WA',tier:'Ascot Open',roi:'+184%',pts:'+2,840',tBg:'#fef3c7',tClr:'#92400e'},
     {rank:2,user:'JPunter88',tier:'Newcastle BM84',roi:'+147%',pts:'+1,920',tBg:'#dcfce7',tClr:'#166534'},
     {rank:3,user:'MeggsK',tier:'Moonee Valley',roi:'+122%',pts:'+1,540',tBg:'#dbeafe',tClr:'#1e40af'},
     {rank:4,user:'DoombenDaily',tier:'Gold Coast BM84',roi:'+71%',pts:'+890',tBg:'#f3f4f6',tClr:'#374151'},
     {rank:5,user:'SpringCarnival',tier:'Gosford BM78',roi:'+44%',pts:'+640',tBg:'#f3f4f6',tClr:'#374151'},
   ];
-  const af=window._communityFilter||'all';
-  const at=window._communityMobTab||'feed';
+  var af=window._communityFilter||'all';
+  var at=window._communityMobTab||'feed';
 
-  function pCard(compact){
-    return '<div style="padding:'+(compact?'10px 14px':'14px')+';'+(compact?'background:#1a2634;flex-shrink:0':'border-bottom:0.5px solid #f3f4f6')+'">'
-      +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'
-      +'<div style="width:'+(compact?34:42)+'px;height:'+(compact?34:42)+'px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:'+(compact?13:16)+'px;font-weight:700;color:#1e40af;flex-shrink:0">'+initial+'</div>'
-      +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:'+(compact?'#fff':'#111827')+'">'+(u.name||'Your Profile')+'</div>'
-      +'<div style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:#fef3c7;color:#92400e;display:inline-block;margin-top:2px">🐴 '+currentTier.name+'</div></div>'
-      +(compact?'<div style="text-align:right"><div style="font-size:11px;font-weight:700;color:#fbbf24">'+userPts+' pts</div><div style="font-size:9px;color:rgba(255,255,255,.4)">→ '+nextTier.pts.toLocaleString()+'</div></div>':'')
-      +'</div>'
-      +'<div style="height:4px;background:'+(compact?'rgba(255,255,255,.12)':'#f1f5f9')+';border-radius:2px;overflow:hidden;margin-bottom:3px">'
-      +'<div style="width:'+pctToNext+'%;height:100%;background:#fbbf24;border-radius:2px"></div></div>'
-      +'<div style="font-size:9px;color:'+(compact?'rgba(255,255,255,.4)':'#9ca3af')+'">'+(nextTier.pts-userPts).toLocaleString()+' pts to '+nextTier.name+'</div>'
-      +(!compact?'<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px"><span style="font-size:8px;background:#f1f5f9;color:#6b7280;padding:2px 6px;border-radius:3px">0 pts</span><span style="font-size:8px;background:#f1f5f9;color:#6b7280;padding:2px 6px;border-radius:3px">0 bets</span><span style="font-size:8px;background:#f1f5f9;color:#6b7280;padding:2px 6px;border-radius:3px">0 posts</span></div>':'')
-      +'</div>';
+  function profileCard(compact){
+    var html='<div style="padding:'+(compact?'10px 14px':'14px')+';">';
+    if(compact) html='<div style="padding:10px 14px;background:#1a2634;flex-shrink:0;">';
+    else html='<div style="padding:14px;border-bottom:0.5px solid #f3f4f6;">';
+    html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">';
+    html+='<div style="width:'+(compact?34:42)+'px;height:'+(compact?34:42)+'px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:'+(compact?13:16)+'px;font-weight:700;color:#1e40af;flex-shrink:0;">'+initial+'</div>';
+    html+='<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;color:'+(compact?'#fff':'#111827')+';">'+(u.name||'Your Profile')+'</div>';
+    html+='<div style="font-size:9px;font-weight:700;padding:2px 7px;border-radius:4px;background:#fef3c7;color:#92400e;display:inline-block;margin-top:2px;">🐴 '+currentTier.name+'</div></div>';
+    if(compact) html+='<div style="text-align:right;"><div style="font-size:11px;font-weight:700;color:#fbbf24;">'+userPts+' pts</div><div style="font-size:9px;color:rgba(255,255,255,.4);">→ '+nextTier.pts.toLocaleString()+'</div></div>';
+    html+='</div>';
+    html+='<div style="height:4px;background:'+(compact?'rgba(255,255,255,.12)':'#f1f5f9')+';border-radius:2px;overflow:hidden;margin-bottom:3px;">';
+    html+='<div style="width:'+pctToNext+'%;height:100%;background:#fbbf24;border-radius:2px;"></div></div>';
+    html+='<div style="font-size:9px;color:'+(compact?'rgba(255,255,255,.4)':'#9ca3af')+';">'+(nextTier.pts-userPts).toLocaleString()+' pts to '+nextTier.name+'</div>';
+    if(!compact) html+='<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;"><span style="font-size:8px;background:#f1f5f9;color:#6b7280;padding:2px 6px;border-radius:3px;">0 pts</span><span style="font-size:8px;background:#f1f5f9;color:#6b7280;padding:2px 6px;border-radius:3px;">0 bets</span><span style="font-size:8px;background:#f1f5f9;color:#6b7280;padding:2px 6px;border-radius:3px;">0 posts</span></div>';
+    html+='</div>';
+    return html;
   }
 
   function feedPanel(){
-    const filtered=af==='all'?posts:posts.filter(p=>p.sec===af);
-    return '<div style="background:#fff;border-bottom:0.5px solid #e5e7eb;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">'
-      +'<div style="font-size:13px;font-weight:600">Community</div>'
-      +'<button onclick="showNewPost()" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:6px;background:#00471b;color:#fff;border:none;font-size:11px;font-weight:600;cursor:pointer;font-family:Space Grotesk,sans-serif"><i class=\"ti ti-pencil\" style=\"font-size:12px\"></i> New post</button>'
-      +'</div>'
-      +'<div style="background:#fff;border-bottom:0.5px solid #e5e7eb;display:flex;overflow-x:auto;scrollbar-width:none;flex-shrink:0;padding:0 8px">'
-      +sections.map(s=>'<div onclick=\"communityFilter(\\'+s.id+'\\)\" style=\"padding:8px 8px;font-size:11px;font-weight:'+(af===s.id?600:500)+';color:'+(af===s.id?'#00471b':'#9ca3af')+';border-bottom:2px solid '+(af===s.id?'#00471b':'transparent')+';cursor:pointer;white-space:nowrap\">'+(s.label.replace(/'/g,"\\'"))+'</div>').join('')
-      +'</div>'
-      +'<div style="background:#fef9c3;border-bottom:0.5px solid #fde68a;padding:6px 14px;display:flex;align-items:center;gap:6px;flex-shrink:0">'
-      +'<i class=\"ti ti-info-circle\" style=\"font-size:12px;color:#d97706;flex-shrink:0\"></i>'
-      +'<span style=\"font-size:10px;color:#92400e\">Posts are member opinions only — not financial advice.</span></div>'
-      +'<div style="flex:1;overflow-y:auto">'
-      +(filtered.length===0?'<div style=\"padding:40px;text-align:center;color:#9ca3af;font-size:12px\">No posts in this section yet</div>':
-        filtered.map(p=>'<div style=\"padding:10px 14px;border-bottom:0.5px solid #f3f4f6;background:#fff;cursor:pointer\" onmouseover=\"this.style.background=\\'#fafafa\\'\" onmouseout=\"this.style.background=\\'#fff\\'">'
-          +'<div style=\"display:flex;gap:10px\">'
-          +'<div style=\"display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;padding-top:2px\">'
-          +'<span style=\"font-size:13px;color:#d1d5db;cursor:pointer;line-height:1\" onmouseover=\"this.style.color=\\'#059669\\'\" onmouseout=\"this.style.color=\\'#d1d5db\\'">&amp;#9650;</span>'
-          +'<span style=\"font-size:11px;font-weight:700;color:#111827\">'+p.votes+'</span></div>'
-          +'<div style=\"flex:1;min-width:0\">'
-          +'<div style=\"display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px\">'
-          +'<span style=\"font-size:9px;font-weight:600;padding:1px 6px;border-radius:3px;background:'+p.cBg+';color:'+p.cClr+'\">'+p.cat+'</span>'
-          +(p.hot?'<span style=\"font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#fef3c7;color:#92400e\">🔥 Hot</span>':'')
-          +'</div>'
-          +'<div style=\"font-size:12px;font-weight:500;color:#111827;line-height:1.45;margin-bottom:5px\">'+p.title+'</div>'
-          +'<div style=\"display:flex;align-items:center;gap:6px;flex-wrap:wrap\">'
-          +'<div style=\"width:17px;height:17px;border-radius:50%;background:'+p.tBg+';display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:'+p.tClr+'\">'+p.user[0]+'</div>'
-          +'<span style=\"font-size:10px;font-weight:600;color:#374151\">'+p.user+'</span>'
-          +'<span style=\"font-size:9px;padding:1px 5px;border-radius:3px;background:'+p.tBg+';color:'+p.tClr+'\">'+p.tier+'</span>'
-          +'<span style=\"font-size:10px;color:#9ca3af;margin-left:auto\"><i class=\"ti ti-message\" style=\"font-size:10px\"></i> '+p.replies+'</span>'
-          +'<span style=\"font-size:10px;color:#9ca3af\">'+p.time+'</span>'
-          +'</div></div></div></div>').join(''))
-      +'</div>';
+    var filtered=af==='all'?posts:posts.filter(function(p){return p.sec===af;});
+    var html='';
+    html+='<div style="background:#fff;border-bottom:0.5px solid #e5e7eb;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">';
+    html+='<div style="font-size:13px;font-weight:600;">Community</div>';
+    html+='<button onclick="showNewPost()" style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:6px;background:#00471b;color:#fff;border:none;font-size:11px;font-weight:600;cursor:pointer;font-family:Space Grotesk,sans-serif;"><i class="ti ti-pencil" style="font-size:12px;"></i> New post</button>';
+    html+='</div>';
+    html+='<div style="background:#fff;border-bottom:0.5px solid #e5e7eb;display:flex;overflow-x:auto;scrollbar-width:none;flex-shrink:0;padding:0 8px;">';
+    sections.forEach(function(s){
+      var active=af===s.id;
+      html+='<div onclick="communityFilter(\''+s.id+'\')" style="padding:8px 8px;font-size:11px;font-weight:'+(active?600:500)+';color:'+(active?'#00471b':'#9ca3af')+';border-bottom:2px solid '+(active?'#00471b':'transparent')+';cursor:pointer;white-space:nowrap;">'+s.label+'</div>';
+    });
+    html+='</div>';
+    html+='<div style="background:#fef9c3;border-bottom:0.5px solid #fde68a;padding:6px 14px;display:flex;align-items:center;gap:6px;flex-shrink:0;">';
+    html+='<i class="ti ti-info-circle" style="font-size:12px;color:#d97706;flex-shrink:0;"></i>';
+    html+='<span style="font-size:10px;color:#92400e;">Posts are member opinions only — not financial advice.</span></div>';
+    html+='<div style="flex:1;overflow-y:auto;">';
+    if(filtered.length===0){
+      html+='<div style="padding:40px;text-align:center;color:#9ca3af;font-size:12px;">No posts in this section yet</div>';
+    } else {
+      filtered.forEach(function(p){
+        html+='<div style="padding:10px 14px;border-bottom:0.5px solid #f3f4f6;background:#fff;cursor:pointer;" onmouseover="this.style.background=\'#fafafa\'" onmouseout="this.style.background=\'#fff\'">';
+        html+='<div style="display:flex;gap:10px;">';
+        html+='<div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;padding-top:2px;">';
+        html+='<span style="font-size:13px;color:#d1d5db;cursor:pointer;line-height:1;" onmouseover="this.style.color=\'#059669\'" onmouseout="this.style.color=\'#d1d5db\'">▲</span>';
+        html+='<span style="font-size:11px;font-weight:700;color:#111827;">'+p.votes+'</span></div>';
+        html+='<div style="flex:1;min-width:0;">';
+        html+='<div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:4px;">';
+        html+='<span style="font-size:9px;font-weight:600;padding:1px 6px;border-radius:3px;background:'+p.cBg+';color:'+p.cClr+';">'+p.cat+'</span>';
+        if(p.hot) html+='<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;background:#fef3c7;color:#92400e;">🔥 Hot</span>';
+        html+='</div>';
+        html+='<div style="font-size:12px;font-weight:500;color:#111827;line-height:1.45;margin-bottom:5px;">'+p.title+'</div>';
+        html+='<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">';
+        html+='<div style="width:17px;height:17px;border-radius:50%;background:'+p.tBg+';display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:'+p.tClr+';">'+p.user[0]+'</div>';
+        html+='<span style="font-size:10px;font-weight:600;color:#374151;">'+p.user+'</span>';
+        html+='<span style="font-size:9px;padding:1px 5px;border-radius:3px;background:'+p.tBg+';color:'+p.tClr+';">'+p.tier+'</span>';
+        html+='<span style="font-size:10px;color:#9ca3af;margin-left:auto;"><i class="ti ti-message" style="font-size:10px;"></i> '+p.replies+'</span>';
+        html+='<span style="font-size:10px;color:#9ca3af;">'+p.time+'</span>';
+        html+='<span style="font-size:10px;color:#d1d5db;cursor:pointer;" title="Report" onmouseover="this.style.color=\'#dc2626\'" onmouseout="this.style.color=\'#d1d5db\'"><i class="ti ti-flag" style="font-size:11px;"></i></span>';
+        html+='</div></div></div></div>';
+      });
+    }
+    html+='</div>';
+    return html;
   }
 
   function lbPanel(){
-    return '<div style="background:#fff;border-bottom:0.5px solid #e5e7eb;padding:10px 14px;flex-shrink:0">'
-      +'<div style="font-size:13px;font-weight:600">Leaderboards</div>'
-      +'<div style="font-size:10px;color:#9ca3af">Resets every Monday</div></div>'
-      +'<div style="flex:1;overflow-y:auto">'
-      +'<div style="padding:12px 14px;border-bottom:0.5px solid #f3f4f6">'
-      +'<div style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Weekly ROI</div>'
-      +lb.map(r=>'<div style=\"display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid #f9fafb\">'
-        +'<span style=\"font-size:13px;width:20px\">'+(r.rank===1?'🥇':r.rank===2?'🥈':r.rank===3?'🥉':r.rank)+'</span>'
-        +'<div style=\"width:26px;height:26px;border-radius:50%;background:'+r.tBg+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:'+r.tClr+';flex-shrink:0\">'+r.user[0]+'</div>'
-        +'<div style=\"flex:1;min-width:0\"><div style=\"font-size:11px;font-weight:600;color:#111827\">'+r.user+'</div>'
-        +'<div style=\"font-size:8px;padding:1px 4px;border-radius:2px;background:'+r.tBg+';color:'+r.tClr+';display:inline-block;margin-top:1px\">'+r.tier+'</div></div>'
-        +'<span style=\"font-size:12px;font-weight:700;color:#059669\">'+r.roi+'</span></div>').join('')
-      +'</div>'
-      +'<div style="padding:12px 14px;border-bottom:0.5px solid #f3f4f6">'
-      +'<div style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Top Contributors</div>'
-      +lb.map(r=>'<div style=\"display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid #f9fafb\">'
-        +'<span style=\"font-size:10px;font-weight:600;width:18px;color:'+(r.rank<=3?'#d97706':'#9ca3af')+'\">'+r.rank+'</span>'
-        +'<div style=\"width:24px;height:24px;border-radius:50%;background:'+r.tBg+';display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:'+r.tClr+';flex-shrink:0\">'+r.user[0]+'</div>'
-        +'<span style=\"flex:1;font-size:10px;font-weight:600;color:#111827\">'+r.user+'</span>'
-        +'<span style=\"font-size:10px;color:#6b7280\">'+r.pts+' pts</span></div>').join('')
-      +'</div>'
-      +'<div style="padding:12px 14px">'
-      +'<div style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Community Stats</div>'
-      +[['Members online','2,847','#22c55e'],['Posts today','128',null],['Total members','14,203',null]].map(([l,v,c])=>'<div style=\"display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid #f9fafb;font-size:11px\"><span style=\"color:#9ca3af\">'+l+'</span><span style=\"font-weight:600;'+(c?'color:'+c:'')+'\">'+(v)+'</span></div>').join('')
-      +'</div></div>';
+    var html='';
+    html+='<div style="background:#fff;border-bottom:0.5px solid #e5e7eb;padding:10px 14px;flex-shrink:0;">';
+    html+='<div style="font-size:13px;font-weight:600;">Leaderboards</div>';
+    html+='<div style="font-size:10px;color:#9ca3af;">Resets every Monday</div></div>';
+    html+='<div style="flex:1;overflow-y:auto;">';
+    html+='<div style="padding:12px 14px;border-bottom:0.5px solid #f3f4f6;">';
+    html+='<div style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Weekly ROI</div>';
+    lb.forEach(function(r){
+      var medal=r.rank===1?'🥇':r.rank===2?'🥈':r.rank===3?'🥉':r.rank;
+      html+='<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid #f9fafb;">';
+      html+='<span style="font-size:13px;width:20px;">'+medal+'</span>';
+      html+='<div style="width:26px;height:26px;border-radius:50%;background:'+r.tBg+';display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:'+r.tClr+';flex-shrink:0;">'+r.user[0]+'</div>';
+      html+='<div style="flex:1;min-width:0;"><div style="font-size:11px;font-weight:600;color:#111827;">'+r.user+'</div>';
+      html+='<div style="font-size:8px;padding:1px 4px;border-radius:2px;background:'+r.tBg+';color:'+r.tClr+';display:inline-block;margin-top:1px;">'+r.tier+'</div></div>';
+      html+='<span style="font-size:12px;font-weight:700;color:#059669;">'+r.roi+'</span></div>';
+    });
+    html+='</div>';
+    html+='<div style="padding:12px 14px;border-bottom:0.5px solid #f3f4f6;">';
+    html+='<div style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Top Contributors</div>';
+    lb.forEach(function(r){
+      html+='<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid #f9fafb;">';
+      html+='<span style="font-size:10px;font-weight:600;width:18px;color:'+(r.rank<=3?'#d97706':'#9ca3af')+';">'+r.rank+'</span>';
+      html+='<div style="width:24px;height:24px;border-radius:50%;background:'+r.tBg+';display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:'+r.tClr+';flex-shrink:0;">'+r.user[0]+'</div>';
+      html+='<span style="flex:1;font-size:10px;font-weight:600;color:#111827;">'+r.user+'</span>';
+      html+='<span style="font-size:10px;color:#6b7280;">'+r.pts+' pts</span></div>';
+    });
+    html+='</div>';
+    html+='<div style="padding:12px 14px;">';
+    html+='<div style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">Community Stats</div>';
+    [['Members online','2,847','#22c55e'],['Posts today','128',null],['Total members','14,203',null]].forEach(function(item){
+      html+='<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:0.5px solid #f9fafb;font-size:11px;">';
+      html+='<span style="color:#9ca3af;">'+item[0]+'</span>';
+      html+='<span style="font-weight:600;'+(item[2]?'color:'+item[2]:'')+' ">'+item[1]+'</span></div>';
+    });
+    html+='</div></div>';
+    return html;
   }
 
   function profPanel(){
-    return '<div style="background:#fff;border-bottom:0.5px solid #e5e7eb;padding:10px 14px;flex-shrink:0"><div style="font-size:13px;font-weight:600">My Profile</div></div>'
-      +'<div style="flex:1;overflow-y:auto;padding:14px">'
-      +'<div style="background:#1a2634;border-radius:12px;padding:16px;margin-bottom:12px">'
-      +'<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">'
-      +'<div style="width:48px;height:48px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#1e40af">'+initial+'</div>'
-      +'<div><div style="font-size:14px;font-weight:700;color:#fff">'+(u.name||'Member')+'</div>'
-      +'<div style="font-size:9px;padding:2px 8px;border-radius:4px;background:#fef3c7;color:#92400e;font-weight:700;display:inline-block;margin-top:3px">🐴 '+currentTier.name+'</div></div></div>'
-      +'<div style="height:5px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;margin-bottom:4px"><div style="width:'+pctToNext+'%;height:100%;background:#fbbf24;border-radius:3px"></div></div>'
-      +'<div style="font-size:9px;color:rgba(255,255,255,.4)">'+(nextTier.pts-userPts).toLocaleString()+' pts to '+nextTier.name+'</div></div>'
-      +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px">'
-      +[['0','Pts'],['0','Bets'],['0','Posts']].map(([v,l])=>'<div style=\"background:#fff;border:0.5px solid #e5e7eb;border-radius:8px;padding:10px;text-align:center\"><div style=\"font-size:16px;font-weight:700;color:#111827;font-family:JetBrains Mono,monospace\">'+v+'</div><div style=\"font-size:9px;color:#9ca3af;margin-top:2px\">'+l+'</div></div>').join('')
-      +'</div>'
-      +'<div style="background:#fff;border:0.5px solid #e5e7eb;border-radius:10px;overflow:hidden">'
-      +'<div style="padding:10px 12px;border-bottom:0.5px solid #f3f4f6;font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px">My Badges</div>'
-      +'<div style="padding:12px;display:flex;flex-wrap:wrap;gap:8px">'
-      +badges.map(b=>'<div title=\"'+b.name+'\" style=\"width:34px;height:34px;border-radius:6px;background:#f1f5f9;border:0.5px solid #e5e7eb;display:flex;align-items:center;justify-content:center;font-size:17px;opacity:0.3;cursor:pointer\">'+b.icon+'</div>').join('')
-      +'</div><div style=\"padding:0 12px 12px;font-size:10px;color:#9ca3af;line-height:1.5\">Log bets, post in the community and hit milestones to unlock badges.</div>'
-      +'</div></div>';
+    var html='';
+    html+='<div style="background:#fff;border-bottom:0.5px solid #e5e7eb;padding:10px 14px;flex-shrink:0;"><div style="font-size:13px;font-weight:600;">My Profile</div></div>';
+    html+='<div style="flex:1;overflow-y:auto;padding:14px;">';
+    html+='<div style="background:#1a2634;border-radius:12px;padding:16px;margin-bottom:12px;">';
+    html+='<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">';
+    html+='<div style="width:48px;height:48px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#1e40af;">'+initial+'</div>';
+    html+='<div><div style="font-size:14px;font-weight:700;color:#fff;">'+(u.name||'Member')+'</div>';
+    html+='<div style="font-size:9px;padding:2px 8px;border-radius:4px;background:#fef3c7;color:#92400e;font-weight:700;display:inline-block;margin-top:3px;">🐴 '+currentTier.name+'</div></div></div>';
+    html+='<div style="height:5px;background:rgba(255,255,255,.1);border-radius:3px;overflow:hidden;margin-bottom:4px;"><div style="width:'+pctToNext+'%;height:100%;background:#fbbf24;border-radius:3px;"></div></div>';
+    html+='<div style="font-size:9px;color:rgba(255,255,255,.4);">'+(nextTier.pts-userPts).toLocaleString()+' pts to '+nextTier.name+'</div></div>';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:12px;">';
+    [['0','Pts'],['0','Bets'],['0','Posts']].forEach(function(item){
+      html+='<div style="background:#fff;border:0.5px solid #e5e7eb;border-radius:8px;padding:10px;text-align:center;">';
+      html+='<div style="font-size:16px;font-weight:700;color:#111827;font-family:JetBrains Mono,monospace;">'+item[0]+'</div>';
+      html+='<div style="font-size:9px;color:#9ca3af;margin-top:2px;">'+item[1]+'</div></div>';
+    });
+    html+='</div>';
+    html+='<div style="background:#fff;border:0.5px solid #e5e7eb;border-radius:10px;overflow:hidden;">';
+    html+='<div style="padding:10px 12px;border-bottom:0.5px solid #f3f4f6;font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;">My Badges</div>';
+    html+='<div style="padding:12px;display:flex;flex-wrap:wrap;gap:8px;">';
+    badges.forEach(function(b,i){
+      html+='<div title="'+badgeNames[i]+'" style="width:34px;height:34px;border-radius:6px;background:#f1f5f9;border:0.5px solid #e5e7eb;display:flex;align-items:center;justify-content:center;font-size:17px;opacity:0.3;cursor:pointer;">'+b+'</div>';
+    });
+    html+='</div>';
+    html+='<div style="padding:0 12px 12px;font-size:10px;color:#9ca3af;line-height:1.5;">Log bets, post in the community and hit milestones to unlock badges.</div>';
+    html+='</div></div>';
+    return html;
   }
 
-  const mobTabs=[['feed','ti-layout-list','Feed'],['leaderboard','ti-trophy','Leaderboard'],['profile','ti-user','Profile']];
+  var mobTabItems=[['feed','ti-layout-list','Feed'],['leaderboard','ti-trophy','Leaderboard'],['profile','ti-user','Profile']];
 
   if(isMob){
-    main.innerHTML='<div style=\"display:flex;flex-direction:column;height:100%;overflow:hidden\">'
-      +pCard(true)
-      +'<div style=\"background:#fff;border-bottom:0.5px solid #e5e7eb;display:flex;flex-shrink:0\">'
-      +mobTabs.map(([id,icon,label])=>'<div onclick=\"setCommunityTab(\\''+id+'\\')\" style=\"flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px;cursor:pointer;border-bottom:2px solid '+(at===id?'#00471b':'transparent')+'\">'
-        +'<i class=\"ti '+icon+'\" style=\"font-size:16px;color:'+(at===id?'#00471b':'#9ca3af')+'\"></i>'
-        +'<span style=\"font-size:9px;font-weight:600;color:'+(at===id?'#00471b':'#9ca3af')+';margin-top:2px\">'+label+'</span></div>').join('')
-      +'</div>'
-      +'<div style=\"flex:1;overflow:hidden;display:flex;flex-direction:column\">'
-      +(at==='feed'?feedPanel():at==='leaderboard'?lbPanel():profPanel())
-      +'</div></div>';
+    var html='<div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">';
+    html+=profileCard(true);
+    html+='<div style="background:#fff;border-bottom:0.5px solid #e5e7eb;display:flex;flex-shrink:0;">';
+    mobTabItems.forEach(function(tab){
+      var active=at===tab[0];
+      html+='<div onclick="setCommunityTab(\''+tab[0]+'\')" style="flex:1;display:flex;flex-direction:column;align-items:center;padding:8px 4px;cursor:pointer;border-bottom:2px solid '+(active?'#00471b':'transparent')+';">';
+      html+='<i class="ti '+tab[1]+'" style="font-size:16px;color:'+(active?'#00471b':'#9ca3af')+';"></i>';
+      html+='<span style="font-size:9px;font-weight:600;color:'+(active?'#00471b':'#9ca3af')+';margin-top:2px;">'+tab[2]+'</span></div>';
+    });
+    html+='</div>';
+    html+='<div style="flex:1;overflow:hidden;display:flex;flex-direction:column;">';
+    if(at==='feed') html+=feedPanel();
+    else if(at==='leaderboard') html+=lbPanel();
+    else html+=profPanel();
+    html+='</div></div>';
+    main.innerHTML=html;
   } else {
-    main.innerHTML='<div style=\"display:grid;grid-template-columns:220px 1fr 240px;height:100%;overflow:hidden\">'
-      +'<div style=\"border-right:0.5px solid #e5e7eb;background:#fff;display:flex;flex-direction:column;overflow-y:auto\">'
-      +pCard(false)
-      +'<div style=\"padding:10px 14px;border-bottom:0.5px solid #f3f4f6\">'
-      +'<div style=\"font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px\">Sections</div>'
-      +sections.map(s=>'<div onclick=\"communityFilter(\\''+s.id+'\\')\" style=\"display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:12px;margin-bottom:1px;'+(af===s.id?'background:#f0fdf4;color:#00471b;font-weight:600':'color:#374151')+'\">'
-        +'<i class=\"ti '+s.icon+'\" style=\"font-size:14px;color:'+(af===s.id?'#00471b':'#9ca3af')+'\">&zwj;</i>'+s.label.replace(/'/g,"\'")+'</div>').join('')
-      +'</div>'
-      +'<div style=\"padding:10px 14px\">'
-      +'<div style=\"font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px\">My Badges</div>'
-      +'<div style=\"display:flex;flex-wrap:wrap;gap:4px\">'
-      +badges.map(b=>'<div title=\"'+b.name+'\" style=\"width:28px;height:28px;border-radius:5px;background:#f1f5f9;border:0.5px solid #e5e7eb;display:flex;align-items:center;justify-content:center;font-size:14px;opacity:0.3;cursor:pointer\">'+b.icon+'</div>').join('')
-      +'</div></div></div>'
-      +'<div style=\"display:flex;flex-direction:column;overflow:hidden\">'+feedPanel()+'</div>'
-      +'<div style=\"border-left:0.5px solid #e5e7eb;background:#fff;display:flex;flex-direction:column;overflow:hidden\">'+lbPanel()+'</div>'
-      +'</div>';
+    var html='<div style="display:grid;grid-template-columns:220px 1fr 240px;height:100%;overflow:hidden;">';
+    html+='<div style="border-right:0.5px solid #e5e7eb;background:#fff;display:flex;flex-direction:column;overflow-y:auto;">';
+    html+=profileCard(false);
+    html+='<div style="padding:10px 14px;border-bottom:0.5px solid #f3f4f6;">';
+    html+='<div style="font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Sections</div>';
+    sections.forEach(function(s){
+      var active=af===s.id;
+      html+='<div onclick="communityFilter(\''+s.id+'\')" style="display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:6px;cursor:pointer;font-size:12px;margin-bottom:1px;'+(active?'background:#f0fdf4;color:#00471b;font-weight:600;':'color:#374151;')+'">';
+      html+='<i class="ti '+s.icon+'" style="font-size:14px;color:'+(active?'#00471b':'#9ca3af')+';"></i>'+s.label+'</div>';
+    });
+    html+='</div>';
+    html+='<div style="padding:10px 14px;">';
+    html+='<div style="font-size:9px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">My Badges</div>';
+    html+='<div style="display:flex;flex-wrap:wrap;gap:4px;">';
+    badges.forEach(function(b,i){
+      html+='<div title="'+badgeNames[i]+'" style="width:28px;height:28px;border-radius:5px;background:#f1f5f9;border:0.5px solid #e5e7eb;display:flex;align-items:center;justify-content:center;font-size:14px;opacity:0.3;cursor:pointer;">'+b+'</div>';
+    });
+    html+='</div></div></div>';
+    html+='<div style="display:flex;flex-direction:column;overflow:hidden;">'+feedPanel()+'</div>';
+    html+='<div style="border-left:0.5px solid #e5e7eb;background:#fff;display:flex;flex-direction:column;overflow:hidden;">'+lbPanel()+'</div>';
+    html+='</div>';
+    main.innerHTML=html;
   }
 }
 function setCommunityTab(tab){window._communityMobTab=tab;showCommunity();}
@@ -2132,9 +2178,9 @@ function showNewPost(){if(!currentUser){openLoginModal();return;}toast('Forum po
 
 // ── COMPETITIONS PAGE ──
 function showCompetitions(){
-  const main=document.getElementById('main');
-  const at=window._compTab||'this-week';
-  const races=[
+  var main=document.getElementById('main');
+  var at=window._compTab||'this-week';
+  var races=[
     {meeting:'Flemington',race:'R5',time:'2:30pm',dist:'1200m',cls:'BM84',rank1:'Sideshow Frankie'},
     {meeting:'Randwick',race:'R7',time:'3:10pm',dist:'1600m',cls:'Open',rank1:'Ocean Chill'},
     {meeting:'Doomben',race:'R4',time:'1:45pm',dist:'1050m',cls:'BM78',rank1:'Walsh Bay'},
@@ -2142,85 +2188,98 @@ function showCompetitions(){
     {meeting:'Eagle Farm',race:'R3',time:'1:10pm',dist:'1400m',cls:'BM72',rank1:'The Exponent'},
     {meeting:'Moonee Valley',race:'R8',time:'4:30pm',dist:'1600m',cls:'Group 3',rank1:'Viminele'},
   ];
-  const lb=[
+  var lb=[
     {rank:1,user:'TrackRat_WA',tier:'Ascot Open',tBg:'#fef3c7',tClr:'#92400e',pts:14,picks:['✓','✓','✗','✓','✓','✗']},
     {rank:2,user:'MeggsK',tier:'Moonee Valley',tBg:'#dbeafe',tClr:'#1e40af',pts:11,picks:['✓','✗','✓','✓','✗','✓']},
     {rank:3,user:'JPunter88',tier:'Newcastle BM84',tBg:'#dcfce7',tClr:'#166534',pts:9,picks:['✓','✓','✗','✗','✓','✗']},
     {rank:4,user:'DoombenDaily',tier:'Gold Coast BM84',tBg:'#f3f4f6',tClr:'#374151',pts:6,picks:['✗','✓','✓','✗','✗','✗']},
     {rank:5,user:'SpringCarnival',tier:'Gosford BM78',tBg:'#f3f4f6',tClr:'#374151',pts:4,picks:['✗','✗','✓','✗','✗','✓']},
   ];
+  var tabs=[['this-week','This Week'],['leaderboard','Leaderboard'],['how','How It Works']];
 
-  var picksHTML='<div style=\"flex:1;overflow-y:auto;padding:14px\">'
-    +'<div style=\"background:#fff;border:0.5px solid #e5e7eb;border-radius:10px;overflow:hidden;margin-bottom:12px\">'
-    +'<div style=\"background:#1a2634;padding:10px 14px;display:flex;align-items:center;justify-content:space-between\">'
-    +'<div><div style=\"font-size:13px;font-weight:600;color:#fff\">Saturday Comp</div>'
-    +'<div style=\"font-size:10px;color:rgba(255,255,255,.5);margin-top:1px\">Pick a horse in each race &amp;middot; 3pts 1st &amp;middot; 2pts 2nd &amp;middot; 1pt 3rd</div></div>'
-    +'<div style=\"text-align:right\"><div style=\"font-size:9px;color:rgba(255,255,255,.5)\">Entries close</div><div style=\"font-size:12px;font-weight:700;color:#fbbf24\">Sat 9:00am</div></div></div>'
-    +'<div style=\"padding:10px 14px;background:#fef9c3;border-bottom:0.5px solid #fde68a;display:flex;align-items:center;gap:6px\">'
-    +'<i class=\"ti ti-trophy\" style=\"font-size:13px;color:#d97706\"></i>'
-    +'<span style=\"font-size:10px;color:#92400e;font-weight:500\">Top 3 earn bonus community points: 500 &amp;middot; 300 &amp;middot; 200 pts</span></div>'
-    +'<div style=\"padding:8px 0\">'
-    +races.map((r,i)=>'<div style=\"padding:10px 14px;border-bottom:0.5px solid #f3f4f6;display:flex;align-items:center;gap:10px\">'
-      +'<div style=\"width:28px;height:28px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#374151;flex-shrink:0\">'+(i+1)+'</div>'
-      +'<div style=\"flex:1;min-width:0\">'
-      +'<div style=\"font-size:12px;font-weight:600;color:#111827\">'+r.meeting+' '+r.race+'</div>'
-      +'<div style=\"font-size:10px;color:#9ca3af\">'+r.time+' &amp;middot; '+r.dist+' &amp;middot; '+r.cls+'</div>'
-      +'<div style=\"font-size:10px;color:#059669;margin-top:2px\">System R1: <span style=\"font-weight:600\">'+r.rank1+'</span></div></div>'
-      +'<select style=\"padding:5px 8px;border:0.5px solid #d1d5db;border-radius:6px;font-size:11px;color:#111827;background:#fff\">'
-      +'<option value=\"\">Pick horse...</option>'
-      +'<option value=\"r1\">'+r.rank1+' (R1)</option>'
-      +'<option value=\"other\">Other horse</option>'
-      +'</select></div>').join('')
-    +'</div>'
-    +'<div style=\"padding:12px 14px;border-top:0.5px solid #f3f4f6\">'
-    +'<button onclick=\"toast(\'Picks submitted! Good luck 🏇\',\'success\')\" style=\"width:100%;padding:11px;background:#00471b;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer\">Submit My Picks</button>'
-    +'</div></div></div>';
+  var html='<div style="display:flex;flex-direction:column;height:100%;overflow:hidden;">';
+  html+='<div style="background:#fff;border-bottom:0.5px solid #e5e7eb;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">';
+  html+='<div><div style="font-size:15px;font-weight:700;color:#111827;">Saturday Comp</div>';
+  html+='<div style="font-size:10px;color:#9ca3af;margin-top:1px;">Free weekly competition · pick your horses · climb the leaderboard</div></div>';
+  html+='<div style="padding:5px 10px;border-radius:8px;background:#f0fdf4;border:0.5px solid #86efac;">';
+  html+='<span style="font-size:9px;font-weight:700;color:#166534;">FREE ENTRY</span></div></div>';
+  html+='<div style="background:#fff;border-bottom:0.5px solid #e5e7eb;display:flex;padding:0 14px;flex-shrink:0;">';
+  tabs.forEach(function(tab){
+    var active=at===tab[0];
+    html+='<div onclick="setCompTab(\''+tab[0]+'\')" style="padding:9px 12px;font-size:11px;font-weight:'+(active?600:500)+';color:'+(active?'#00471b':'#9ca3af')+';border-bottom:2px solid '+(active?'#00471b':'transparent')+';cursor:pointer;white-space:nowrap;">'+tab[1]+'</div>';
+  });
+  html+='</div>';
 
-  var lbHTML='<div style=\"flex:1;overflow-y:auto;padding:14px\">'
-    +'<div style=\"background:#fff;border:0.5px solid #e5e7eb;border-radius:10px;overflow:hidden\">'
-    +'<div style=\"padding:10px 14px;border-bottom:0.5px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between\">'
-    +'<div style=\"font-size:12px;font-weight:600;color:#374151\">This Week</div>'
-    +'<div style=\"font-size:9px;color:#9ca3af\">Resets Monday</div></div>'
-    +lb.map(r=>'<div style=\"padding:10px 14px;border-bottom:0.5px solid #f3f4f6;display:flex;align-items:center;gap:10px\">'
-      +'<span style=\"font-size:15px;width:24px\">'+(r.rank===1?'🥇':r.rank===2?'🥈':r.rank===3?'🥉':r.rank)+'</span>'
-      +'<div style=\"width:30px;height:30px;border-radius:50%;background:'+r.tBg+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:'+r.tClr+';flex-shrink:0\">'+r.user[0]+'</div>'
-      +'<div style=\"flex:1;min-width:0\"><div style=\"font-size:12px;font-weight:600;color:#111827\">'+r.user+'</div>'
-      +'<div style=\"font-size:9px;padding:1px 5px;border-radius:3px;background:'+r.tBg+';color:'+r.tClr+';display:inline-block;margin-top:1px\">'+r.tier+'</div></div>'
-      +'<div style=\"display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;max-width:90px\">'
-      +r.picks.map(p=>'<span style=\"font-size:9px;font-weight:700;color:'+(p==='✓'?'#059669':'#dc2626')+';width:14px;text-align:center\">'+p+'</span>').join('')
-      +'</div>'
-      +'<div style=\"text-align:right;flex-shrink:0;min-width:36px\">'
-      +'<div style=\"font-size:14px;font-weight:700;color:#111827;font-family:JetBrains Mono,monospace\">'+r.pts+'</div>'
-      +'<div style=\"font-size:9px;color:#9ca3af\">pts</div></div></div>').join('')
-    +'</div></div>';
-
-  var howHTML='<div style=\"flex:1;overflow-y:auto;padding:14px\">'
-    +[['🏇','Pick 6 races','Every Saturday we select 6 races from major metro meetings. Pick one horse per race — system Rank 1 or your own selection.'],
-      ['🏆','Score points','3 pts for 1st · 2 pts for 2nd · 1 pt for 3rd. Maximum 18 points per week.'],
-      ['📅','Entries close Saturday 9am','Submit your picks before 9am AEST Saturday. The leaderboard updates in real time as races run.'],
+  if(at==='this-week'){
+    html+='<div style="flex:1;overflow-y:auto;padding:14px;">';
+    html+='<div style="background:#fff;border:0.5px solid #e5e7eb;border-radius:10px;overflow:hidden;margin-bottom:12px;">';
+    html+='<div style="background:#1a2634;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;">';
+    html+='<div><div style="font-size:13px;font-weight:600;color:#fff;">Saturday Comp</div>';
+    html+='<div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:1px;">Pick a horse in each race · 3pts 1st · 2pts 2nd · 1pt 3rd</div></div>';
+    html+='<div style="text-align:right;"><div style="font-size:9px;color:rgba(255,255,255,.5);">Entries close</div><div style="font-size:12px;font-weight:700;color:#fbbf24;">Sat 9:00am</div></div></div>';
+    html+='<div style="padding:10px 14px;background:#fef9c3;border-bottom:0.5px solid #fde68a;display:flex;align-items:center;gap:6px;">';
+    html+='<i class="ti ti-trophy" style="font-size:13px;color:#d97706;"></i>';
+    html+='<span style="font-size:10px;color:#92400e;font-weight:500;">Top 3 earn bonus community points: 500 · 300 · 200 pts</span></div>';
+    html+='<div style="padding:8px 0;">';
+    races.forEach(function(r,i){
+      html+='<div style="padding:10px 14px;border-bottom:0.5px solid #f3f4f6;display:flex;align-items:center;gap:10px;">';
+      html+='<div style="width:28px;height:28px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#374151;flex-shrink:0;">'+(i+1)+'</div>';
+      html+='<div style="flex:1;min-width:0;">';
+      html+='<div style="font-size:12px;font-weight:600;color:#111827;">'+r.meeting+' '+r.race+'</div>';
+      html+='<div style="font-size:10px;color:#9ca3af;">'+r.time+' · '+r.dist+' · '+r.cls+'</div>';
+      html+='<div style="font-size:10px;color:#059669;margin-top:2px;">System R1: <span style="font-weight:600;">'+r.rank1+'</span></div></div>';
+      html+='<select style="padding:5px 8px;border:0.5px solid #d1d5db;border-radius:6px;font-size:11px;color:#111827;background:#fff;">';
+      html+='<option value="">Pick horse...</option>';
+      html+='<option value="r1">'+r.rank1+' (R1)</option>';
+      html+='<option value="other">Other horse</option>';
+      html+='</select></div>';
+    });
+    html+='</div>';
+    html+='<div style="padding:12px 14px;border-top:0.5px solid #f3f4f6;">';
+    html+='<button onclick="toast(\'Picks submitted! Good luck on Saturday\',\'success\')" style="width:100%;padding:11px;background:#00471b;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;">Submit My Picks</button>';
+    html+='</div></div></div>';
+  } else if(at==='leaderboard'){
+    html+='<div style="flex:1;overflow-y:auto;padding:14px;">';
+    html+='<div style="background:#fff;border:0.5px solid #e5e7eb;border-radius:10px;overflow:hidden;">';
+    html+='<div style="padding:10px 14px;border-bottom:0.5px solid #f3f4f6;display:flex;align-items:center;justify-content:space-between;">';
+    html+='<div style="font-size:12px;font-weight:600;color:#374151;">This Week\'s Leaderboard</div>';
+    html+='<div style="font-size:9px;color:#9ca3af;">Resets Monday</div></div>';
+    lb.forEach(function(r){
+      var medal=r.rank===1?'🥇':r.rank===2?'🥈':r.rank===3?'🥉':r.rank;
+      html+='<div style="padding:10px 14px;border-bottom:0.5px solid #f3f4f6;display:flex;align-items:center;gap:10px;">';
+      html+='<span style="font-size:15px;width:24px;">'+medal+'</span>';
+      html+='<div style="width:30px;height:30px;border-radius:50%;background:'+r.tBg+';display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:'+r.tClr+';flex-shrink:0;">'+r.user[0]+'</div>';
+      html+='<div style="flex:1;min-width:0;"><div style="font-size:12px;font-weight:600;color:#111827;">'+r.user+'</div>';
+      html+='<div style="font-size:9px;padding:1px 5px;border-radius:3px;background:'+r.tBg+';color:'+r.tClr+';display:inline-block;margin-top:1px;">'+r.tier+'</div></div>';
+      html+='<div style="display:flex;gap:3px;flex-wrap:wrap;justify-content:flex-end;max-width:90px;">';
+      r.picks.forEach(function(p){
+        html+='<span style="font-size:9px;font-weight:700;color:'+(p==='✓'?'#059669':'#dc2626')+';width:14px;text-align:center;">'+p+'</span>';
+      });
+      html+='</div>';
+      html+='<div style="text-align:right;flex-shrink:0;min-width:36px;"><div style="font-size:14px;font-weight:700;color:#111827;font-family:JetBrains Mono,monospace;">'+r.pts+'</div><div style="font-size:9px;color:#9ca3af;">pts</div></div></div>';
+    });
+    html+='</div></div>';
+  } else {
+    var items=[
+      ['🏇','Pick 6 races','Every Saturday we select 6 races from major metro meetings. Pick one horse per race.'],
+      ['🏆','Score points','3 pts for 1st · 2 pts for 2nd · 1 pt for 3rd. Max 18 points per week.'],
+      ['📅','Entries close Saturday 9am','Submit before 9am AEST. Leaderboard updates in real time as races run.'],
       ['🎖️','Win community points','Top 3 earn bonus tier points: 500 for 1st · 300 for 2nd · 200 for 3rd.'],
-      ['🆓','Free to enter','The Saturday Comp is free for all registered users. Bragging rights and community points only.'],
-    ].map(([icon,title,desc])=>'<div style=\"background:#fff;border:0.5px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:8px;display:flex;gap:12px\">'
-      +'<div style=\"font-size:24px;flex-shrink:0\">'+icon+'</div>'
-      +'<div><div style=\"font-size:13px;font-weight:600;color:#111827;margin-bottom:4px\">'+title+'</div>'
-      +'<div style=\"font-size:11px;color:#6b7280;line-height:1.6\">'+desc+'</div></div></div>').join('')
-    +'</div>';
-
-  const tabs=[['this-week','This Week'],['leaderboard','Leaderboard'],['how','How It Works']];
-  main.innerHTML='<div style=\"display:flex;flex-direction:column;height:100%;overflow:hidden\">'
-    +'<div style=\"background:#fff;border-bottom:0.5px solid #e5e7eb;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0\">'
-    +'<div><div style=\"font-size:15px;font-weight:700;color:#111827\">Saturday Comp</div>'
-    +'<div style=\"font-size:10px;color:#9ca3af;margin-top:1px\">Free weekly competition &amp;middot; pick your horses &amp;middot; climb the leaderboard</div></div>'
-    +'<div style=\"display:flex;align-items:center;padding:5px 10px;border-radius:8px;background:#f0fdf4;border:0.5px solid #86efac\">'
-    +'<span style=\"font-size:9px;font-weight:700;color:#166534\">FREE ENTRY</span></div></div>'
-    +'<div style=\"background:#fff;border-bottom:0.5px solid #e5e7eb;display:flex;padding:0 14px;flex-shrink:0\">'
-    +tabs.map(([id,label])=>'<div onclick=\"setCompTab(\\''+id+'\\')\" style=\"padding:9px 12px;font-size:11px;font-weight:'+(at===id?600:500)+';color:'+(at===id?'#00471b':'#9ca3af')+';border-bottom:2px solid '+(at===id?'#00471b':'transparent')+';cursor:pointer;white-space:nowrap\">'+label+'</div>').join('')
-    +'</div>'
-    +(at==='this-week'?picksHTML:at==='leaderboard'?lbHTML:howHTML)
-    +'</div>';
+      ['🆓','Free to enter','Free for all registered users. Bragging rights and community points only.'],
+    ];
+    html+='<div style="flex:1;overflow-y:auto;padding:14px;">';
+    items.forEach(function(item){
+      html+='<div style="background:#fff;border:0.5px solid #e5e7eb;border-radius:10px;padding:14px;margin-bottom:8px;display:flex;gap:12px;">';
+      html+='<div style="font-size:24px;flex-shrink:0;">'+item[0]+'</div>';
+      html+='<div><div style="font-size:13px;font-weight:600;color:#111827;margin-bottom:4px;">'+item[1]+'</div>';
+      html+='<div style="font-size:11px;color:#6b7280;line-height:1.6;">'+item[2]+'</div></div></div>';
+    });
+    html+='</div>';
+  }
+  html+='</div>';
+  main.innerHTML=html;
 }
 function setCompTab(tab){window._compTab=tab;showCompetitions();}
-
 // ── BLACKBOOK PAGE ──
 function showBlackbook() {
   const bb = JSON.parse(localStorage.getItem('re_blackbook')||'[]');
