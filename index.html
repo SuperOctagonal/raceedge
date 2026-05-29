@@ -681,7 +681,7 @@ let currentPage = 'home';
 
 function navTo(page) {
   // Auth gate — non-home pages require sign in
-  var publicPages = ['home'];
+  var publicPages = ['home','races'];
   if (!publicPages.includes(page) && !currentUser) {
     // Not signed in — open Clerk sign in then redirect after
     window._pendingNav = page;
