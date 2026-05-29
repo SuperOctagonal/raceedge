@@ -1,4 +1,4 @@
-<!-- WAGING WAR-BUILD-V1780041472-1780041140 -->
+<!-- WAGING WAR-BUILD-1780041909 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1406,8 +1406,7 @@ function showToday() {
     + '<div style="font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:2px;color:#00471b;">WAGING<span style="color:#fbbf24;">WAR</span></div>'
     + '<div style="display:flex;flex-wrap:wrap;gap:14px;">';
   ['About Us','Contact Us','Disclaimer','Privacy Policy','Terms of Service','Responsible Gambling'].forEach(function(p){
-    html += '<span onclick="showLegalPage(\\"'+p+'\\")" style="font-size:10px;color:#9ca3af;cursor:pointer;text-decoration:underline;text-underline-offset:2px;"'
-      + ' onmouseover="this.style.color=&quot;#374151&quot;" onmouseout="this.style.color=&quot;#9ca3af&quot;">'+p+'</span>';
+    html += '<span data-legal="'+p+'" style="font-size:10px;color:#9ca3af;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">'+p+'</span>';
   });
   html += '</div>'
     + '<div style="font-size:10px;color:#d1d5db;">© 2026 Waging War Pty Ltd</div>'
@@ -1419,6 +1418,12 @@ function showToday() {
 
   html += '</div></div>';
   document.getElementById('main').innerHTML = html;
+  // Wire legal footer links
+  document.querySelectorAll('[data-legal]').forEach(function(el){
+    el.addEventListener('click', function(){ showLegalPage(this.getAttribute('data-legal')); });
+    el.addEventListener('mouseover', function(){ this.style.color='#374151'; });
+    el.addEventListener('mouseout', function(){ this.style.color='#9ca3af'; });
+  });
 }
 function toggleTopPicks(){
   var body = document.getElementById('picks-body');
