@@ -1,4 +1,4 @@
-<!-- WAGING WAR-BUILD-1780040600 -->
+<!-- WAGING WAR-BUILD-1780040820 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1384,9 +1384,9 @@ function showToday() {
     keys.forEach(function(k) {
       var rc = allRaces[k];
       if (!rc) return;
-      html += '<div onclick="navTo('races');selectRace(allRaces[''+k+''],''+k+'')"'
+      html += '<div onclick="navTo(\'races\');selectRace(allRaces[\''+k+'\'],\''+k+'\')"'
         + ' style="display:flex;align-items:center;gap:5px;padding:3px 7px;cursor:pointer;border-radius:5px;transition:background .1s;"'
-        + ' onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background=''">'
+        + ' onmouseover="this.style.background=\'#f0fdf4\'" onmouseout="this.style.background=\'\'">'
         + '<span style="font-size:11px;font-weight:700;color:#111827;">R'+rc.num+'</span>'
         + '<span style="font-size:10px;color:#9ca3af;">'+( rc.time||'')+'</span>'
         + '</div>';
