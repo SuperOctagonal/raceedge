@@ -266,7 +266,7 @@ body{background:#f1f5f9;color:#111827;font-family:'Space Grotesk',sans-serif;fon
   html,body{height:auto!important;overflow-y:auto!important;overflow-x:hidden!important}
   .main{overflow:visible!important;height:auto!important}
   .main>div{flex:none!important;overflow:visible!important;height:auto!important;max-height:none!important}
-  body{padding-bottom:48px}
+  body{padding-bottom:56px}
 
   /* Nav — hide desktop links, keep brand */
   .nav-links{display:none!important}
@@ -275,10 +275,10 @@ body{background:#f1f5f9;color:#111827;font-family:'Space Grotesk',sans-serif;fon
   #acct-btn-wrap{margin-left:auto}
 
   /* Bottom tab bar */
-  #mob-tab-bar{display:flex;position:fixed;bottom:0;left:0;right:0;background:#00471b;border-top:1.5px solid #003314;z-index:1000;height:48px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  #mob-tab-bar{display:flex;position:fixed;bottom:0;left:0;right:0;background:#00471b;border-top:1px solid rgba(255,255,255,.1);z-index:1000;height:56px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
   #mob-tab-bar::-webkit-scrollbar{display:none}
-  .mob-tab{flex:0 0 auto;display:flex;align-items:center;justify-content:center;padding:0 16px;color:rgba(255,255,255,.55);font-size:10px;font-weight:600;white-space:nowrap;cursor:pointer;border-bottom:2px solid transparent;height:100%;font-family:'Space Grotesk'}
-  .mob-tab.active{color:#fbbf24;border-bottom-color:#fbbf24}
+  .mob-tab{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 2px;color:rgba(255,255,255,.45);font-size:9px;font-weight:600;white-space:nowrap;cursor:pointer;border-top:2px solid transparent;height:100%;font-family:'Space Grotesk';letter-spacing:.3px;transition:color .15s}
+  .mob-tab.active{color:#fbbf24;border-top-color:#fbbf24}
   #mob-csv-strip{display:flex;align-items:center;gap:8px;padding:4px 10px;background:#00471b;border-bottom:1px solid #003314;font-size:9px}
   .mob-csv-label{color:rgba(255,255,255,.7);cursor:pointer;display:flex;align-items:center;gap:4px}
 
@@ -587,19 +587,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <!-- MOBILE TAB BAR -->
 <div id="mob-tab-bar">
-  <div class="mob-tab active" id="mobTab-races" onclick="mobTabNav('races')">Racing</div>
-  <div class="mob-tab" id="mobTab-today" onclick="mobTabNav('today')">Today</div>
-  <div class="mob-tab" id="mobTab-mybets" onclick="mobTabNav('mybets')">My Bets</div>
-  <div class="mob-tab" id="mobTab-insights" onclick="mobTabNav('insights')">Insights</div>
-  <div class="mob-tab" id="mobTab-results" onclick="mobTabNav('results')">Results</div>
-  <div class="mob-tab" id="mobTab-community" onclick="mobTabNav('community')">Community</div>
-  <div class="mob-tab" id="mobTab-settings" onclick="mobTabNav('settings')">Settings</div>
+  <div class="mob-tab active" id="mobTab-races" onclick="mobTabNav('races')"><i class="ti ti-horse-toy" style="font-size:15px;display:block;margin-bottom:1px"></i>Racing</div>
+  <div class="mob-tab" id="mobTab-today" onclick="mobTabNav('today')"><i class="ti ti-calendar" style="font-size:15px;display:block;margin-bottom:1px"></i>Today</div>
+  <div class="mob-tab" id="mobTab-mybets" onclick="mobTabNav('mybets')"><i class="ti ti-report-money" style="font-size:15px;display:block;margin-bottom:1px"></i>My Bets</div>
+  <div class="mob-tab" id="mobTab-insights" onclick="mobTabNav('insights')"><i class="ti ti-chart-bar" style="font-size:15px;display:block;margin-bottom:1px"></i>Insights</div>
+  <div class="mob-tab" id="mobTab-results" onclick="mobTabNav('results')"><i class="ti ti-flag-check" style="font-size:15px;display:block;margin-bottom:1px"></i>Results</div>
+  <div class="mob-tab" id="mobTab-community" onclick="mobTabNav('community')"><i class="ti ti-users" style="font-size:15px;display:block;margin-bottom:1px"></i>Community</div>
 </div>
 
 <!-- MOBILE CSV STRIP -->
 <div id="mob-csv-strip">
   <label for="fileIn" class="mob-csv-label" id="mob-csv-label"><i class="ti ti-upload" style="font-size:12px"></i> Load CSV</label>
   <span id="mob-file-hint" style="font-size:9px;color:rgba(255,255,255,.5)"></span>
+</div>
+
+<!-- MOBILE MEETING + RACE SELECTORS -->
+<div id="mob-selectors" style="display:none;background:#fff;border-bottom:1px solid #e5e7eb;padding:6px 10px;gap:6px;flex-direction:column">
+  <div style="display:flex;gap:6px">
+    <div style="flex:1;position:relative">
+      <select id="mob-meeting-sel" onchange="mobMeetingChange()" style="width:100%;padding:7px 10px;border:0.5px solid #d1d5db;border-radius:7px;font-size:12px;font-weight:600;color:#111827;background:#fff;appearance:none;font-family:'Space Grotesk'">
+        <option value="">Select meeting…</option>
+      </select>
+    </div>
+    <div style="flex:1;position:relative">
+      <select id="mob-race-sel" onchange="mobRaceChange()" style="width:100%;padding:7px 10px;border:0.5px solid #d1d5db;border-radius:7px;font-size:12px;font-weight:600;color:#111827;background:#fff;appearance:none;font-family:'Space Grotesk'">
+        <option value="">Select race…</option>
+      </select>
+    </div>
+  </div>
 </div>
 
 <!-- QUICK BET PANEL -->
@@ -775,6 +790,7 @@ function onCSVLoaded(fname) {
   document.getElementById('mob-file-hint').style.color = '#4ade80';
   document.getElementById('lr-meetings-sec').style.display = 'block';
   buildSidebarMeetings();
+  mobBuildSelectors();
   navTo('races');
 }
 
@@ -1296,7 +1312,11 @@ function showToday() {
   const dateStr = today.toLocaleDateString('en-AU', {weekday:'long',day:'numeric',month:'long'});
   const venues = Object.keys(allVenues||{});
 
-  let html = `<div class="page-wrap"><div class="page-title">Today</div><div class="page-sub">${dateStr}</div>`;
+  let html = `<div class="page-wrap" style="padding:12px 14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+      <div class="page-title" style="margin-bottom:0">Today</div>
+    </div>
+    <div class="page-sub" style="margin-bottom:12px">${dateStr}</div>`;
 
   if (!venues.length) {
     html += `<div class="empty-state"><i class="ti ti-calendar"></i><p>Load a CSV to see today's meetings</p></div></div>`;
@@ -1304,11 +1324,20 @@ function showToday() {
     return;
   }
 
-  // Top 3 picks
+  // Top Picks — collapsed by default, expandable
   const picks = getTopPicks(3);
   if (picks.length) {
-    html += `<div style="margin-bottom:14px"><div style="font-size:11px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Today's top picks</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">`;
+    html += `<div style="margin-bottom:14px;border:0.5px solid #e5e7eb;border-radius:10px;overflow:hidden;background:#fff">
+      <div onclick="toggleTopPicks()" id="picks-toggle-row" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:pointer;user-select:none">
+        <div style="display:flex;align-items:center;gap:7px">
+          <span style="font-size:13px">🏆</span>
+          <span style="font-size:12px;font-weight:600;color:#111827">Today's top picks</span>
+          <span style="background:#fbbf24;color:#78350f;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px">${picks.length}</span>
+        </div>
+        <i class="ti ti-chevron-down" id="picks-chevron" style="font-size:14px;color:#9ca3af;transition:transform .2s"></i>
+      </div>
+      <div id="picks-body" style="display:none;border-top:0.5px solid #f3f4f6;padding:10px 12px">
+        <div style="display:flex;flex-direction:column;gap:8px">`;
     picks.forEach((p, i) => {
       const rkClass = i===0?'pick-r1':i===1?'pick-r2':'pick-r3';
       html += `<div class="pick-card"><span class="pick-rank ${rkClass}">${i+1}</span>
@@ -1316,11 +1345,12 @@ function showToday() {
         <div class="pick-odds"><div class="pick-edge">${p.myOdds?'$'+formatRacingOdds(p.myOdds):'—'}</div><div class="pick-live">${p.rawOdds?'$'+p.rawOdds.toFixed(2):'—'}</div></div>
       </div>`;
     });
-    html += `</div></div>`;
+    html += `</div></div></div>`;
   }
 
-  // Meetings grid
-  html += `<div style="font-size:11px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">All meetings</div>`;
+  // Meetings — compact style
+  html += `<div style="font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">All meetings</div>`;
+  html += `<div style="display:flex;flex-direction:column;gap:6px">`;
   venues.forEach(venue => {
     const keys = allVenues[venue] || [];
     const tc = window.currentTrackCond || 'good';
@@ -1328,29 +1358,35 @@ function showToday() {
     const tcColor = {good:'#d1fae5',soft:'#fef9c3',heavy:'#dbeafe',synthetic:'#f3e8ff'}[tc]||'#d1fae5';
     const tcText = {good:'#065f46',soft:'#713f12',heavy:'#1e3a8a',synthetic:'#4c1d95'}[tc]||'#065f46';
 
-    html += `<div class="meeting-card" style="margin-bottom:4px">
-      <div class="meeting-card-header">
-        <span class="meeting-card-name">${venue}</span>
-        <span class="meeting-card-tc" style="background:${tcColor};color:${tcText}">${tcLabel}</span>
+    html += `<div style="background:#fff;border:0.5px solid #e5e7eb;border-radius:10px;overflow:hidden">
+      <div style="background:#1a2634;padding:7px 12px;display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:12px;font-weight:600;color:#fff;letter-spacing:.3px">${venue}</span>
+        <span style="background:${tcColor};color:${tcText};font-size:9px;font-weight:700;padding:2px 8px;border-radius:8px">${tcLabel}</span>
       </div>
-      <div class="races-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));border-top:0.5px solid #2d3a47">`;
+      <div style="display:flex;flex-wrap:wrap;padding:6px 4px 4px">`;
 
     keys.forEach(k => {
       const rc = allRaces[k];
       if (!rc) return;
-      const top = getTopHorse(rc);
-      html += `<div class="race-cell" onclick="navTo('races');selectRace(allRaces['${k}'],'${k}')">
-        <div class="race-cell-num">R${rc.num}</div>
-        <div class="race-cell-time">${rc.time||''}</div>
-        <div class="race-cell-horse ${top?'':'none'}">${top?top.name:'—'}</div>
+      html += `<div onclick="navTo('races');selectRace(allRaces['${k}'],'${k}')" style="display:flex;flex-direction:column;align-items:center;padding:5px 8px;cursor:pointer;border-radius:6px;min-width:44px;transition:background .1s" onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background=''">
+        <span style="font-size:11px;font-weight:700;color:#111827">R${rc.num}</span>
+        <span style="font-size:9px;color:#9ca3af;margin-top:1px">${rc.time||''}</span>
       </div>`;
     });
 
     html += `</div></div>`;
   });
-
-  html += `</div>`;
+  html += `</div></div>`;
   document.getElementById('main').innerHTML = html;
+}
+
+function toggleTopPicks(){
+  var body = document.getElementById('picks-body');
+  var chevron = document.getElementById('picks-chevron');
+  if(!body) return;
+  var open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if(chevron) chevron.style.transform = open ? '' : 'rotate(180deg)';
 }
 
 function getTopPicks(n) {
@@ -1910,6 +1946,109 @@ function showInsights() {
 // ── COMMUNITY PAGE ──
 function showCommunity() {
   const main = document.getElementById('main');
+  const isMob = window.innerWidth <= 900;
+
+  if(isMob){
+    // Mobile: fully stacked vertical layout
+    main.innerHTML = `<div style="display:flex;flex-direction:column;height:100%;overflow-y:auto">
+
+      <!-- Profile strip -->
+      <div style="background:#1a2634;padding:12px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0">
+        <div style="width:36px;height:36px;border-radius:50%;background:#dbeafe;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#1e40af;flex-shrink:0">A</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:600;color:#fff">Your Profile</div>
+          <div style="display:inline-flex;align-items:center;gap:3px;padding:1px 6px;border-radius:4px;background:#fef3c7;color:#92400e;font-size:9px;font-weight:600;margin-top:2px"><i class="ti ti-trophy" style="font-size:9px"></i> Adaminaby Maiden</div>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div style="font-size:9px;color:rgba(255,255,255,.5);margin-bottom:2px">0 pts · 50 to next tier</div>
+          <div style="height:4px;width:80px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden"><div style="width:2%;height:100%;background:#fbbf24;border-radius:2px"></div></div>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div style="background:#fff;display:flex;border-bottom:0.5px solid #f3f4f6;flex-shrink:0">
+        ${[['Members online','2,847','#22c55e'],['Posts today','128','#374151'],['Total members','14,203','#374151']].map(([l,v,c])=>
+          `<div style="flex:1;padding:8px 4px;text-align:center;border-right:0.5px solid #f3f4f6">
+            <div style="font-size:13px;font-weight:700;color:${c};font-family:'JetBrains Mono'">${v}</div>
+            <div style="font-size:8px;color:#9ca3af;margin-top:1px">${l}</div>
+          </div>`
+        ).join('')}
+      </div>
+
+      <!-- Weekly ROI leaderboard -->
+      <div style="background:#fff;border-bottom:0.5px solid #e5e7eb;padding:10px 14px;flex-shrink:0">
+        <div style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Weekly ROI</div>
+        <div style="display:flex;flex-direction:column;gap:0">
+          ${[
+            {rank:1,user:'TrackRat_WA',tier:'Ascot Open',roi:'+184%',tierBg:'#fef3c7',tierColor:'#92400e'},
+            {rank:2,user:'JPunter88',tier:'Newcastle BM84',roi:'+147%',tierBg:'#dcfce7',tierColor:'#166534'},
+            {rank:3,user:'MeggsK',tier:'Moonee Valley',roi:'+122%',tierBg:'#dbeafe',tierColor:'#1e40af'},
+          ].map(r=>`
+            <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:0.5px solid #f9fafb">
+              <span style="font-size:11px;font-weight:700;width:16px;color:#d97706">${r.rank}</span>
+              <div style="width:24px;height:24px;border-radius:50%;background:${r.tierBg};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;color:${r.tierColor};flex-shrink:0">${r.user[0]}</div>
+              <div style="flex:1;min-width:0">
+                <div style="font-size:11px;font-weight:600">${r.user}</div>
+                <div style="font-size:9px;padding:0 4px;border-radius:3px;background:${r.tierBg};color:${r.tierColor};display:inline-block">${r.tier}</div>
+              </div>
+              <span style="font-size:12px;font-weight:700;color:#059669">${r.roi}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <!-- Forum header -->
+      <div style="background:#fff;border-bottom:0.5px solid #e5e7eb;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+        <div style="font-size:13px;font-weight:600">Today's races</div>
+        <button onclick="showNewPost()" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:6px;background:#00471b;color:#fff;border:none;font-size:11px;font-weight:600;cursor:pointer">
+          <i class="ti ti-pencil" style="font-size:12px"></i> New post
+        </button>
+      </div>
+
+      <!-- Tab bar -->
+      <div style="background:#fff;border-bottom:0.5px solid #e5e7eb;display:flex;padding:0 14px;flex-shrink:0;overflow-x:auto;scrollbar-width:none">
+        ${['Hot','Latest','Top this week','Unanswered'].map((t,i)=>
+          `<div style="padding:8px 10px;font-size:11px;font-weight:${i===0?'600':'500'};color:${i===0?'#00471b':'#9ca3af'};border-bottom:2px solid ${i===0?'#00471b':'transparent'};cursor:pointer;white-space:nowrap">${t}</div>`
+        ).join('')}
+      </div>
+
+      <!-- Pinned -->
+      <div style="background:#fafafa;border-bottom:0.5px solid #e5e7eb;padding:8px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <i class="ti ti-pin" style="font-size:13px;color:#6b21a8;flex-shrink:0"></i>
+        <div style="font-size:11px;color:#374151;flex:1;line-height:1.4">Welcome to Waging War Community — share your analysis and climb the tier ladder</div>
+        <span style="font-size:9px;color:#9ca3af;flex-shrink:0">Pinned</span>
+      </div>
+
+      <!-- Posts -->
+      <div style="flex:1">
+        ${[
+          {user:'JPunter88',tier:'Newcastle BM84',tierBg:'#dcfce7',tierColor:'#166534',cat:'Winning bet',catBg:'#fef9c3',catColor:'#854d0e',title:'Backed Rank 1 at Flemington this morning — $8.50 — bolted in by 3 lengths',votes:89,replies:31,time:'5h ago',hot:true},
+          {user:'TrackRat_WA',tier:'Ascot Open',tierBg:'#fef3c7',tierColor:'#92400e',cat:'Tips & analysis',catBg:'#dcfce7',catColor:'#166534',title:'Track bias at Doomben today — closers dominating after rail position change',votes:47,replies:23,time:'2h ago',hot:false},
+          {user:'MeggsK',tier:'Moonee Valley',tierBg:'#dbeafe',tierColor:'#1e40af',cat:"Today's races",catBg:'#dbeafe',catColor:'#1e40af',title:'Doomben R6 — system Rank 1 at $12, market has it at $4.50. Value% +166%. Thoughts?',votes:34,replies:19,time:'3h ago',hot:false},
+          {user:'NewMember247',tier:'Walgett Maiden',tierBg:'#f3f4f6',tierColor:'#374151',cat:'Winning bet',catBg:'#fef9c3',catColor:'#854d0e',title:'First win with the system! Rank 2 at $6.50 at Caulfield — stoked',votes:12,replies:8,time:'1h ago',hot:false},
+        ].map(p=>`
+          <div style="padding:10px 14px;border-bottom:0.5px solid #f3f4f6;background:#fff;cursor:pointer" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background='#fff'">
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:4px">
+              <span style="font-size:9px;font-weight:600;padding:1px 6px;border-radius:3px;background:${p.catBg};color:${p.catColor}">${p.cat}</span>
+              ${p.hot?'<span style="font-size:9px;font-weight:600;padding:1px 5px;border-radius:8px;background:#fef3c7;color:#92400e">🔥 Hot</span>':''}
+            </div>
+            <div style="font-size:12px;font-weight:500;color:#111827;line-height:1.4;margin-bottom:6px">${p.title}</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="width:18px;height:18px;border-radius:50%;background:${p.tierBg};display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:600;color:${p.tierColor}">${p.user[0]}</div>
+              <span style="font-size:10px;font-weight:500;color:#374151">${p.user}</span>
+              <span style="font-size:9px;padding:1px 5px;border-radius:3px;background:${p.tierBg};color:${p.tierColor}">${p.tier}</span>
+              <span style="margin-left:auto;font-size:10px;color:#9ca3af"><i class="ti ti-message" style="font-size:10px"></i> ${p.replies}</span>
+              <span style="font-size:10px;color:#9ca3af">▲ ${p.votes}</span>
+              <span style="font-size:10px;color:#9ca3af">${p.time}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+    return;
+  }
+
+  // Desktop: 3-column layout
   main.innerHTML = `<div style="display:grid;grid-template-columns:220px 1fr 220px;height:100%;overflow:hidden">
 
     <!-- LEFT: Profile + sections -->
@@ -1968,19 +2107,16 @@ function showCommunity() {
           <i class="ti ti-pencil" style="font-size:13px"></i> New post
         </button>
       </div>
-      <!-- Tab bar -->
       <div style="background:#fff;border-bottom:0.5px solid #e5e7eb;display:flex;padding:0 14px;flex-shrink:0">
         ${['Hot','Latest','Top this week','Unanswered'].map((t,i) =>
           `<div style="padding:8px 12px;font-size:11px;font-weight:${i===0?'600':'500'};color:${i===0?'#00471b':'#9ca3af'};border-bottom:2px solid ${i===0?'#00471b':'transparent'};cursor:pointer;white-space:nowrap">${t}</div>`
         ).join('')}
       </div>
-      <!-- Pinned announcement -->
       <div style="background:#fafafa;border-bottom:0.5px solid #e5e7eb;padding:8px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0">
         <i class="ti ti-pin" style="font-size:14px;color:#6b21a8;flex-shrink:0"></i>
         <div style="font-size:11px;font-weight:500;color:#374151;flex:1">Welcome to Waging War Community — share your analysis and climb the tier ladder</div>
         <span style="font-size:10px;color:#9ca3af">Pinned</span>
       </div>
-      <!-- Posts -->
       <div style="flex:1;overflow-y:auto">
         ${[
           {user:'JPunter88',tier:'Newcastle BM84',tierBg:'#dcfce7',tierColor:'#166534',cat:'Winning bet',catBg:'#fef9c3',catColor:'#854d0e',title:'Backed Rank 1 at Flemington this morning — $8.50 — bolted in by 3 lengths',votes:89,replies:31,views:687,time:'5h ago',hot:true},
@@ -1990,12 +2126,10 @@ function showCommunity() {
           {user:'SpringCarnival',tier:'Gosford BM78',tierBg:'#f3f4f6',tierColor:'#374151',cat:'System feedback',catBg:'#f3e8ff',catColor:'#6b21a8',title:'How does the system handle horses returning from a long spell?',votes:8,replies:6,views:97,time:'2 days ago',hot:false},
         ].map(p => `
           <div style="display:flex;align-items:flex-start;gap:0;padding:10px 14px;border-bottom:0.5px solid #f3f4f6;cursor:pointer" onmouseover="this.style.background='#fafafa'" onmouseout="this.style.background=''">
-            <!-- Vote col -->
             <div style="display:flex;flex-direction:column;align-items:center;width:36px;flex-shrink:0;gap:1px;padding-top:2px">
               <button style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:16px;line-height:1;padding:0" onmouseover="this.style.color='#059669'" onmouseout="this.style.color='#9ca3af'">▲</button>
               <span style="font-size:12px;font-weight:600;color:#111827">${p.votes}</span>
             </div>
-            <!-- Content -->
             <div style="flex:1;min-width:0">
               <div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-bottom:3px">
                 <span style="font-size:9px;font-weight:600;padding:1px 6px;border-radius:3px;background:${p.catBg};color:${p.catColor}">${p.cat}</span>
@@ -2011,7 +2145,6 @@ function showCommunity() {
                 <span style="font-size:10px;color:#9ca3af">${p.time}</span>
               </div>
             </div>
-            <!-- Replies pill -->
             <div style="background:#f1f5f9;border-radius:6px;padding:5px 8px;text-align:center;min-width:40px;flex-shrink:0;margin-left:8px">
               <div style="font-size:13px;font-weight:600;line-height:1">${p.replies}</div>
               <div style="font-size:8px;color:#9ca3af">replies</div>
@@ -2023,7 +2156,6 @@ function showCommunity() {
 
     <!-- RIGHT: Leaderboards -->
     <div style="border-left:0.5px solid #e5e7eb;background:#fff;overflow-y:auto;display:flex;flex-direction:column;gap:0">
-      <!-- Weekly ROI -->
       <div style="padding:12px 14px;border-bottom:0.5px solid #f3f4f6">
         <div style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">Weekly ROI</div>
         <div style="font-size:9px;color:#9ca3af;margin-bottom:8px">Min 5 bets · resets Monday</div>
@@ -2045,7 +2177,6 @@ function showCommunity() {
           </div>
         `).join('')}
       </div>
-      <!-- Top contributors -->
       <div style="padding:12px 14px;border-bottom:0.5px solid #f3f4f6">
         <div style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Top contributors</div>
         ${[
@@ -2062,7 +2193,6 @@ function showCommunity() {
           </div>
         `).join('')}
       </div>
-      <!-- Community stats -->
       <div style="padding:12px 14px">
         <div style="font-size:10px;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Community stats</div>
         ${[['Members online','2,847','#22c55e'],['Posts today','128',null],['Total members','14,203',null]].map(([l,v,c]) =>
@@ -5620,11 +5750,37 @@ function setTrackCond(cond){
 
 function openLoginModal(){
   if(window.Clerk && window.Clerk.loaded){
-    window.Clerk.openSignIn();
+    // Start 5s timeout — if modal hasn't appeared, redirect to hosted sign-in
+    var _signInTimer = setTimeout(function(){
+      // Check if Clerk modal is visible — if not, fallback
+      var clerkModal = document.querySelector('.cl-rootBox,.cl-signIn-root,.cl-component');
+      if(!clerkModal || clerkModal.style.display === 'none' || !document.body.contains(clerkModal)){
+        window.location.href = 'https://accounts.wagingwar.com.au/sign-in';
+      }
+    }, 5000);
+    try {
+      window.Clerk.openSignIn({
+        afterSignInUrl: window.location.href,
+        afterSignUpUrl: window.location.href,
+      });
+    } catch(e) {
+      clearTimeout(_signInTimer);
+      window.location.href = 'https://accounts.wagingwar.com.au/sign-in';
+    }
     return;
   }
-  // fallback if Clerk not loaded yet
-  setTimeout(function(){ openLoginModal(); }, 300);
+  // Clerk not loaded yet — wait up to 5s then redirect
+  var _waitCount = 0;
+  var _waitTimer = setInterval(function(){
+    _waitCount++;
+    if(window.Clerk && window.Clerk.loaded){
+      clearInterval(_waitTimer);
+      openLoginModal();
+    } else if(_waitCount >= 10){
+      clearInterval(_waitTimer);
+      window.location.href = 'https://accounts.wagingwar.com.au/sign-in';
+    }
+  }, 500);
 }
 
 function closeLoginModal(){
@@ -5823,8 +5979,49 @@ function mobTabNav(tab){
   if(btn) btn.classList.add('active');
   // Show/hide CSV strip (only on racing tab)
   var strip=document.getElementById('mob-csv-strip');
-  if(strip) strip.style.display=(tab==='racing')?'flex':'none';
+  if(strip) strip.style.display=(tab==='races')?'flex':'none';
+  // Show/hide mobile selectors (only on racing tab, only when CSV loaded)
+  var sels=document.getElementById('mob-selectors');
+  if(sels) sels.style.display=(tab==='races'&&Object.keys(allVenues||{}).length)?'flex':'none';
   switchNav(tab);
+}
+
+function mobBuildSelectors(){
+  if(window.innerWidth>900) return;
+  var meetSel=document.getElementById('mob-meeting-sel');
+  if(!meetSel) return;
+  var venues=Object.keys(allVenues||{});
+  meetSel.innerHTML='<option value="">Select meeting…</option>'+venues.map(function(v){return'<option value="'+v+'">'+v+'</option>';}).join('');
+  var sels=document.getElementById('mob-selectors');
+  if(sels&&currentPage==='races') sels.style.display='flex';
+}
+
+function mobMeetingChange(){
+  var meetSel=document.getElementById('mob-meeting-sel');
+  var raceSel=document.getElementById('mob-race-sel');
+  if(!meetSel||!raceSel) return;
+  var venue=meetSel.value;
+  raceSel.innerHTML='<option value="">Select race…</option>';
+  if(!venue) return;
+  var keys=allVenues[venue]||[];
+  keys.forEach(function(k){
+    var rc=allRaces[k];
+    if(!rc) return;
+    raceSel.innerHTML+='<option value="'+k+'">R'+rc.num+(rc.time?' · '+rc.time:'')+'</option>';
+  });
+  // Auto-select first race
+  if(keys.length){
+    raceSel.value=keys[0];
+    mobRaceChange();
+  }
+}
+
+function mobRaceChange(){
+  var raceSel=document.getElementById('mob-race-sel');
+  if(!raceSel||!raceSel.value) return;
+  var key=raceSel.value;
+  var rc=allRaces[key];
+  if(rc) selectRace(rc,key);
 }
 
 function mobSetTC(cond){
