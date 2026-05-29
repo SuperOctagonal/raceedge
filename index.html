@@ -1092,7 +1092,11 @@ function renderRaceTable(rc, results, scratched, hasLive, liveOddsData) {
 
   // ── Pace Map view ──
   function buildPaceView() {
-    const scored = results.map(r => {
+    // First calculate system rank (by score, same as field view)
+    const ranked = results.map((r, i) => ({...r, systemRank: i+1}));
+
+    // Then sort by barrier for display
+    const scored = ranked.map(r => {
       const pm = calcPaceMap(r, rc.venue, +rc.dist, tc);
       return {...r, pm};
     }).sort((a,b) => (+a['BP']||+a.tab||99) - (+b['BP']||+b.tab||99));
@@ -1106,7 +1110,7 @@ function renderRaceTable(rc, results, scratched, hasLive, liveOddsData) {
       if (!h.pm) return '';
       const bp = h['BP']||h.BP||'';
       const barrierNum = bp || h.tab || '—';
-      const rank = hi+1;
+      const rank = h.systemRank;
       const rkBg = rank===1?'#fbbf24':rank===2?'#d1d5db':rank===3?'#cd7f32':'#f3f4f6';
       const rkColor = rank<=3?'#374151':'#9ca3af';
       const myO = h.myOdds ? '$'+formatRacingOdds(h.myOdds) : '—';
