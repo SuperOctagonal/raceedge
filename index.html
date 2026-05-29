@@ -5749,38 +5749,7 @@ function setTrackCond(cond){
 }
 
 function openLoginModal(){
-  if(window.Clerk && window.Clerk.loaded){
-    // Start 5s timeout — if modal hasn't appeared, redirect to hosted sign-in
-    var _signInTimer = setTimeout(function(){
-      // Check if Clerk modal is visible — if not, fallback
-      var clerkModal = document.querySelector('.cl-rootBox,.cl-signIn-root,.cl-component');
-      if(!clerkModal || clerkModal.style.display === 'none' || !document.body.contains(clerkModal)){
-        window.location.href = 'https://accounts.wagingwar.com.au/sign-in';
-      }
-    }, 5000);
-    try {
-      window.Clerk.openSignIn({
-        afterSignInUrl: window.location.href,
-        afterSignUpUrl: window.location.href,
-      });
-    } catch(e) {
-      clearTimeout(_signInTimer);
-      window.location.href = 'https://accounts.wagingwar.com.au/sign-in';
-    }
-    return;
-  }
-  // Clerk not loaded yet — wait up to 5s then redirect
-  var _waitCount = 0;
-  var _waitTimer = setInterval(function(){
-    _waitCount++;
-    if(window.Clerk && window.Clerk.loaded){
-      clearInterval(_waitTimer);
-      openLoginModal();
-    } else if(_waitCount >= 10){
-      clearInterval(_waitTimer);
-      window.location.href = 'https://accounts.wagingwar.com.au/sign-in';
-    }
-  }, 500);
+  window.location.href = 'https://accounts.wagingwar.com.au/sign-in';
 }
 
 function closeLoginModal(){
@@ -5847,10 +5816,16 @@ function toggleAcctDropdown(){
 
 function updateAcctBtn(){
   var btn = document.getElementById('acct-btn');
-  if(btn && currentUser){
-    btn.textContent = (currentUser.name || 'U').charAt(0).toUpperCase();
-    btn.style.background = '#fbbf24';
-    btn.style.color = '#111827';
+  if(!btn) return;
+  if(currentUser){
+    var initial = (currentUser.name || 'U').charAt(0).toUpperCase();
+    btn.innerHTML = '<span style="width:22px;height:22px;border-radius:50%;background:#fbbf24;color:#111827;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">' + initial + '</span><span id="acct-name" style="margin-left:5px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (currentUser.name || 'Account') + '</span>';
+    btn.style.background = 'rgba(255,255,255,.1)';
+    btn.style.color = '#fff';
+  } else {
+    btn.innerHTML = '<i class="ti ti-user" style="font-size:14px"></i> <span id="acct-name">Sign in</span>';
+    btn.style.background = 'rgba(255,255,255,.1)';
+    btn.style.color = '#fff';
   }
 }
 
