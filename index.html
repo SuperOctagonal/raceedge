@@ -1,4 +1,4 @@
-<!-- WAGING WAR-BUILD-1780101328 -->
+<!-- WAGING WAR-BUILD-1780102426 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -432,19 +432,21 @@ body{background:#f1f5f9;color:#111827;font-family:'Space Grotesk',sans-serif;fon
 .hfc-foot span{font-size:9px;color:#9ca3af}
 
 /* ── RACE RESULTS PANEL ── */
-.results-panel{background:#fff;border-bottom:1px solid #e5e7eb;flex-shrink:0}
-.results-panel-header{background:#1e2936;padding:8px 14px;display:flex;align-items:center;justify-content:space-between}
-.results-panel-title{font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:7px}
-.results-panel-badge{background:#22c55e;color:#fff;font-size:8px;font-weight:700;padding:2px 6px;border-radius:3px;letter-spacing:.3px}
-.results-panel-meta{font-size:10px;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:10px}
-.res-row{display:flex;align-items:center;padding:7px 14px;border-bottom:0.5px solid #f3f4f6;transition:background .1s}
+.results-panel{background:#fff;border-bottom:1px solid #e5e7eb;flex-shrink:0;overflow:hidden}
+.results-panel-header{background:#1e2936;padding:5px 12px;display:flex;align-items:center;justify-content:space-between}
+.results-panel-title{font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:6px}
+.results-panel-badge{background:#22c55e;color:#fff;font-size:7px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:.3px}
+.results-panel-meta{font-size:9px;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:8px}
+.res-row{display:flex;align-items:center;padding:2px 12px;border-bottom:0.5px solid #f3f4f6;transition:background .1s;min-height:24px}
+.res-row.top3{min-height:28px;padding:3px 12px}
 .res-row:hover{background:#f9fafb}
 .res-row.res-1{background:#fffbeb;border-left:3px solid #fbbf24}
 .res-row.res-2{border-left:3px solid #e5e7eb}
 .res-row.res-3{border-left:3px solid #fed7aa}
 .res-row.res-n{border-left:3px solid transparent}
-.res-place{width:36px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.res-place-badge{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.res-place{width:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.res-place-badge{width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;flex-shrink:0}
+.res-place-badge.top3{width:20px;height:20px;font-size:9px}
 .res-pb-1{background:#fbbf24;color:#78350f}
 .res-pb-2{background:#e5e7eb;color:#374151}
 .res-pb-3{background:#fed7aa;color:#92400e}
@@ -1335,7 +1337,6 @@ function showLockedModal(feature) {
 }
 
 function buildRaceResultsPanel(rc, res, scoredResults) {
-  // Build a lookup: horse name -> system rank from scored results
   var sysRankMap = {};
   (scoredResults||[]).forEach(function(r, i) {
     sysRankMap[(r.name||'').toUpperCase()] = i + 1;
@@ -1343,94 +1344,89 @@ function buildRaceResultsPanel(rc, res, scoredResults) {
 
   var html = '<div class="results-panel">';
 
-  // Header — matches site dark header style
+  // Compact header
   html += '<div class="results-panel-header">';
   html += '<div class="results-panel-title">';
-  html += '<i class="ti ti-flag-check" style="font-size:14px;color:#4ade80;"></i>';
-  html += rc.venue + ' R' + rc.num + ' — Race Result';
+  html += '<i class="ti ti-flag-check" style="font-size:12px;color:#4ade80;"></i>';
+  html += rc.venue + ' R' + rc.num + ' — Result';
   html += '<span class="results-panel-badge">OFFICIAL</span>';
   html += '</div>';
   html += '<div class="results-panel-meta">';
-  if (res.raceTime) html += '<span><i class="ti ti-clock" style="font-size:10px;margin-right:2px;"></i>' + res.raceTime + '</span>';
-  if (res.trackCond) html += '<span><i class="ti ti-cloud" style="font-size:10px;margin-right:2px;"></i>' + res.trackCond + '</span>';
+  if (res.raceTime) html += '<span>' + res.raceTime + '</span>';
+  if (res.trackCond) html += '<span>' + res.trackCond + '</span>';
   if (res.dist) html += '<span>' + res.dist + '</span>';
-  if (res.l600) html += '<span>L600m: ' + res.l600 + '</span>';
-  html += '</div>';
+  if (res.l600) html += '<span>L600: ' + res.l600 + '</span>';
+  html += '</div></div>';
+
+  // Compact column headers
+  html += '<div style="display:flex;align-items:center;padding:3px 12px;background:#f8fafc;border-bottom:0.5px solid #e5e7eb;">';
+  html += '<div style="width:30px;font-size:7px;font-weight:600;color:#9ca3af;text-transform:uppercase;text-align:center;">Pos</div>';
+  html += '<div style="width:24px;font-size:7px;font-weight:600;color:#9ca3af;text-transform:uppercase;text-align:center;">Tab</div>';
+  html += '<div style="flex:1;font-size:7px;font-weight:600;color:#9ca3af;text-transform:uppercase;padding-left:6px;">Horse</div>';
+  html += '<div style="width:44px;font-size:7px;font-weight:600;color:#9ca3af;text-transform:uppercase;text-align:center;">Sys #</div>';
+  html += '<div style="width:58px;font-size:7px;font-weight:600;color:#9ca3af;text-transform:uppercase;text-align:right;">SP</div>';
+  html += '<div style="width:58px;font-size:7px;font-weight:600;color:#9ca3af;text-transform:uppercase;text-align:right;padding-right:4px;">Margin</div>';
   html += '</div>';
 
-  // Column headers — match runner-header style exactly
-  html += '<div class="res-header-row">';
-  html += '<div class="res-header-col" style="width:36px;text-align:center;">Pos</div>';
-  html += '<div class="res-header-col" style="width:28px;text-align:center;">Tab</div>';
-  html += '<div class="res-header-col" style="flex:1;padding-left:6px;">Horse / Jockey</div>';
-  html += '<div class="res-header-col" style="width:48px;text-align:center;">Sys #</div>';
-  html += '<div class="res-header-col" style="width:64px;text-align:right;">SP</div>';
-  html += '<div class="res-header-col" style="width:64px;text-align:right;">Margin</div>';
-  html += '</div>';
-
-  // Runner rows
+  // Runner rows - compact, top 3 slightly taller
   res.runners.forEach(function(r) {
     var p = r.place;
-    var rowClass = p===1?'res-row res-1':p===2?'res-row res-2':p===3?'res-row res-3':'res-row res-n';
+    var isTop3 = p <= 3;
+    var rowClass = p===1?'res-row res-1'+(isTop3?' top3':''):p===2?'res-row res-2 top3':p===3?'res-row res-3 top3':'res-row res-n';
     var pbClass = p===1?'res-pb-1':p===2?'res-pb-2':p===3?'res-pb-3':'res-pb-n';
-
-    // Get system rank from live scored results OR stored in mock data
     var sysRank = sysRankMap[(r.name||'').toUpperCase()] || r.systemRank || '—';
     var rkClass = sysRank===1?'rk1':sysRank===2?'rk2':sysRank===3?'rk3':'rkn';
-
-    // Is rank 1 winner?
     var rank1Won = (p === 1 && sysRank === 1);
     var rank1Lost = (p > 3 && sysRank === 1);
 
     html += '<div class="' + rowClass + '">';
 
-    // Position badge
-    html += '<div style="width:36px;flex-shrink:0;display:flex;justify-content:center;">';
-    html += '<span class="res-place-badge ' + pbClass + '">' + p + '</span>';
+    // Pos badge
+    html += '<div style="width:30px;flex-shrink:0;display:flex;justify-content:center;">';
+    html += '<span class="res-place-badge ' + pbClass + (isTop3?' top3':'') + '">' + p + '</span>';
     html += '</div>';
 
-    // Tab number
-    html += '<div style="width:28px;flex-shrink:0;display:flex;justify-content:center;">';
-    if (r.tab) html += '<span style="background:#1e40af;color:#fff;font-size:7px;font-weight:700;padding:1px 4px;border-radius:2px;">' + r.tab + '</span>';
+    // Tab
+    html += '<div style="width:24px;flex-shrink:0;display:flex;justify-content:center;">';
+    if (r.tab) html += '<span style="background:#1e40af;color:#fff;font-size:7px;font-weight:700;padding:1px 3px;border-radius:2px;">' + r.tab + '</span>';
     html += '</div>';
 
-    // Horse name + jockey — matches .rc-horse style
-    html += '<div style="flex:1;min-width:0;padding:0 6px;display:flex;flex-direction:column;justify-content:center;">';
-    html += '<div class="horse-name" style="font-size:12px;font-weight:600;color:#111827;">';
-    if (rank1Won) html += '<span style="font-size:9px;background:#d1fae5;color:#065f46;font-weight:700;padding:1px 5px;border-radius:3px;margin-right:5px;">✓ R1 WON</span>';
-    if (rank1Lost) html += '<span style="font-size:9px;background:#fee2e2;color:#991b1b;font-weight:700;padding:1px 5px;border-radius:3px;margin-right:5px;">R1 LOST</span>';
+    // Horse + jockey — top3 shows jockey, rest shows name only
+    html += '<div style="flex:1;min-width:0;padding:0 6px;">';
+    html += '<div style="font-size:'+(isTop3?'11':'10')+'px;font-weight:'+(isTop3?'600':'500')+';color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">';
+    if (rank1Won) html += '<span style="font-size:8px;background:#d1fae5;color:#065f46;font-weight:700;padding:1px 4px;border-radius:3px;margin-right:4px;">✓ R1</span>';
+    if (rank1Lost) html += '<span style="font-size:8px;background:#fee2e2;color:#991b1b;font-weight:700;padding:1px 4px;border-radius:3px;margin-right:4px;">R1</span>';
     html += r.name;
-    if (r.barrier) html += '<span style="font-weight:400;color:#9ca3af;font-size:10px;margin-left:4px;">(' + r.barrier + ')</span>';
+    if (r.barrier) html += '<span style="font-weight:400;color:#9ca3af;font-size:9px;margin-left:3px;">(' + r.barrier + ')</span>';
     html += '</div>';
-    if (r.jockey) html += '<div class="horse-detail">' + r.jockey + '</div>';
+    if (isTop3 && r.jockey) html += '<div style="font-size:8px;color:#9ca3af;">' + r.jockey + '</div>';
     html += '</div>';
 
-    // System rank badge
-    html += '<div style="width:48px;flex-shrink:0;display:flex;justify-content:center;align-items:center;">';
+    // Sys rank
+    html += '<div style="width:44px;flex-shrink:0;display:flex;justify-content:center;align-items:center;">';
     html += '<span class="rk ' + rkClass + '">' + sysRank + '</span>';
     html += '</div>';
 
-    // SP — matches .odds-val color
-    html += '<div style="width:64px;flex-shrink:0;text-align:right;padding-right:8px;">';
-    html += '<span class="odds-val" style="color:#1d4ed8;">$' + (r.sp||0).toFixed(2) + '</span>';
+    // SP
+    html += '<div style="width:58px;flex-shrink:0;text-align:right;padding-right:6px;">';
+    html += '<span style="font-family:JetBrains Mono,monospace;font-weight:600;font-size:'+(isTop3?'11':'10')+'px;color:#1d4ed8;">$' + (r.sp||0).toFixed(2) + '</span>';
     html += '</div>';
 
     // Margin
-    html += '<div style="width:64px;flex-shrink:0;text-align:right;font-size:10px;color:#6b7280;padding-right:8px;">' + (r.margin||'—') + '</div>';
+    html += '<div style="width:58px;flex-shrink:0;text-align:right;font-size:'+(isTop3?'10':'9')+'px;color:#6b7280;padding-right:6px;">' + (r.margin||'—') + '</div>';
 
     html += '</div>';
   });
 
-  // Scratched row
+  // Scratched
   if (res.scratched && res.scratched.length) {
-    html += '<div style="padding:6px 14px;font-size:10px;color:#9ca3af;border-top:0.5px solid #f3f4f6;">';
-    html += 'Scratched: ' + res.scratched.join(' · ');
-    html += '</div>';
+    html += '<div style="padding:4px 12px;font-size:9px;color:#9ca3af;border-top:0.5px solid #f3f4f6;">Scratched: ' + res.scratched.join(' · ') + '</div>';
   }
 
-  html += '</div>'; // .results-panel
+  html += '</div>';
   return html;
 }
+
 
 
 // ── AI RACE SUMMARY ──
@@ -1551,14 +1547,12 @@ function showToday() {
   // Top Picks
   var picks = getTopPicks(3);
   if (picks.length) {
-    html += '<div style="margin-bottom:16px;border:0.5px solid #e5e7eb;border-radius:10px;overflow:hidden;background:#fff;">'
-      + '<div onclick="toggleTopPicks()" id="picks-toggle-row" style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;cursor:pointer;user-select:none;">'
-      + '<div style="display:flex;align-items:center;gap:7px;">'
+    html += '<div style="display:inline-flex;flex-direction:column;margin-bottom:16px;border:0.5px solid #e5e7eb;border-radius:10px;overflow:hidden;background:#fff;min-width:260px;max-width:100%;">'
+      + '<div onclick="toggleTopPicks()" id="picks-toggle-row" style="display:flex;align-items:center;gap:7px;padding:7px 12px;cursor:pointer;user-select:none;">'
       + '<span style="font-size:12px;">🏆</span>'
       + '<span style="font-size:12px;font-weight:600;color:#111827;">Today\'s top picks</span>'
       + '<span style="background:#fbbf24;color:#78350f;font-size:9px;font-weight:700;padding:1px 6px;border-radius:8px;">'+picks.length+'</span>'
-      + '</div>'
-      + '<i class="ti ti-chevron-down" id="picks-chevron" style="font-size:13px;color:#9ca3af;transition:transform .2s;"></i>'
+      + '<i class="ti ti-chevron-down" id="picks-chevron" style="font-size:13px;color:#9ca3af;transition:transform .2s;margin-left:4px;"></i>'
       + '</div>'
       + '<div id="picks-body" style="display:none;border-top:0.5px solid #f3f4f6;padding:10px 14px;">'
       + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;">';
