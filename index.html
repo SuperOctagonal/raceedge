@@ -818,7 +818,8 @@ function getRaceResults(venue, raceNum) {
 function isRaceResulted(venue, raceNum) {
   return !!getRaceResults(venue, raceNum);
 }
-\nfunction handleFileInput(el) {
+
+function handleFileInput(el) {
   if (el.files && el.files[0]) handleFile(el.files[0]);
 }
 
@@ -1623,8 +1624,7 @@ function showToday() {
     + '<div style="font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:2px;color:#00471b;">WAGING<span style="color:#fbbf24;">WAR</span></div>'
     + '<div style="display:flex;flex-wrap:wrap;gap:14px;">';
   ['About Us','Contact Us','Disclaimer','Privacy Policy','Terms of Service','Responsible Gambling'].forEach(function(p){
-    html += '<span onclick="showLegalPage(''+p+'')" style="font-size:10px;color:#9ca3af;cursor:pointer;text-decoration:underline;text-underline-offset:2px;"'
-      + ' onmouseover="this.style.color='#374151'" onmouseout="this.style.color='#9ca3af'">'+p+'</span>';
+    html += '<span data-legal="'+p+'" style="font-size:10px;color:#9ca3af;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">'+p+'</span>';
   });
   html += '</div>'
     + '<div style="font-size:10px;color:#d1d5db;">© 2026 Waging War Pty Ltd</div>'
@@ -1711,7 +1711,7 @@ function showResultsPage() {
     // Show individual meeting results
     var races = meetings[selectedMeeting];
     html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">';
-    html += '<button onclick="window._resultsMeeting=null;showResultsPage()" style="display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;border:0.5px solid #e5e7eb;background:#fff;color:#374151;font-size:10px;font-weight:600;cursor:pointer;">';
+    html += '<button data-results-back="1" style="display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;border:0.5px solid #e5e7eb;background:#fff;color:#374151;font-size:10px;font-weight:600;cursor:pointer;">';
     html += '<i class="ti ti-arrow-left" style="font-size:12px;"></i> All meetings</button>';
     html += '<span style="font-size:14px;font-weight:700;color:#111827;">'+selectedMeeting+'</span>';
     html += '</div>';
@@ -1725,7 +1725,7 @@ function showResultsPage() {
       var color = resulted ? (rank1Won ? '#065f46' : '#991b1b') : '#9ca3af';
       var border = resulted ? (rank1Won ? '#86efac' : '#fca5a5') : '#e5e7eb';
       var active = window._resultsRace == r.raceNum;
-      html += '<div onclick="window._resultsRace='+r.raceNum+';showResultsPage()" style="padding:4px 10px;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;';
+      html += '<div data-rrace="'+r.raceNum+'" style="padding:4px 10px;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;';
       html += 'background:'+(active?'#1e2936':bg)+';color:'+(active?'#fff':color)+';border:0.5px solid '+(active?'#1e2936':border)+';">';
       html += 'R'+r.raceNum+(resulted ? (rank1Won ? ' ✓' : ' ✗') : '')+'</div>';
     });
@@ -1757,7 +1757,7 @@ function showResultsPage() {
         var resultedCount = races.filter(function(r){ return r.results; }).length;
         var allResulted = resultedCount === races.length;
         var tcC = allResulted ? {bg:'#d1fae5',text:'#065f46'} : {bg:'#f1f5f9',text:'#9ca3af'};
-        html += '<div class="results-meeting-card" onclick="window._resultsMeeting=''+venue+'';window._resultsRace=null;showResultsPage()">';
+        html += '<div class="results-meeting-card" data-venue="'+venue+'">';
         html += '<div class="rmc-header">';
         html += '<span class="rmc-venue">'+venue+'</span>';
         html += '<span class="rmc-badge" style="background:'+tcC.bg+';color:'+tcC.text+'">';
@@ -1780,6 +1780,19 @@ function showResultsPage() {
 
   html += '</div>';
   main.innerHTML = html;
+  // Wire data-attribute click handlers
+  document.querySelectorAll('[data-legal]').forEach(function(el){
+    el.onclick = function(){ showLegalPage(this.getAttribute('data-legal')); };
+  });
+  document.querySelectorAll('[data-results-back]').forEach(function(el){
+    el.onclick = function(){ window._resultsMeeting=null; showResultsPage(); };
+  });
+  document.querySelectorAll('.results-meeting-card').forEach(function(el){
+    el.onclick = function(){ window._resultsMeeting=this.getAttribute('data-venue'); window._resultsRace=null; showResultsPage(); };
+  });
+  document.querySelectorAll('[data-rrace]').forEach(function(el){
+    el.onclick = function(){ window._resultsRace=this.getAttribute('data-rrace'); showResultsPage(); };
+  });
 }
 
 function buildResultsDetail(venue, raceData) {
