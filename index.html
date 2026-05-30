@@ -1,4 +1,4 @@
-<!-- WAGING WAR-BUILD-1780113711 -->
+<!-- WAGING WAR-BUILD-1780115419 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -773,48 +773,94 @@ function showEmptyRaces() {
 
 // ── FILE HANDLING ──
 
-// ── MOCK RESULTS DATA ──
-// Structure: key = "VENUE_R{num}", value = result object
-var mockResults = {
-  'DOOMBEN_R1': {
-    raceTime: '11:48am',
-    trackCond: 'Good 4',
-    dist: '1350m',
-    l600: '0:34.21',
-    runners: [
-      {place:1,tab:2,name:'MIDNIGHT DYNAMITE',barrier:1,jockey:'J.McDonald',sp:3.00,margin:'W',systemRank:1},
-      {place:2,tab:4,name:'COSMO CENTAURUS',barrier:5,jockey:'Z.Purton',sp:4.50,margin:'0.8L',systemRank:2},
-      {place:3,tab:1,name:'BUNKER HUT (NZ)',barrier:9,jockey:'J.McMurray',sp:7.00,margin:'2.1L',systemRank:3},
-      {place:4,tab:7,name:'TRUE TO FORM (USA)',barrier:2,jockey:'T.Clark',sp:10.00,margin:'3.4L',systemRank:5},
-      {place:5,tab:12,name:'CONCOCTION',barrier:11,jockey:'B.Thompson',sp:21.00,margin:'4.2L',systemRank:4},
-      {place:6,tab:8,name:'EXPRESS PAYMENT',barrier:3,jockey:'T.Berry',sp:31.00,margin:'5.1L',systemRank:6},
-      {place:7,tab:13,name:'DREAM SMART',barrier:4,jockey:'C.Graham',sp:12.00,margin:'6.3L',systemRank:7},
-      {place:8,tab:6,name:'VIMINELE',barrier:8,jockey:'J.Bayliss',sp:61.00,margin:'7.8L',systemRank:8},
-      {place:9,tab:3,name:'BOYS NIGHT OUT',barrier:7,jockey:'N.Rawiller',sp:41.00,margin:'8.9L',systemRank:9},
-      {place:10,tab:10,name:'SAMMY CONQUERS ALL',barrier:10,jockey:'R.Stewart',sp:126.00,margin:'10.2L',systemRank:10},
-      {place:11,tab:11,name:'RED DEFCON',barrier:6,jockey:'M.Du Plessis',sp:151.00,margin:'12.4L',systemRank:11},
-    ],
-    scratched:['ROBRICK','BLAZING HARRY','COUNT NICHOLAS']
-  },
-  'DOOMBEN_R2': {
-    raceTime: '12:23pm',
-    trackCond: 'Good 4',
-    dist: '1200m',
-    l600: '0:33.85',
-    runners: [
-      {place:1,tab:5,name:'FALCON LAIR',barrier:3,jockey:'D.Oliver',sp:5.50,margin:'W',systemRank:3},
-      {place:2,tab:3,name:'WALSH BAY',barrier:7,jockey:'J.McDonald',sp:2.80,margin:'0.5L',systemRank:1},
-      {place:3,tab:8,name:'JIMMYSTAR',barrier:2,jockey:'T.Berry',sp:9.00,margin:'1.8L',systemRank:4},
-      {place:4,tab:1,name:'MIDNIGHT BOY',barrier:5,jockey:'Z.Purton',sp:4.00,margin:'2.9L',systemRank:2},
-      {place:5,tab:6,name:'VEGAS QUEEN',barrier:1,jockey:'R.Mallyon',sp:15.00,margin:'4.1L',systemRank:5},
-    ],
-    scratched:[]
-  }
-};
+// ── SUPABASE RESULTS ──
+var SUPABASE_URL = 'https://jqoqmwxrhfazxnzzynvn.supabase.co';
+var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impxb3Ftd3hyaGZhenhuenp5bnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3NDk5NDIsImV4cCI6MjA5NTMyNTk0Mn0.wNJITvDSuLncd29vleL6oLEcs95zmgT_z684Ex1iquM';
+
+// In-memory results cache: key = "VENUE_R{num}", value = formatted result object
+var resultsCache = {};
+var resultsFetched = {};  // track which dates we have loaded
+
+// Fetch all results for today from Supabase
+function fetchResultsForDate(dateStr) {
+  if (resultsFetched[dateStr]) return Promise.resolve();
+  return fetch(
+    SUPABASE_URL + '/rest/v1/race_results?select=*&date=eq.' + dateStr + '&order=venue,race_num,finish_pos',
+    {
+      headers: {
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json'
+      }
+    }
+  )
+  .then(function(r) {
+    if (!r.ok) throw new Error('Supabase error: ' + r.status);
+    return r.json();
+  })
+  .then(function(rows) {
+    resultsFetched[dateStr] = true;
+    // Group rows by venue+race_num
+    var grouped = {};
+    rows.forEach(function(row) {
+      var key = row.venue.toUpperCase().replace(/\s+/g,'_') + '_R' + row.race_num;
+      if (!grouped[key]) {
+        grouped[key] = {
+          raceTime: row.race_time || '',
+          trackCond: row.track_cond || '',
+          dist: row.dist || '',
+          l600: row.l600 || '',
+          scratched: [],
+          runners: []
+        };
+      }
+      if (row.finish_pos) {
+        grouped[key].runners.push({
+          place: row.finish_pos,
+          name: row.horse_name,
+          sp: row.sp || 0,
+          margin: row.margin || '',
+          systemRank: null  // filled in by buildRaceResultsPanel from scored results
+        });
+      }
+    });
+    // Merge into cache
+    Object.keys(grouped).forEach(function(k) {
+      grouped[k].runners.sort(function(a,b){return a.place-b.place;});
+      resultsCache[k] = grouped[k];
+    });
+    console.log('[Results] Loaded ' + rows.length + ' result rows for ' + dateStr);
+  })
+  .catch(function(err) {
+    console.warn('[Results] Failed to load from Supabase:', err.message);
+  });
+}
+
+// Auto-fetch results when CSV loads
+function initResultsFetch() {
+  var today = new Date().toISOString().slice(0,10);
+  fetchResultsForDate(today).then(function() {
+    // Re-render current race if one is selected
+    if (currentRace) render(currentRace);
+    // Re-render sidebar tabs
+    if (Object.keys(allRaces).length) {
+      var keys = Object.keys(allRaces);
+      buildRaceTabs(Object.keys(allVenues[Object.keys(allVenues)[0]] || {}));
+    }
+  });
+  // Poll every 10 minutes during race hours
+  setInterval(function() {
+    var h = new Date().getHours();
+    if (h >= 10 && h < 19) {
+      resultsFetched[today] = false;  // force refresh
+      fetchResultsForDate(today);
+    }
+  }, 10 * 60 * 1000);
+}
 
 function getRaceResults(venue, raceNum) {
   var key = (venue||'').toUpperCase().replace(/\s+/g,'_') + '_R' + raceNum;
-  return mockResults[key] || null;
+  return resultsCache[key] || null;
 }
 
 function isRaceResulted(venue, raceNum) {
@@ -898,6 +944,7 @@ function onCSVLoaded(fname) {
   buildSidebarMeetings();
   mobBuildSelectors();
   navTo('races');
+  initResultsFetch();
 }
 
 // ── RACE RENDER (override to update sidebar) ──
