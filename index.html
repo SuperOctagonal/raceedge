@@ -1,4 +1,4 @@
-<!-- WAGING WAR-BUILD-1780115419 -->
+<!-- WAGING WAR-BUILD-1780132014 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -470,7 +470,7 @@ body{background:#f1f5f9;color:#111827;font-family:'Space Grotesk',sans-serif;fon
 /* Results page */
 .results-page-wrap{flex:1;overflow-y:auto;padding:16px 20px;max-width:1100px;margin:0 auto;width:100%}
 .results-date-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
-.results-meeting-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px;margin-bottom:16px}
+.results-meeting-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;margin-bottom:16px;max-width:1000px}
 .results-meeting-card{background:#fff;border:0.5px solid #e5e7eb;border-radius:8px;overflow:hidden;cursor:pointer;transition:box-shadow .15s}
 .results-meeting-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.08)}
 .rmc-header{background:#1e2936;padding:7px 12px;display:flex;align-items:center;justify-content:space-between}
@@ -1010,7 +1010,7 @@ function renderRaceTable(rc, results, scratched, hasLive, liveOddsData) {
         <span class="race-chip rc-dist">${rc.dist}m</span>
         ${rc.cls?`<span class="race-chip rc-cls">${rc.cls}</span>`:''}
         ${rc.prize?`<span class="race-chip rc-prize">$${rc.prize}</span>`:''}
-        <span class="race-chip rc-tc ${tcClass}" onclick="showTCModal()" title="Click to override">
+        <span class="race-chip rc-tc ${tcClass}" onclick="if(currentRace && getRaceResults(currentRace.venue, currentRace.num)){toast('Track condition locked — race has been resulted','info');}else{showTCModal();}" title="Click to override">
           <i class="ti ti-cloud" style="font-size:10px"></i> ${tcLabel}
           <i class="ti ti-pencil" style="font-size:9px;opacity:.5"></i>
         </span>
@@ -1374,16 +1374,69 @@ function renderRaceTable(rc, results, scratched, hasLive, liveOddsData) {
     }
   }
 
-  // Assembly: header → tab bar (sticky) → results panel + scoring view in one scroll
-  // Field/Form/Pace views already wrap in tbl-wrap, so inject results panel inside it
-  if (resultsPanel && viewContent.includes('class="tbl-wrap"')) {
-    // Inject results panel as first child of tbl-wrap
-    viewContent = viewContent.replace('<div class="tbl-wrap">', '<div class="tbl-wrap">' + resultsPanel);
-  } else if (resultsPanel) {
-    viewContent = '<div class="tbl-wrap">' + resultsPanel + viewContent + '</div>';
+  // Assembly: if race has results, show a "Results" button in tab bar area
+  // Results open in a compact modal overlay - don't push scoring view down
+  if (resultsPanel) {
+    var resultsBtnBar = '<div style="background:#f0fdf4;border-bottom:1px solid #86efac;padding:6px 14px;display:flex;align-items:center;gap:8px;flex-shrink:0;">'
+      + '<i class="ti ti-flag-check" style="font-size:14px;color:#059669;"></i>'
+      + '<span style="font-size:11px;font-weight:600;color:#065f46;">Race resulted</span>'
+      + '<button onclick="showResultsModal()" style="margin-left:auto;padding:4px 12px;background:#059669;color:#fff;border:none;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;font-family:Space Grotesk,sans-serif;"><i class="ti ti-list-details" style="font-size:11px;"></i> View Results</button>'
+      + '</div>';
+    // Store results panel for modal
+    window._currentResultsPanel = resultsPanel;
+    document.getElementById('main').innerHTML = header + tabBar + resultsBtnBar + viewContent;
+  } else {
+    window._currentResultsPanel = null;
+    document.getElementById('main').innerHTML = header + tabBar + viewContent;
   }
-  document.getElementById('main').innerHTML = header + tabBar + viewContent;
   generateAISummary(rc, results, tc);
+}
+
+
+function handleTodayPillClick(el, rc, key) {
+  var resulted = el.getAttribute('data-resulted') === '1';
+  var venue = el.getAttribute('data-venue');
+  var raceNum = parseInt(el.getAttribute('data-race'));
+  if (resulted) {
+    showTodayResultPopup(venue, raceNum);
+  } else {
+    navTo('races');
+    selectRace(rc, key);
+  }
+}
+
+function showTodayResultPopup(venue, raceNum) {
+  var res = getRaceResults(venue, raceNum);
+  if (!res || !res.runners) return;
+  var panel = buildRaceResultsPanel({venue:venue, num:raceNum}, res, []);
+  var modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:8000;display:flex;align-items:center;justify-content:center;padding:16px;';
+  modal.innerHTML = '<div style="background:#fff;border-radius:10px;overflow:hidden;width:100%;max-width:660px;max-height:85vh;overflow-y:auto;">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1e2936;position:sticky;top:0;">'
+    + '<span style="font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.5px;">'+venue+' R'+raceNum+' — Result</span>'
+    + '<button onclick="this.closest(\'[style*=fixed]\').remove()" style="background:none;border:none;color:rgba(255,255,255,.6);font-size:20px;cursor:pointer;line-height:1;">×</button>'
+    + '</div>'
+    + panel
+    + '</div>';
+  modal.onclick = function(e){ if(e.target===modal) modal.remove(); };
+  document.body.appendChild(modal);
+}
+
+function showResultsModal() {
+  var panel = window._currentResultsPanel;
+  if (!panel) return;
+  var modal = document.createElement('div');
+  modal.id = 'results-modal-overlay';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:8000;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;';
+  modal.innerHTML = '<div style="background:#fff;border-radius:10px;overflow:hidden;width:100%;max-width:680px;margin:auto;">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 14px;background:#1e2936;">'
+    + '<span style="font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.5px;">Race Result</span>'
+    + '<button onclick="document.getElementById(\'results-modal-overlay\').remove()" style="background:none;border:none;color:rgba(255,255,255,.6);font-size:20px;cursor:pointer;line-height:1;">×</button>'
+    + '</div>'
+    + panel
+    + '</div>';
+  modal.onclick = function(e) { if (e.target === modal) modal.remove(); };
+  document.body.appendChild(modal);
 }
 
 function showLockedModal(feature) {
@@ -1651,7 +1704,7 @@ function showToday() {
         pillColor = rank1Won ? '#065f46' : '#991b1b';
         pillIcon = rank1Won ? ' ✓' : ' ✗';
       }
-      html += '<div onclick="navTo(\'races\');selectRace(allRaces[\''+k+'\'],\''+k+'\')"'
+      html += '<div data-venue="'+venue+'" data-race="'+rc.num+'" data-resulted="'+(res?'1':'0')+'" onclick="handleTodayPillClick(this,allRaces[\''+k+'\'],\''+k+'\')"'
         + ' style="display:flex;align-items:center;gap:4px;padding:3px 7px;cursor:pointer;border-radius:5px;transition:background .1s;'
         + (res ? 'background:'+pillBg+';' : '')
         + '"'
@@ -1673,7 +1726,7 @@ function showToday() {
     + '<div style="font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:2px;color:#00471b;">WAGING<span style="color:#fbbf24;">WAR</span></div>'
     + '<div style="display:flex;flex-wrap:wrap;gap:14px;">';
   ['About Us','Contact Us','Disclaimer','Privacy Policy','Terms of Service','Responsible Gambling'].forEach(function(p){
-    html += '<span data-legal="'+p+'" style="font-size:10px;color:#9ca3af;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">'+p+'</span>';
+    html += '<span onclick="showLegalPage(this.getAttribute(\"data-page\"))" data-page="'+p+'" style="font-size:10px;color:#9ca3af;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">'+p+'</span>';
   });
   html += '</div>'
     + '<div style="font-size:10px;color:#d1d5db;">© 2026 Waging War Pty Ltd</div>'
@@ -2791,6 +2844,7 @@ function removeFromBlackbook(i) {
 
 // ── LEARN PAGE ──
 function showLearn() {
+  document.getElementById('main').style.overflowY = 'auto';
   var learnItems=[
     {icon:'ti-layout-list',title:'Field view',desc:'Each horse scored across Form, Speed, Conditions and Connections. Horses ranked by total score. Load any EveryRace CSV file to get started.',live:true},
     {icon:'ti-currency-dollar',title:'Edge $',desc:'Fair value odds from our proprietary model. Shows what the horse should pay, independent of the market.',live:true},
@@ -2811,7 +2865,7 @@ function showLearn() {
       +'<div class="card-title"><i class="ti '+x.icon+'" style="font-size:15px;color:'+(x.live?'#00471b':'#9ca3af')+'"></i> '+x.title+badge+'</div>'
       +'<p style="font-size:12px;color:#374151;line-height:1.7">'+x.desc+'</p></div>';
   }).join('');
-  document.getElementById('main').innerHTML='<div class="page-wrap">'
+  document.getElementById('main').innerHTML='<div class="page-wrap" style="max-width:780px;margin:0 auto;">'
     +'<div class="page-title">How Waging War works</div>'
     +'<div class="page-sub">Current features — no surprises</div>'
     +'<div style="display:flex;flex-direction:column;gap:10px">'
@@ -4304,7 +4358,7 @@ function renderMobile(rc,results,scratched,hasLive,liveOddsData){
     <button id="mpill-jt" onclick="mobToggle('jt')" style="background:#fff;border:0.5px solid #cbd5e1;border-radius:10px;padding:2px 8px;font-size:8px;font-weight:600;color:#111827;white-space:nowrap;cursor:pointer;flex-shrink:0">J/T</button>
     <button id="mpill-pace" onclick="mobToggle('pace')" style="background:#00471b;border:0.5px solid #00471b;border-radius:10px;padding:2px 8px;font-size:8px;font-weight:600;color:#fff;white-space:nowrap;cursor:pointer;flex-shrink:0">Pace</button>
     <button onclick="mobShowSheet('pace')" style="background:#fff;border:0.5px solid #cbd5e1;border-radius:10px;padding:2px 8px;font-size:8px;font-weight:600;color:#111827;white-space:nowrap;cursor:pointer;flex-shrink:0">Pace Map</button>
-    <button id="mob-tc-pill" onclick="mobShowSheet('trackcond')" style="background:#fff;border:0.5px solid #cbd5e1;border-radius:10px;padding:2px 8px;font-size:8px;font-weight:600;color:#111827;white-space:nowrap;cursor:pointer;flex-shrink:0">Track: ${tcLabel}</button>
+    <button id="mob-tc-pill" onclick="if(currentRace && getRaceResults(currentRace.venue, currentRace.num)){toast('Track condition locked — race has been resulted','info');}else{mobShowSheet('trackcond');}" style="background:#fff;border:0.5px solid #cbd5e1;border-radius:10px;padding:2px 8px;font-size:8px;font-weight:600;color:#111827;white-space:nowrap;cursor:pointer;flex-shrink:0">Track: ${tcLabel}</button>
   </div>`;
 
   const cards=results.map((r,i)=>{
