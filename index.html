@@ -1,4 +1,4 @@
-<!-- WAGING WAR-BUILD-1780102426 -->
+<!-- WAGING WAR-BUILD-1780113711 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -432,7 +432,7 @@ body{background:#f1f5f9;color:#111827;font-family:'Space Grotesk',sans-serif;fon
 .hfc-foot span{font-size:9px;color:#9ca3af}
 
 /* ── RACE RESULTS PANEL ── */
-.results-panel{background:#fff;border-bottom:1px solid #e5e7eb;flex-shrink:0;overflow:hidden}
+.results-panel{background:#fff;border-bottom:1px solid #e5e7eb;flex-shrink:0;overflow:hidden;max-width:700px;margin:10px 14px 0;border-radius:8px;border:0.5px solid #e5e7eb}
 .results-panel-header{background:#1e2936;padding:5px 12px;display:flex;align-items:center;justify-content:space-between}
 .results-panel-title{font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:6px}
 .results-panel-badge{background:#22c55e;color:#fff;font-size:7px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:.3px}
@@ -1327,7 +1327,15 @@ function renderRaceTable(rc, results, scratched, hasLive, liveOddsData) {
     }
   }
 
-  document.getElementById('main').innerHTML = resultsPanel + header + tabBar + viewContent;
+  // Assembly: header → tab bar (sticky) → results panel + scoring view in one scroll
+  // Field/Form/Pace views already wrap in tbl-wrap, so inject results panel inside it
+  if (resultsPanel && viewContent.includes('class="tbl-wrap"')) {
+    // Inject results panel as first child of tbl-wrap
+    viewContent = viewContent.replace('<div class="tbl-wrap">', '<div class="tbl-wrap">' + resultsPanel);
+  } else if (resultsPanel) {
+    viewContent = '<div class="tbl-wrap">' + resultsPanel + viewContent + '</div>';
+  }
+  document.getElementById('main').innerHTML = header + tabBar + viewContent;
   generateAISummary(rc, results, tc);
 }
 
