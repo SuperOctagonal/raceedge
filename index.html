@@ -1,11 +1,8 @@
-<!-- WAGING WAR-BUILD-1780041909 -->
+<!-- WAGING WAR-BUILD-1780101328 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Waging War — Racing Analytics</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -433,6 +430,58 @@ body{background:#f1f5f9;color:#111827;font-family:'Space Grotesk',sans-serif;fon
 .hfc-rx{background:#f3f4f6;color:#9ca3af}
 .hfc-foot{padding:8px 14px;border-top:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between}
 .hfc-foot span{font-size:9px;color:#9ca3af}
+
+/* ── RACE RESULTS PANEL ── */
+.results-panel{background:#fff;border-bottom:1px solid #e5e7eb;flex-shrink:0}
+.results-panel-header{background:#1e2936;padding:8px 14px;display:flex;align-items:center;justify-content:space-between}
+.results-panel-title{font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:7px}
+.results-panel-badge{background:#22c55e;color:#fff;font-size:8px;font-weight:700;padding:2px 6px;border-radius:3px;letter-spacing:.3px}
+.results-panel-meta{font-size:10px;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:10px}
+.res-row{display:flex;align-items:center;padding:7px 14px;border-bottom:0.5px solid #f3f4f6;transition:background .1s}
+.res-row:hover{background:#f9fafb}
+.res-row.res-1{background:#fffbeb;border-left:3px solid #fbbf24}
+.res-row.res-2{border-left:3px solid #e5e7eb}
+.res-row.res-3{border-left:3px solid #fed7aa}
+.res-row.res-n{border-left:3px solid transparent}
+.res-place{width:36px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.res-place-badge{width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0}
+.res-pb-1{background:#fbbf24;color:#78350f}
+.res-pb-2{background:#e5e7eb;color:#374151}
+.res-pb-3{background:#fed7aa;color:#92400e}
+.res-pb-n{background:#f3f4f6;color:#9ca3af}
+.res-horse{flex:1;min-width:0}
+.res-horse-name{font-size:12px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.res-horse-detail{font-size:9px;color:#9ca3af;margin-top:1px}
+.res-sys-rank{width:48px;flex-shrink:0;text-align:center}
+.res-sp{width:64px;flex-shrink:0;text-align:right;font-family:'JetBrains Mono';font-size:11px;font-weight:600;color:#1d4ed8}
+.res-margin{width:64px;flex-shrink:0;text-align:right;font-size:10px;color:#6b7280}
+.res-outcome{width:52px;flex-shrink:0;text-align:center}
+.res-outcome-win{color:#059669;font-weight:700;font-size:10px}
+.res-outcome-place{color:#d97706;font-weight:700;font-size:10px}
+.res-outcome-loss{color:#9ca3af;font-size:10px}
+.res-footer{padding:7px 14px;background:#f8fafc;border-top:0.5px solid #e5e7eb;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.res-footer-item{font-size:10px;color:#6b7280;display:flex;align-items:center;gap:4px}
+.res-footer-val{font-weight:600;color:#111827;font-family:'JetBrains Mono'}
+.res-header-row{display:flex;align-items:center;padding:4px 14px;background:#f8fafc;border-bottom:0.5px solid #e5e7eb}
+.res-header-col{font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px}
+
+/* Results page */
+.results-page-wrap{flex:1;overflow-y:auto;padding:16px 20px;max-width:1100px;margin:0 auto;width:100%}
+.results-date-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.results-meeting-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px;margin-bottom:16px}
+.results-meeting-card{background:#fff;border:0.5px solid #e5e7eb;border-radius:8px;overflow:hidden;cursor:pointer;transition:box-shadow .15s}
+.results-meeting-card:hover{box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.rmc-header{background:#1e2936;padding:7px 12px;display:flex;align-items:center;justify-content:space-between}
+.rmc-venue{font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.4px}
+.rmc-badge{font-size:9px;font-weight:600;padding:1px 7px;border-radius:5px}
+.rmc-races{display:flex;flex-wrap:wrap;padding:4px 6px 2px}
+.rmc-race-pill{display:flex;align-items:center;gap:4px;padding:3px 7px;border-radius:5px;margin:2px;font-size:10px;font-weight:600;cursor:pointer;transition:background .1s}
+.rmc-race-pill.won{background:#d1fae5;color:#065f46}
+.rmc-race-pill.lost{background:#fee2e2;color:#991b1b}
+.rmc-race-pill.pending{background:#f1f5f9;color:#9ca3af}
+.rmc-race-detail{background:#fff;border:0.5px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:8px}
+.rmc-race-detail-header{background:#f8fafc;padding:7px 12px;border-bottom:0.5px solid #e5e7eb;display:flex;align-items:center;gap:8px}
+
 </style>
 <script>
   // Clerk configuration
@@ -721,7 +770,55 @@ function showEmptyRaces() {
 }
 
 // ── FILE HANDLING ──
-function handleFileInput(el) {
+
+// ── MOCK RESULTS DATA ──
+// Structure: key = "VENUE_R{num}", value = result object
+var mockResults = {
+  'DOOMBEN_R1': {
+    raceTime: '11:48am',
+    trackCond: 'Good 4',
+    dist: '1350m',
+    l600: '0:34.21',
+    runners: [
+      {place:1,tab:2,name:'MIDNIGHT DYNAMITE',barrier:1,jockey:'J.McDonald',sp:3.00,margin:'W',systemRank:1},
+      {place:2,tab:4,name:'COSMO CENTAURUS',barrier:5,jockey:'Z.Purton',sp:4.50,margin:'0.8L',systemRank:2},
+      {place:3,tab:1,name:'BUNKER HUT (NZ)',barrier:9,jockey:'J.McMurray',sp:7.00,margin:'2.1L',systemRank:3},
+      {place:4,tab:7,name:'TRUE TO FORM (USA)',barrier:2,jockey:'T.Clark',sp:10.00,margin:'3.4L',systemRank:5},
+      {place:5,tab:12,name:'CONCOCTION',barrier:11,jockey:'B.Thompson',sp:21.00,margin:'4.2L',systemRank:4},
+      {place:6,tab:8,name:'EXPRESS PAYMENT',barrier:3,jockey:'T.Berry',sp:31.00,margin:'5.1L',systemRank:6},
+      {place:7,tab:13,name:'DREAM SMART',barrier:4,jockey:'C.Graham',sp:12.00,margin:'6.3L',systemRank:7},
+      {place:8,tab:6,name:'VIMINELE',barrier:8,jockey:'J.Bayliss',sp:61.00,margin:'7.8L',systemRank:8},
+      {place:9,tab:3,name:'BOYS NIGHT OUT',barrier:7,jockey:'N.Rawiller',sp:41.00,margin:'8.9L',systemRank:9},
+      {place:10,tab:10,name:'SAMMY CONQUERS ALL',barrier:10,jockey:'R.Stewart',sp:126.00,margin:'10.2L',systemRank:10},
+      {place:11,tab:11,name:'RED DEFCON',barrier:6,jockey:'M.Du Plessis',sp:151.00,margin:'12.4L',systemRank:11},
+    ],
+    scratched:['ROBRICK','BLAZING HARRY','COUNT NICHOLAS']
+  },
+  'DOOMBEN_R2': {
+    raceTime: '12:23pm',
+    trackCond: 'Good 4',
+    dist: '1200m',
+    l600: '0:33.85',
+    runners: [
+      {place:1,tab:5,name:'FALCON LAIR',barrier:3,jockey:'D.Oliver',sp:5.50,margin:'W',systemRank:3},
+      {place:2,tab:3,name:'WALSH BAY',barrier:7,jockey:'J.McDonald',sp:2.80,margin:'0.5L',systemRank:1},
+      {place:3,tab:8,name:'JIMMYSTAR',barrier:2,jockey:'T.Berry',sp:9.00,margin:'1.8L',systemRank:4},
+      {place:4,tab:1,name:'MIDNIGHT BOY',barrier:5,jockey:'Z.Purton',sp:4.00,margin:'2.9L',systemRank:2},
+      {place:5,tab:6,name:'VEGAS QUEEN',barrier:1,jockey:'R.Mallyon',sp:15.00,margin:'4.1L',systemRank:5},
+    ],
+    scratched:[]
+  }
+};
+
+function getRaceResults(venue, raceNum) {
+  var key = (venue||'').toUpperCase().replace(/\s+/g,'_') + '_R' + raceNum;
+  return mockResults[key] || null;
+}
+
+function isRaceResulted(venue, raceNum) {
+  return !!getRaceResults(venue, raceNum);
+}
+\nfunction handleFileInput(el) {
   if (el.files && el.files[0]) handleFile(el.files[0]);
 }
 
@@ -1218,13 +1315,120 @@ function renderRaceTable(rc, results, scratched, hasLive, liveOddsData) {
   else if (view === 'sectionals') viewContent = buildLockedView('Sectionals');
   else if (view === 'compareodds') viewContent = buildLockedView('Compare Odds');
 
-  document.getElementById('main').innerHTML = header + tabBar + viewContent;
+  // ── Results panel — shown above scoring if race has results ──
+  var resultsPanel = '';
+  if (typeof getRaceResults === 'function') {
+    var raceRes = getRaceResults(rc.venue, rc.num);
+    if (raceRes) {
+      resultsPanel = buildRaceResultsPanel(rc, raceRes, results);
+    }
+  }
+
+  document.getElementById('main').innerHTML = resultsPanel + header + tabBar + viewContent;
   generateAISummary(rc, results, tc);
 }
 
 function showLockedModal(feature) {
   const names = {sectionals:'Sectionals',compareodds:'Compare Odds'};
   toast(names[feature] + ' — coming soon. Requires PuntingForm integration.');
+}
+
+function buildRaceResultsPanel(rc, res, scoredResults) {
+  // Build a lookup: horse name -> system rank from scored results
+  var sysRankMap = {};
+  (scoredResults||[]).forEach(function(r, i) {
+    sysRankMap[(r.name||'').toUpperCase()] = i + 1;
+  });
+
+  var html = '<div class="results-panel">';
+
+  // Header — matches site dark header style
+  html += '<div class="results-panel-header">';
+  html += '<div class="results-panel-title">';
+  html += '<i class="ti ti-flag-check" style="font-size:14px;color:#4ade80;"></i>';
+  html += rc.venue + ' R' + rc.num + ' — Race Result';
+  html += '<span class="results-panel-badge">OFFICIAL</span>';
+  html += '</div>';
+  html += '<div class="results-panel-meta">';
+  if (res.raceTime) html += '<span><i class="ti ti-clock" style="font-size:10px;margin-right:2px;"></i>' + res.raceTime + '</span>';
+  if (res.trackCond) html += '<span><i class="ti ti-cloud" style="font-size:10px;margin-right:2px;"></i>' + res.trackCond + '</span>';
+  if (res.dist) html += '<span>' + res.dist + '</span>';
+  if (res.l600) html += '<span>L600m: ' + res.l600 + '</span>';
+  html += '</div>';
+  html += '</div>';
+
+  // Column headers — match runner-header style exactly
+  html += '<div class="res-header-row">';
+  html += '<div class="res-header-col" style="width:36px;text-align:center;">Pos</div>';
+  html += '<div class="res-header-col" style="width:28px;text-align:center;">Tab</div>';
+  html += '<div class="res-header-col" style="flex:1;padding-left:6px;">Horse / Jockey</div>';
+  html += '<div class="res-header-col" style="width:48px;text-align:center;">Sys #</div>';
+  html += '<div class="res-header-col" style="width:64px;text-align:right;">SP</div>';
+  html += '<div class="res-header-col" style="width:64px;text-align:right;">Margin</div>';
+  html += '</div>';
+
+  // Runner rows
+  res.runners.forEach(function(r) {
+    var p = r.place;
+    var rowClass = p===1?'res-row res-1':p===2?'res-row res-2':p===3?'res-row res-3':'res-row res-n';
+    var pbClass = p===1?'res-pb-1':p===2?'res-pb-2':p===3?'res-pb-3':'res-pb-n';
+
+    // Get system rank from live scored results OR stored in mock data
+    var sysRank = sysRankMap[(r.name||'').toUpperCase()] || r.systemRank || '—';
+    var rkClass = sysRank===1?'rk1':sysRank===2?'rk2':sysRank===3?'rk3':'rkn';
+
+    // Is rank 1 winner?
+    var rank1Won = (p === 1 && sysRank === 1);
+    var rank1Lost = (p > 3 && sysRank === 1);
+
+    html += '<div class="' + rowClass + '">';
+
+    // Position badge
+    html += '<div style="width:36px;flex-shrink:0;display:flex;justify-content:center;">';
+    html += '<span class="res-place-badge ' + pbClass + '">' + p + '</span>';
+    html += '</div>';
+
+    // Tab number
+    html += '<div style="width:28px;flex-shrink:0;display:flex;justify-content:center;">';
+    if (r.tab) html += '<span style="background:#1e40af;color:#fff;font-size:7px;font-weight:700;padding:1px 4px;border-radius:2px;">' + r.tab + '</span>';
+    html += '</div>';
+
+    // Horse name + jockey — matches .rc-horse style
+    html += '<div style="flex:1;min-width:0;padding:0 6px;display:flex;flex-direction:column;justify-content:center;">';
+    html += '<div class="horse-name" style="font-size:12px;font-weight:600;color:#111827;">';
+    if (rank1Won) html += '<span style="font-size:9px;background:#d1fae5;color:#065f46;font-weight:700;padding:1px 5px;border-radius:3px;margin-right:5px;">✓ R1 WON</span>';
+    if (rank1Lost) html += '<span style="font-size:9px;background:#fee2e2;color:#991b1b;font-weight:700;padding:1px 5px;border-radius:3px;margin-right:5px;">R1 LOST</span>';
+    html += r.name;
+    if (r.barrier) html += '<span style="font-weight:400;color:#9ca3af;font-size:10px;margin-left:4px;">(' + r.barrier + ')</span>';
+    html += '</div>';
+    if (r.jockey) html += '<div class="horse-detail">' + r.jockey + '</div>';
+    html += '</div>';
+
+    // System rank badge
+    html += '<div style="width:48px;flex-shrink:0;display:flex;justify-content:center;align-items:center;">';
+    html += '<span class="rk ' + rkClass + '">' + sysRank + '</span>';
+    html += '</div>';
+
+    // SP — matches .odds-val color
+    html += '<div style="width:64px;flex-shrink:0;text-align:right;padding-right:8px;">';
+    html += '<span class="odds-val" style="color:#1d4ed8;">$' + (r.sp||0).toFixed(2) + '</span>';
+    html += '</div>';
+
+    // Margin
+    html += '<div style="width:64px;flex-shrink:0;text-align:right;font-size:10px;color:#6b7280;padding-right:8px;">' + (r.margin||'—') + '</div>';
+
+    html += '</div>';
+  });
+
+  // Scratched row
+  if (res.scratched && res.scratched.length) {
+    html += '<div style="padding:6px 14px;font-size:10px;color:#9ca3af;border-top:0.5px solid #f3f4f6;">';
+    html += 'Scratched: ' + res.scratched.join(' · ');
+    html += '</div>';
+  }
+
+  html += '</div>'; // .results-panel
+  return html;
 }
 
 
@@ -1387,11 +1591,24 @@ function showToday() {
     keys.forEach(function(k) {
       var rc = allRaces[k];
       if (!rc) return;
+      // Check if this race has results
+      var res = (typeof getRaceResults === 'function') ? getRaceResults(venue, rc.num) : null;
+      var pillBg = '', pillColor = '', pillIcon = '';
+      if (res) {
+        // Check if rank 1 won
+        var rank1Won = res.runners[0] && res.runners[0].systemRank === 1;
+        pillBg = rank1Won ? '#d1fae5' : '#fee2e2';
+        pillColor = rank1Won ? '#065f46' : '#991b1b';
+        pillIcon = rank1Won ? ' ✓' : ' ✗';
+      }
       html += '<div onclick="navTo(\'races\');selectRace(allRaces[\''+k+'\'],\''+k+'\')"'
-        + ' style="display:flex;align-items:center;gap:5px;padding:3px 7px;cursor:pointer;border-radius:5px;transition:background .1s;"'
-        + ' onmouseover="this.style.background=\'#f0fdf4\'" onmouseout="this.style.background=\'\'">'
-        + '<span style="font-size:11px;font-weight:700;color:#111827;">R'+rc.num+'</span>'
-        + '<span style="font-size:10px;color:#9ca3af;">'+( rc.time||'')+'</span>'
+        + ' style="display:flex;align-items:center;gap:4px;padding:3px 7px;cursor:pointer;border-radius:5px;transition:background .1s;'
+        + (res ? 'background:'+pillBg+';' : '')
+        + '"'
+        + (res ? '' : ' onmouseover="this.style.background=\'#f0fdf4\'" onmouseout="this.style.background=\'\'"')
+        + '>'
+        + '<span style="font-size:11px;font-weight:700;color:'+(res?pillColor:'#111827')+';">R'+rc.num+pillIcon+'</span>'
+        + '<span style="font-size:10px;color:'+(res?pillColor:'#9ca3af')+';">'+( rc.time||'')+'</span>'
         + '</div>';
     });
 
@@ -1406,7 +1623,8 @@ function showToday() {
     + '<div style="font-family:Bebas Neue,sans-serif;font-size:16px;letter-spacing:2px;color:#00471b;">WAGING<span style="color:#fbbf24;">WAR</span></div>'
     + '<div style="display:flex;flex-wrap:wrap;gap:14px;">';
   ['About Us','Contact Us','Disclaimer','Privacy Policy','Terms of Service','Responsible Gambling'].forEach(function(p){
-    html += '<span data-legal="'+p+'" style="font-size:10px;color:#9ca3af;cursor:pointer;text-decoration:underline;text-underline-offset:2px;">'+p+'</span>';
+    html += '<span onclick="showLegalPage(''+p+'')" style="font-size:10px;color:#9ca3af;cursor:pointer;text-decoration:underline;text-underline-offset:2px;"'
+      + ' onmouseover="this.style.color='#374151'" onmouseout="this.style.color='#9ca3af'">'+p+'</span>';
   });
   html += '</div>'
     + '<div style="font-size:10px;color:#d1d5db;">© 2026 Waging War Pty Ltd</div>'
@@ -1418,12 +1636,6 @@ function showToday() {
 
   html += '</div></div>';
   document.getElementById('main').innerHTML = html;
-  // Wire legal footer links
-  document.querySelectorAll('[data-legal]').forEach(function(el){
-    el.addEventListener('click', function(){ showLegalPage(this.getAttribute('data-legal')); });
-    el.addEventListener('mouseover', function(){ this.style.color='#374151'; });
-    el.addEventListener('mouseout', function(){ this.style.color='#9ca3af'; });
-  });
 }
 function toggleTopPicks(){
   var body = document.getElementById('picks-body');
@@ -1459,20 +1671,196 @@ function getTopPicks(n) {
 
 // ── RESULTS PAGE ──
 function showResultsPage() {
-  document.getElementById('main').innerHTML = '<div class="page-wrap">'
-    + '<div class="page-title">Results</div>'
-    + '<div class="page-sub">Settle your bets in My Bets as races finish</div>'
-    + '<div style="background:#fef9c3;border:0.5px solid #fde68a;border-radius:8px;padding:12px 14px;margin-bottom:14px;display:flex;gap:10px">'
-    + '<i class="ti ti-info-circle" style="font-size:18px;color:#d97706;flex-shrink:0"></i>'
-    + '<div><div style="font-size:12px;font-weight:600;color:#92400e;margin-bottom:3px">Live results coming soon</div>'
-    + '<div style="font-size:11px;color:#78350f;line-height:1.6">Automatic race results require a data provider integration. In the meantime, settle your bets manually in <strong>My Bets</strong> — click the result dropdown next to each bet.</div></div></div>'
-    + '<div style="background:#fff;border:0.5px solid #e5e7eb;border-radius:8px;padding:14px;margin-bottom:10px">'
-    + '<div style="font-size:13px;font-weight:600;margin-bottom:6px">How to check results now</div>'
-    + '<div style="font-size:12px;color:#374151;line-height:1.8">1. Visit <strong>racenet.com.au/results</strong> or <strong>tab.com.au</strong> for official results<br>'
-    + '2. Return to <strong>My Bets</strong> and mark each bet Win / Place / Loss<br>'
-    + '3. Your P&amp;L and ROI update automatically</div></div>'
-    + '<div class="empty-state" style="height:140px"><i class="ti ti-flag-check" style="font-size:36px"></i><p style="font-size:12px">Automated results feed — coming soon</p></div>'
-    + '</div>';
+  var main = document.getElementById('main');
+  var today = new Date();
+  var defaultDate = today.toISOString().slice(0,10);
+  var selectedDate = window._resultsDate || defaultDate;
+  var selectedMeeting = window._resultsMeeting || null;
+
+  // Build results from allRaces (CSV loaded races) + mock results
+  var meetings = {};
+  Object.keys(allVenues||{}).forEach(function(venue) {
+    var keys = allVenues[venue] || [];
+    if (!meetings[venue]) meetings[venue] = [];
+    keys.forEach(function(k) {
+      var rc = allRaces[k];
+      if (!rc) return;
+      var res = getRaceResults(venue, rc.num);
+      meetings[venue].push({raceNum: rc.num, time: rc.time, key: k, results: res});
+    });
+  });
+
+  // Add mock meetings if no CSV
+  if (!Object.keys(meetings).length) {
+    meetings['DOOMBEN'] = [
+      {raceNum:1, time:'11:48am', key:'DOOMBEN_R1', results: getRaceResults('DOOMBEN',1)},
+      {raceNum:2, time:'12:23pm', key:'DOOMBEN_R2', results: getRaceResults('DOOMBEN',2)},
+      {raceNum:3, time:'12:58pm', key:'DOOMBEN_R3', results: null},
+      {raceNum:4, time:'1:33pm', key:'DOOMBEN_R4', results: null},
+    ];
+  }
+
+  var html = '<div class="results-page-wrap">';
+  html += '<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:14px;">';
+  html += '<div style="font-size:20px;font-weight:700;color:#111827;">Results</div>';
+  html += '<input type="date" value="'+selectedDate+'" onchange="window._resultsDate=this.value;window._resultsMeeting=null;showResultsPage()" ';
+  html += 'style="border:0.5px solid #d1d5db;border-radius:6px;padding:4px 8px;font-size:11px;font-family:Space Grotesk,sans-serif;color:#374151;background:#fff;">';
+  html += '</div>';
+
+  if (selectedMeeting && meetings[selectedMeeting]) {
+    // Show individual meeting results
+    var races = meetings[selectedMeeting];
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">';
+    html += '<button onclick="window._resultsMeeting=null;showResultsPage()" style="display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:6px;border:0.5px solid #e5e7eb;background:#fff;color:#374151;font-size:10px;font-weight:600;cursor:pointer;">';
+    html += '<i class="ti ti-arrow-left" style="font-size:12px;"></i> All meetings</button>';
+    html += '<span style="font-size:14px;font-weight:700;color:#111827;">'+selectedMeeting+'</span>';
+    html += '</div>';
+
+    // Race selector tabs
+    html += '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;">';
+    races.forEach(function(r) {
+      var resulted = !!r.results;
+      var rank1Won = resulted && r.results.runners[0] && r.results.runners[0].systemRank === 1;
+      var bg = resulted ? (rank1Won ? '#d1fae5' : '#fee2e2') : '#f1f5f9';
+      var color = resulted ? (rank1Won ? '#065f46' : '#991b1b') : '#9ca3af';
+      var border = resulted ? (rank1Won ? '#86efac' : '#fca5a5') : '#e5e7eb';
+      var active = window._resultsRace == r.raceNum;
+      html += '<div onclick="window._resultsRace='+r.raceNum+';showResultsPage()" style="padding:4px 10px;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;';
+      html += 'background:'+(active?'#1e2936':bg)+';color:'+(active?'#fff':color)+';border:0.5px solid '+(active?'#1e2936':border)+';">';
+      html += 'R'+r.raceNum+(resulted ? (rank1Won ? ' ✓' : ' ✗') : '')+'</div>';
+    });
+    html += '</div>';
+
+    // Show selected race results or first resulted race
+    var showRace = null;
+    if (window._resultsRace) {
+      showRace = races.find(function(r){ return r.raceNum == window._resultsRace; });
+    }
+    if (!showRace) showRace = races.find(function(r){ return r.results; });
+
+    if (showRace && showRace.results) {
+      html += buildResultsDetail(selectedMeeting, showRace);
+    } else {
+      html += '<div class="empty-state" style="height:160px;"><i class="ti ti-flag-check" style="font-size:32px;"></i><p>No results yet for this race</p></div>';
+    }
+
+  } else {
+    // Show meetings grid
+    var venueNames = Object.keys(meetings);
+    if (!venueNames.length) {
+      html += '<div class="empty-state" style="height:200px;"><i class="ti ti-flag-check" style="font-size:36px;"></i><p>Load a CSV or results will appear here automatically</p></div>';
+    } else {
+      html += '<div style="font-size:10px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">'+venueNames.length+' meetings</div>';
+      html += '<div class="results-meeting-grid">';
+      venueNames.forEach(function(venue) {
+        var races = meetings[venue];
+        var resultedCount = races.filter(function(r){ return r.results; }).length;
+        var allResulted = resultedCount === races.length;
+        var tcC = allResulted ? {bg:'#d1fae5',text:'#065f46'} : {bg:'#f1f5f9',text:'#9ca3af'};
+        html += '<div class="results-meeting-card" onclick="window._resultsMeeting=''+venue+'';window._resultsRace=null;showResultsPage()">';
+        html += '<div class="rmc-header">';
+        html += '<span class="rmc-venue">'+venue+'</span>';
+        html += '<span class="rmc-badge" style="background:'+tcC.bg+';color:'+tcC.text+'">';
+        html += resultedCount+'/'+races.length+' resulted</span>';
+        html += '</div>';
+        html += '<div class="rmc-races">';
+        races.forEach(function(r) {
+          var resulted = !!r.results;
+          var rank1Won = resulted && r.results.runners[0] && r.results.runners[0].systemRank === 1;
+          var cls = resulted ? (rank1Won ? 'won' : 'lost') : 'pending';
+          var icon = resulted ? (rank1Won ? '✓' : '✗') : '';
+          html += '<div class="rmc-race-pill '+cls+'">';
+          html += 'R'+r.raceNum+(icon?' '+icon:'')+'</div>';
+        });
+        html += '</div></div>';
+      });
+      html += '</div>';
+    }
+  }
+
+  html += '</div>';
+  main.innerHTML = html;
+}
+
+function buildResultsDetail(venue, raceData) {
+  var res = raceData.results;
+  if (!res) return '';
+  var html = '';
+
+  // Panel header
+  html += '<div style="background:#1e2936;padding:9px 14px;border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:space-between;">';
+  html += '<div style="display:flex;align-items:center;gap:8px;">';
+  html += '<span style="font-size:11px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.8px;">'+venue+' R'+raceData.raceNum+' — Results</span>';
+  html += '<span style="background:#22c55e;color:#fff;font-size:8px;font-weight:700;padding:2px 6px;border-radius:3px;">OFFICIAL</span>';
+  html += '</div>';
+  html += '<div style="font-size:10px;color:rgba(255,255,255,.5);display:flex;gap:12px;">';
+  if (res.raceTime) html += '<span><i class="ti ti-clock" style="font-size:10px;margin-right:2px;"></i>'+res.raceTime+'</span>';
+  if (res.trackCond) html += '<span><i class="ti ti-cloud" style="font-size:10px;margin-right:2px;"></i>'+res.trackCond+'</span>';
+  if (res.dist) html += '<span>'+res.dist+'</span>';
+  html += '</div>';
+  html += '</div>';
+
+  // Column headers
+  html += '<div style="display:flex;align-items:center;padding:5px 14px;background:#f8fafc;border:0.5px solid #e5e7eb;border-top:none;">';
+  html += '<div style="width:36px;flex-shrink:0;font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;text-align:center;">Pos</div>';
+  html += '<div style="flex:1;font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;padding-left:6px;">Horse</div>';
+  html += '<div style="width:48px;flex-shrink:0;font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;text-align:center;">Sys Rank</div>';
+  html += '<div style="width:64px;flex-shrink:0;font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;text-align:right;">SP</div>';
+  html += '<div style="width:64px;flex-shrink:0;font-size:8px;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.4px;text-align:right;">Margin</div>';
+  html += '</div>';
+
+  // Runner rows
+  var rowsHtml = '';
+  res.runners.forEach(function(r) {
+    var p = r.place;
+    var isTop3 = p <= 3;
+    var pbClass = p===1?'res-pb-1':p===2?'res-pb-2':p===3?'res-pb-3':'res-pb-n';
+    var rowClass = p===1?'res-1':p===2?'res-2':p===3?'res-3':'res-n';
+    var rkBadgeClass = r.systemRank===1?'rk1':r.systemRank===2?'rk2':r.systemRank===3?'rk3':'rkn';
+
+    // Outcome for logged bets (mock: check if user has a bet on this horse)
+    var outcome = '';
+    if (p === 1) outcome = '<span class="res-outcome-win">WIN</span>';
+    else if (p <= 3) outcome = '<span class="res-outcome-place">PLC</span>';
+    else outcome = '<span class="res-outcome-loss">—</span>';
+
+    rowsHtml += '<div class="res-row '+rowClass+'">';
+    rowsHtml += '<div style="width:36px;flex-shrink:0;display:flex;justify-content:center;">';
+    rowsHtml += '<span class="res-place-badge '+pbClass+'">'+p+'</span>';
+    rowsHtml += '</div>';
+    rowsHtml += '<div style="flex:1;min-width:0;padding:0 6px;">';
+    rowsHtml += '<div style="font-size:12px;font-weight:600;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">';
+    rowsHtml += (r.tab ? '<span style="background:#1e40af;color:#fff;font-size:7px;font-weight:700;padding:1px 3px;border-radius:2px;margin-right:4px;">'+r.tab+'</span>' : '');
+    rowsHtml += r.name+'</div>';
+    if (r.jockey) rowsHtml += '<div style="font-size:9px;color:#9ca3af;margin-top:1px;">'+r.jockey+(r.barrier?' · Barrier '+r.barrier:'')+'</div>';
+    rowsHtml += '</div>';
+    rowsHtml += '<div style="width:48px;flex-shrink:0;display:flex;justify-content:center;align-items:center;">';
+    rowsHtml += '<span class="rk '+rkBadgeClass+'">'+r.systemRank+'</span>';
+    rowsHtml += '</div>';
+    rowsHtml += '<div style="width:64px;flex-shrink:0;text-align:right;font-family:JetBrains Mono,monospace;font-size:11px;font-weight:600;color:#1d4ed8;padding-right:6px;">$'+r.sp.toFixed(2)+'</div>';
+    rowsHtml += '<div style="width:64px;flex-shrink:0;text-align:right;font-size:10px;color:#6b7280;padding-right:6px;">'+r.margin+'</div>';
+    rowsHtml += '</div>';
+  });
+
+  html += '<div style="border:0.5px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px;overflow:hidden;margin-bottom:10px;">';
+  html += rowsHtml;
+
+  // Footer
+  if (res.l600 || res.scratched && res.scratched.length) {
+    html += '<div style="padding:7px 14px;background:#f8fafc;border-top:0.5px solid #e5e7eb;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">';
+    if (res.l600) {
+      html += '<span style="font-size:10px;color:#6b7280;">L600m: <span style="font-weight:600;color:#111827;font-family:JetBrains Mono,monospace;">'+res.l600+'</span></span>';
+    }
+    if (res.trackCond) {
+      html += '<span style="font-size:10px;color:#6b7280;">Track: <span style="font-weight:600;color:#111827;">'+res.trackCond+'</span></span>';
+    }
+    if (res.scratched && res.scratched.length) {
+      html += '<span style="font-size:10px;color:#9ca3af;">Scratched: '+res.scratched.join(' · ')+'</span>';
+    }
+    html += '</div>';
+  }
+  html += '</div>';
+  return html;
 }
 
 // ── PACE MAP PAGE ──
@@ -3361,7 +3749,13 @@ function buildRaceTabs(keys){
     const scrBadge=scrCount>0?`<span style="font-size:8px;color:#dc2626;margin-left:2px">${scrCount}S</span>`:'';
     const lateCount=rc.horses.filter(h=>h.lateScratching).length;
     const lateBadge=lateCount>0?`<span style="font-size:8px;color:#f97316;margin-left:1px">!</span>`:'';
-    btn.innerHTML=`<span class="rtn">R${rc.num}</span><span class="rtime">${rc.time||''}</span>${scrBadge}${lateBadge}`;
+    // Results badge
+    const raceRes = (typeof getRaceResults === 'function') ? getRaceResults(rc.venue, rc.num) : null;
+    const rank1Won = raceRes && raceRes.runners[0] && raceRes.runners[0].systemRank === 1;
+    const resBadge = raceRes
+      ? `<span style="font-size:7px;font-weight:700;padding:1px 3px;border-radius:2px;margin-left:2px;background:${rank1Won?'#d1fae5':'#fee2e2'};color:${rank1Won?'#065f46':'#991b1b'};">${rank1Won?'✓':'✗'}</span>`
+      : '';
+    btn.innerHTML=`<span class="rtn">R${rc.num}</span><span class="rtime">${rc.time||''}</span>${scrBadge}${lateBadge}${resBadge}`;
     btn.onclick=()=>selectRace(rc,k);
     tabs.appendChild(btn);
   });
